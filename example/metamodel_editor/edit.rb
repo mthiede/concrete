@@ -6,7 +6,7 @@ require 'webrick'
 # Adapt the path to firefox below.
 # Startup the browser before you run this script, otherwise is might hang.
 #
-Browser = "\"C:/Program Files/Mozilla Firefox/firefox.exe\""
+Browser = "firefox"
 Port = 1234
 
 class ConcreteServer
