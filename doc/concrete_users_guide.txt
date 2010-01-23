@@ -1,0 +1,185 @@
+= Concrete Users Guide =
+
+_Concrete_ is a generic model editor which can be configured for different
+domain specific languages (DSLs). When you use it, you use it for a predefined DSL.
+The DSL describes what the model may look like, both from a content and a visual point of view.
+See the Developers Guide if you want to setup your own DSL.
+
+This document describes the usage of the editor, independant of any specific DSL.
+
+
+== Models ==
+
+Models consist of +elements+ which may have attributes, references to other elements and may contain other elements. 
+
++Attributes+ can take one or more primitive values. Currently
+primitive values are of type +String+, +Integer+, +Boolean+, or custom defined +Enum+ datatypes. +Enum+ types have
+a name and consist of a set of string literals, each of which is a valid instance of the type.
+
++References+ point to one or more other elements. References can not point to or take primitive values.
+
++Containment+ relationships are references with the difference that the contained element is part of the parent element,
+whereas the referenced elemenet normally is not (there may be exceptions). When the parent element is deleted, the contained
+elements are also deleted. When the parent element is collapsed the contained elements are hidden.
+ 
+Attributes, reference and containmend relationships are called _features_ of an element. Feataures have names, 
+although they may not be visible.^
+
+Attributes and reference contain _values_ whereas containment relationships contain _elements_.
+
+
+== Navigation and Selection ==
+
+=== Selecting Elements/Values ===
+
+For all editing commands described below, at least one element or attribute/reference value needs to be selected. 
+Selection can be done with the cursor keys (+Left+, +Right+, +Up+, +Down+), with +Tab+ and +Shift-Tab+ or with the mouse.
+
+Selection with the mouse is straightforward, just click the element.
+
+Using the key +Tab+ and +Shift-Tab+, the next/previous element/value can be selected with respect to the logical order
+(instead of the graphical order on the screen). If an element has other elements or values inside, +Tab+ will select 
+the first child, and so on.
+
+In contrast to the tab keys, the cursor keys select with respect to the graphical position on the screen.
+Press one of +Left+, +Right+, +Up+, +Down+, to move the selection in the respective direction.
+When an element has other elements or values inside, the next selected element may be one of these elements.
+In order to know if the next selected element is inside or outside of the current element, you need to be aware of 
+the current _cursor_ position. The _cursor_ is a little dot on the border of the selected element/value.
+If the cursor is on the left border and you press +Right+, the next selected element will be inside of the
+current element (given that it has child elements). Otherwise, if you press +Left+, the next selected element
+will be outside, left of the current element (given that there are elements on the left). The same is true for the
+other directions, of course. If the next element would be outside but there are no elements in this direction, the 
+parent element will be selected.
+
+Hold +Shift+ down shift while moving the selection with any of the methods described above to extend to selection (_multi select_).
+
+=== Navigating References ===
+
+When you move the mouse over a valid reference value while prssing +Ctrl+, the reference target will be highlighted.
+However, you might not see the target if it is outside of the visible area on the screen.
+
+You can click the left mouse button on a valid reference value while pressing +Ctrl+ to select the reference target.
+This will automatically scroll to make the target visible.
+
+References can also be followed by pressing +Alt-Right+ while a valid reference value is selected. This will select
+the target element and scroll to make it visible. By pressing +Alt-Left+ you can go back the references in reverse order.
+
+=== Collapsing ===
+
+Elements with containment relationships can be collapsed using +Ctrl-Left+. This will hide the containment relationship
+including the contained elements. In order to expand the element again, press +Ctrl-Right+.
+
+You can collapse and expand elements recursively using +Ctrl-Shift-Left+ and +Ctrl-Shift-Right+. This will also
+collapse/expand child elements.
+
+In addition to this, empty features may collapse depending on the DSL configuration. This happens when you leave
+the currently selected element (i.e. select another element which is not a child). You can show all hidden featurs
+be pressing +Shift-Return+.
+
+All collapsing commands also work with multiple elements selected.
+
+
+== Editing ==
+
+=== Edit Mode ===
+
+Whenever you want to actually edit text (e.g. to edit an attribute value or choose an element's type) you need to be in _edit mode_.
+The easiest way to enter edit mode is by just typing text while an element/value is selected. More explicitly you may also
+click the element or value while it is already selected or press +F2+ or +Ctrl-Space+.
+
+You can leave edit mode and cancel your edit by pressing +Esc+ or click the mouse somewhere outside of the current edit box.
+
+In order to leaave edit mode and actually use your changes, press +Return+, +Tab+ or +Shift-Tab+.
+If an error is detected with your input (e.g. because you entered letters for an Integer value), 
+you can not successfully leave edit mode. In this case, either correct your input or cancel edit mode.
+
+If a set of completion options is available for the current element/value, a dropdown box will be shown in edit mode
+when you start typing. You can bring up the dropdown box without typing by pressing one of the cursor keys.
+
+
+=== Creating Elements ===
+
+Elements can be created on toplevel or as children in a containment relationship. If in either place, there are no 
+other elements yet, an empty placeholder element will be shown.
+In this case, select the placeholder, enter edit mode and type the name of the element class to be created.
+Once in edit mode, a dropdown box appears showing possible completion options.
+
+If an element should be added to a set of existing elements, select one of the existing ones and press +Return+.
+This will insert a placeholder after the selected element and immediately enter edit mode.
+
+When an element is created, all features are shown although they are empty. Depending on the configuration of the
+editor, empty features may be hidden when you select a different element which is not a child. In oder to 
+show the hidden features again, press +Shift-Return+.
+
+=== Changing the Element Type ===
+
+When you enter edit mode while an element is selected, the element's type can be changed. When the type changes,
+feature values will be preserved for features which also exist in the new type.
+
+=== Deleting Elements ===
+
+Elements can be deleted by pressing +Del+. This also works if multiple elements are selected.
+
+=== Editing Attribute Values ===
+
+In a newly created element, no attribute values exist. You can create an attribute value by entering edit mode on 
+an empty value placeholder. As with elements, pressing +Return+ on a value will insert another value, pressing +Del+ removes the value.
+In case the attribute to be edited is hidden, press +Shift-Return+ to show it.
+
+=== Editing Reference Values ===
+
+Reference values can be edited in the same way as attribute values. The content of a reference value is the identifier
+of the referenced element. Use the dropdown box in edit mode to choose one of the possible target elements.
+Note, that only elements with an identifier can be referenced.
+
+=== Copy and Paste ===
+
+Both element and values can be cut, copied and pasted with +Ctrl-X+, +Ctrl-C+ and +Ctrl-V+ respectively. This also works
+with multiples elements selected. Note however, that you can not paste an attribute or reference value where an element
+is expected and vice versa.
+
+
+== Errors ==
+
+The DSL defines constraints on possible models. For example, for some attributes only a single value might be
+allowed, whereas for other attributes you may provide more than one value. 
+If a constraint is violated for an element or feature, the element/feature will be marked as erroneous.
+Move the mouse over such an element in order to show the error message in a popup window.
+
+
+== Command Reference ==
+
+.Keyboard
+[frame="topbot",grid="none"]
+|=======================
+| Left, Right, Up, Down | move selection
+| Tab, Shift-Tab | move selection in sequential order, select first child if available, stop editing when in edit mode
+| Shift-Left, Shift-Right, Shift-Up, Shift-Down | extend selection (multi select)
+| Ctrl-A | select all
+| Return | insert new element/value after current element/value, stop editing when in edit mode
+| Del | delete selected element/value(s)
+| start typing, F2, Ctrl-Space | edit selected element/value (enter edit mode)
+| Esc | stop editing when in edit mode
+| Ctrl-C | copy selection to clipboard
+| Ctrl-X | cut selection to clipboard
+| Ctrl-V | insert from clipboard after selected element/value
+| Ctrl-Left | collapse element
+| Ctrl-Shift-Left | collapse element and all child elements 
+| Ctrl-Right | expand element
+| Ctrl-Shift-Right | expand element and all child elements
+| Shift-Return | show hidden features (auto-hide features will hide again when selection leaves the element)
+| Alt-Right | select reference target (jump to reference target) if a reference is selected
+| Alt-Left | jump back references in reverse order
+|=======================
+
+.Mouse
+[frame="topbot",grid="none"]
+|=======================
+| Left Click | move selection, stop editing when in edit mode
+| Shift-Left Click | extend selection (multi select)
+| Left click already selected element/value | edit selected element/value (enter edit mode)
+| Hover over element/value | show errors if present
+| Ctrl-Hover over reference | highlight reference target
+| Ctrl-Left Click | select reference target (jump to reference target)
+|=======================

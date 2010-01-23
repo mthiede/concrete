@@ -1,0 +1,318 @@
+<html>
+<head>
+  <title>Concrete Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../lib/scriptaculous/unittest.js" type="text/javascript"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	// <![CDATA[
+		var Concrete = {}
+	// ]]>
+	</script>
+  <script src="../../concrete/metamodel_provider.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="test.css" type="text/css" />
+</head>
+<body>
+<h1>Concrete Unit test file</h1>
+<p>
+  Tests for metamodel_provider_test.js
+</p>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="metamodel1" style="display: none">
+	[
+		{_class: "Enum", name: "Enum1", literals: ["a", "b"]},
+		{_class: "Class", name: "ClassA", features: [ 
+			{_class: "Feature", name: "feat1", kind: "attribute"}, 
+			{_class: "Feature", name: "feat2", kind: "reference"},
+			{_class: "Feature", name: "feat3", kind: "containment"},
+			{_class: "Feature", name: "feat4", kind: "attribute", type: "Enum1"} 
+		]},
+		{_class: "Class", name: "ClassB",abstract: true, features: [ 
+			{_class: "Feature", name: "feat1"}, 
+		]},
+		{_class: "Class", name: "ClassC", features: [ 
+		]},
+		{_class: "Class", name: "ClassD"}
+	]
+</div>
+
+<div id="metamodel2" style="display: none">
+	[
+		{_class: "Class", name: "ClassA", features: [{_class: "Feature", name: "feat", kind: "reference"}]},
+		{_class: "Class", name: "ClassB", superTypes: ["ClassA"]},
+		{_class: "Class", name: "ClassC", superTypes: ["ClassA", "ClassB"]},
+		{_class: "Class", name: "ClassD", superTypes: ["ClassB"]}
+	]
+</div>
+
+<div id="metamodel3" style="display: none">
+	[
+		{_class: "Class", name: "ClassA"},
+		{_class: "Class", name: "ClassB", features: [
+			{_class: "Feature", name: "feat1", kind: "reference", type: "ClassA"},
+			{_class: "Feature", name: "feat2", kind: "containment", type: "ClassA"}
+		]}
+	]
+</div>
+
+<div id="metamodel4" style="display: none">
+	[
+		{_class: "Class", name: "ClassA"},
+		{_class: "Class", name: "ClassB", features: [
+			{_class: "Feature", name: "feat1", kind: "reference", type: "ClassC"},
+		]}
+	]
+</div>
+
+<div id="metamodel5" style="display: none">
+	[
+		{_class: "Class", name: "ClassA"},
+		{_class: "Class", name: "ClassB", superTypes: ["ClassC"]}
+	]
+</div>
+
+<div id="metamodel6" style="display: none">
+	[
+		{_class: "Class", name: "ClassA", features: [ 
+			{_class: "Feature", name: "feat1", kind: "attribute", upperLimit: 2}, 
+			{_class: "Feature", name: "feat2", kind: "reference", upperLimit: 3},
+			{_class: "Feature", name: "feat3", kind: "containment", upperLimit: 4}
+		]}
+	]
+</div>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+
+  new Test.Unit.Runner({
+
+    setup: function() {
+    },
+
+    testBasics: function() { with(this) {
+    	var provider = new Concrete.MetamodelProvider($('metamodel1').textContent.evalJSON());
+    	var classes = provider.metaclasses;
+    	
+      assertEqual(4, classes.size());
+      
+      // ClassA
+      assertEqual("ClassA", classes[0].name)
+      assertEqual(4, classes[0].features.size())
+      assert(provider.metaclassesByName["ClassA"] == classes[0])
+      // Default superTypes
+      assertEqual(1, classes[0].superTypes.size())
+      var rootClass = classes[0].superTypes[0]
+      assertEqual("_Root", rootClass.name)
+      // Default subTypes
+      assertEqual(0, classes[0].subTypes.size())
+      assertEqual(0, classes[0].allSubTypes().size())
+      // Default abstract
+      assertEqual(false, classes[0].abstract)
+      
+      assertEqual("feat1", classes[0].features[0].name)
+      assert(classes[0].features[0].isAttribute())
+      assert(classes[0].features[0].containingClass == classes[0])
+      // Default type
+      assertEqual("String", classes[0].features[0].type.name)
+      // Default upperLimit
+      assertEqual(1, classes[0].features[0].upperLimit);
+      
+      assertEqual("feat2", classes[0].features[1].name)
+      assert(classes[0].features[1].isReference())
+      assert(classes[0].features[1].containingClass == classes[0])
+      // Default type
+      assert(classes[0].features[1].type == rootClass)
+      // Default upperLimit
+      assertEqual(1, classes[0].features[1].upperLimit);
+
+      assertEqual("feat3", classes[0].features[2].name)
+      assert(classes[0].features[2].isContainment())
+      assert(classes[0].features[2].containingClass == classes[0])
+      // Default type
+      assert(classes[0].features[2].type == rootClass)
+      // Default upperLimit
+      assertEqual(-1, classes[0].features[2].upperLimit);
+
+      assertEqual("feat4", classes[0].features[3].name)
+      
+      // ClassB
+      assertEqual("ClassB", classes[1].name)
+      assertEqual(1, classes[1].features.size())
+      assertEqual("feat1", classes[1].features[0].name)
+      assertEqual("String", classes[1].features[0].type.name)
+      assert(classes[1].features[0].isAttribute())
+      assert(classes[1].features[0].containingClass == classes[1])
+      assertEqual(true, classes[1].abstract)
+     
+      // ClassC
+      assertEqual(0, classes[2].features.size())
+      assert(provider.metaclassesByName["ClassC"] == classes[2])
+      
+      // ClassD
+      assertEqual(0, classes[3].features.size())
+      assert(provider.metaclassesByName["ClassD"] == classes[3])
+    }},
+    
+    testGeneralization: function() { with(this) {
+    	var provider = new Concrete.MetamodelProvider($('metamodel2').textContent.evalJSON());
+    	var classes = provider.metaclasses;
+    	
+    	var classA = classes[0]
+    	var classB = classes[1]
+    	var classC = classes[2]
+    	var classD = classes[3]
+    	
+    	var rootClass = classA.features[0].type
+      assertEqual(4, rootClass.subTypes.size());
+      assertEqual(classA, rootClass.subTypes[0]);  
+      assertEqual(classB, rootClass.subTypes[1]);  
+      assertEqual(classC, rootClass.subTypes[2]);  
+      assertEqual(classD, rootClass.subTypes[3]);  
+    	
+    	// ClassA
+			assertEqual(1, classA.superTypes.size());
+			assertEqual(rootClass, classA.superTypes[0]);
+			assertEqual(1, classA.allSuperTypes().size());
+			assertEqual(rootClass, classA.allSuperTypes()[0]);
+      assertEqual(2, classA.subTypes.size());
+      assertEqual(classB, classA.subTypes[0]);
+      assertEqual(classC, classA.subTypes[1]);
+      assertEqual(3, classA.allSubTypes().size());
+      assertEqual(classB, classA.allSubTypes()[0]);
+      assertEqual(classC, classA.allSubTypes()[1]);
+      assertEqual(classD, classA.allSubTypes()[2]);
+
+			// ClassB
+			assertEqual(2, classB.superTypes.size());
+			assertEqual(rootClass, classB.superTypes[0])
+			assertEqual(classA, classB.superTypes[1])
+			assertEqual(2, classB.allSuperTypes().size());
+			assertEqual(rootClass, classB.allSuperTypes()[0])
+			assertEqual(classA, classB.allSuperTypes()[1])
+      assertEqual(2, classB.subTypes.size());
+      assertEqual(classC, classB.subTypes[0]);
+      assertEqual(classD, classB.subTypes[1]);
+      assertEqual(2, classB.allSubTypes().size());
+      assertEqual(classC, classB.allSubTypes()[0]);
+      assertEqual(classD, classB.allSubTypes()[1]);
+      // features
+      assertEqual(1, classB.allFeatures().size());
+      assertEqual("feat", classB.allFeatures()[0].name);
+      
+
+			// ClassC
+			assertEqual(3, classC.superTypes.size());
+			assertEqual(rootClass, classC.superTypes[0])
+			assertEqual(classA, classC.superTypes[1])
+			assertEqual(classB, classC.superTypes[2])
+			assertEqual(3, classC.allSuperTypes().size());
+			assertEqual(rootClass, classC.allSuperTypes()[0])
+			assertEqual(classA, classC.allSuperTypes()[1])
+			assertEqual(classB, classC.allSuperTypes()[2])
+      assertEqual(0, classC.subTypes.size());
+      assertEqual(0, classD.allSubTypes().size());
+
+			// ClassD
+			assertEqual(2, classD.superTypes.size());
+			assertEqual(rootClass, classD.superTypes[0])			
+			assertEqual(classB, classD.superTypes[1])
+			assertEqual(3, classD.allSuperTypes().size());
+			assertEqual(rootClass, classD.allSuperTypes()[0])			
+			assertEqual(classA, classD.allSuperTypes()[1])
+			assertEqual(classB, classD.allSuperTypes()[2])
+      assertEqual(0, classD.subTypes.size());      
+      assertEqual(0, classD.allSubTypes().size());      
+    }},
+    
+    testGeneralizationUnresolved: function() { with(this) {
+    	assertRaise("Error", function() {
+	    	new Concrete.MetamodelProvider($('metamodel5').textContent.evalJSON());  		
+    	})
+    }},
+        
+    testReference: function() { with(this) {
+    	var provider = new Concrete.MetamodelProvider($('metamodel3').textContent.evalJSON());
+    	var classes = provider.metaclasses;
+    	
+    	var classA = classes[0]
+    	var classB = classes[1]
+    	
+    	assertEqual(classA, classB.features[0].type)
+    	assertEqual(classA, classB.features[1].type)
+    }},
+    
+    testLimits: function() { with(this) {
+    	var provider = new Concrete.MetamodelProvider($('metamodel6').textContent.evalJSON());
+    	var classes = provider.metaclasses;
+    	
+      // ClassA
+      assertEqual("ClassA", classes[0].name);
+      assertEqual(2, classes[0].features[0].upperLimit);
+      assertEqual(3, classes[0].features[1].upperLimit);
+      assertEqual(4, classes[0].features[2].upperLimit);
+		}},
+		
+    testReferenceUnresolved: function() { with(this) {
+    	assertRaise("Error", function() {
+	    	new Concrete.MetamodelProvider($('metamodel4').textContent.evalJSON());  		
+    	})
+    }},
+                
+    testNoClassName: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{}]".evalJSON());
+  		});
+  	}},
+  	
+    testAmbiguousClassName: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A'}, {name: 'A'}]".evalJSON());
+  		});
+    }},
+
+    testInvalidClassProperties: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', wrongProp: 1}]".evalJSON());
+  		});
+    }},
+    
+    testNoFeatureName: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', features: [{}]}]".evalJSON());
+  		});
+  	}},
+  	
+    testAmbiguousFeatureName: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', features: [{name: 'B'}, {name: 'B'}]}]".evalJSON());
+  		});
+    }},
+    
+    testInvalidFeatureProperties: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', features: [{name: 'f1', wrongProp: 1}]}]".evalJSON());
+  		});
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', features: [{name: 'f1', kind: 'wrong'}]}]".evalJSON());
+  		});
+    }},
+    
+    testInvalidAttributeType: function() { with(this) {
+    	assertRaise("Error", function() {
+    		new Concrete.MetamodelProvider("[{name: 'A', features: [{name: 'f1', type: 'Strng'}]}]".evalJSON());
+  		});    	
+    }},
+        
+    testEmptyMM: function() { with(this) {
+    	var provider = new Concrete.MetamodelProvider("[]".evalJSON());
+      assertEqual(0, provider.metaclasses.size());
+    }}
+  })
+// ]]>
+</script>
+</body>
+</html>  

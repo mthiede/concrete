@@ -1,0 +1,231 @@
+<html>
+<head>
+  <title>Concrete Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../lib/scriptaculous/unittest.js" type="text/javascript"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	// <![CDATA[
+		var Concrete = {}
+	// ]]>
+	</script>
+  <script src="../../concrete/helper.js" type="text/javascript"></script>	
+  <script src="../../concrete/metamodel_provider.js" type="text/javascript"></script>	
+  <script src="../../concrete/element_extension.js" type="text/javascript"></script>	
+  <script src="../../concrete/template_provider.js" type="text/javascript"></script>	
+  <script src="../../concrete/identifier_provider.js" type="text/javascript"></script>	
+  <script src="../../concrete/model_interface.js" type="text/javascript"></script>	
+  <link rel="stylesheet" href="test.css" type="text/css" />
+  <style type="text/css" media="screen">
+  /* <![CDATA[ */
+    .ct_containment { margin-left: 20px; }
+  /* ]]> */
+  </style>
+</head>
+<body>
+<h1>Concrete Unit test file</h1>
+<p>
+  Tests for model_interface.js
+</p>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="statemachineMetamodel" style="display: none">
+	[
+		{_class: "Class", name: "Statemachine", features: [ 
+			{_class: "Feature", name: "name", kind: "attribute", type: "String"},
+			{_class: "Feature", name: "states", kind: "containment", type: "State"}, 
+			{_class: "Feature", name: "transitions", kind: "containment", type: "Transition"}
+		]},
+		{_class: "Class", name: "State", abstract: true, features: [ 
+			{_class: "Feature", name: "name", kind: "attribute", type: "String"} 
+		]},
+		{_class: "Class", name: "SimpleState", superTypes: ["State"]},
+		{_class: "Class", name: "CompositeState", superTypes: ["State"], features: [
+			{_class: "Feature", name: "subStates", kind: "containment", type: "State"}
+		]},
+		{_class: "Class", name: "Transition", features: [
+			{_class: "Feature", name: "sourceState", kind: "reference", type: "State"},
+			{_class: "Feature", name: "targetState", kind: "reference", type: "State"}
+		]}
+	]
+</div>
+
+<div id="testModel" style="display: none">
+	{_class: "Statemachine", name: "M1", 
+		states: [
+			{_class: "SimpleState", name: "S1"},
+			{_class: "CompositeState", name: "S2", subStates: [
+				{_class: "SimpleState", name: "S21"},
+				{_class: "SimpleState", name: "S22"}
+			]}
+		],
+		transitions: [
+			{_class: "Transition", sourceState: "S2/S21", targetState: "S2/S22"}
+		]
+  }
+</div>
+
+<div id="genericTemplates" style="display: none">
+</div>
+
+<div id="modelroot" class="ct_root">
+</div>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+
+  new Test.Unit.Runner({
+
+    setup: function() {
+    	$('modelroot').innerHTML = "";
+    	$('genericTemplates').innerHTML = "";
+    },
+		
+    testCreateElement: function() { with(this) {
+			var root = $('modelroot');
+  		var mi = createModelInterface(root);  	
+  		var ip = createIdentifierProvider(mi);
+    	mi.createElement(root, "bottom", $('testModel').textContent.evalJSON());
+    	mi.createElement(root.childElements()[0], "after", {_class: "Statemachine", name: "M2"});
+    	mi.createElement(root.childElements()[1], "before", {_class: "Statemachine"});
+    	// currently, abstract classes can be instantiated
+    	mi.createElement(root, "bottom", {_class: "Statemachine", name: "M3", states: [{_class: "State", name: "S1"}]});
+  		var elements = mi.elements();
+  		
+  		assertEqual(10, elements.size());
+  		assertEqual("/M1", ip.getIdentifier(elements[0]));
+  		assertEqual("/M1/S1", ip.getIdentifier(elements[1]));
+  		assertEqual("/M1/S2", ip.getIdentifier(elements[2]));
+  		assertEqual("/M1/S2/S21", ip.getIdentifier(elements[3]));
+  		assertEqual("/M1/S2/S22", ip.getIdentifier(elements[4]));
+  		assertEqual(undefined, ip.getIdentifier(elements[5]));
+  		assertEqual(undefined, ip.getIdentifier(elements[6]));
+  		assertEqual("/M2", ip.getIdentifier(elements[7]));
+  		assertEqual("/M3", ip.getIdentifier(elements[8]));
+  		assertEqual("/M3/S1", ip.getIdentifier(elements[9]));
+
+  		mi.createElement(ip.getElement("/M1/S2/S21"), "before", {_class: "CompositeState", name: "S20", subStates: [{_class: "SimpleState", name: "S201"}]});
+  		var elements = mi.elements();  		
+  		assertEqual(12, elements.size());
+  		assertEqual("/M1/S2/S20", ip.getIdentifier(elements[3]));
+  		assertEqual("/M1/S2/S20/S201", ip.getIdentifier(elements[4]));
+  		assertEqual("/M1/S2/S21", ip.getIdentifier(elements[5]));  		
+  	}},
+  	
+  	testRemoveElement: function() { with(this) {
+			var root = $('modelroot');
+  		var mi = createModelInterface(root);  	
+  		var ip = createIdentifierProvider(mi);
+    	mi.createElement(root, "bottom", $('testModel').textContent.evalJSON());
+    	mi.createElement(root, "bottom", {_class: "Statemachine", name: "M2"});
+  		
+  		assertEqual(7, mi.elements().size());
+			assertEqual("/M1", ip.getIdentifier(mi.elements()[0]));
+			assertEqual("/M1/S1", ip.getIdentifier(mi.elements()[1]));
+			assertEqual("/M1/S2", ip.getIdentifier(mi.elements()[2]));
+			assertEqual(mi.elements()[0], ip.getElement("/M1"));
+			assertEqual(mi.elements()[1], ip.getElement("/M1/S1"));
+			assertEqual(mi.elements()[2], ip.getElement("/M1/S2"));
+			
+  		mi.removeElement(mi.elements()[2]);
+  		assertEqual(4, mi.elements().size());
+			assertEqual(undefined, ip.getElement("/M1/S2"));
+
+  		mi.removeElement(root.childElements()[0]);
+  		assertEqual(1, mi.elements().size());
+			assertEqual(undefined, ip.getElement("/M1"));
+			assertEqual(undefined, ip.getElement("/M1/S1"));
+			assertEqual("/M2", ip.getIdentifier(mi.elements()[0]));
+			
+  		mi.removeElement(root.childElements()[0]);
+  		assertEqual(0, mi.elements().size());
+  		assertEqual("", root.innerHTML);
+  	}},
+  	
+  	testCreateValue: function() { with(this) {
+			var root = $('modelroot');
+  		var mi = createModelInterface(root);  	
+  		var ip = createIdentifierProvider(mi);
+    	mi.createElement(root, "bottom", {_class: "SimpleState"});
+    	assertEqual(1, mi.elements().size());
+    	var s1 = mi.elements()[0];
+  		mi.createValue(s1.down(".ct_slot"), "bottom", "S1");
+  		assertEqual(s1, ip.getElement("/S1"));
+  		mi.createElement(root, "bottom", {_class: "Transition"});
+  		var tr = mi.elements()[1];
+  		mi.createValue(tr.down(".ct_slot"), "bottom", "/test/ref1");
+  		mi.createValue(tr.down(".ct_slot").down(), "before", "/test/ref2");
+  		mi.createValue(tr.down(".ct_slot").down(), "after", "/test/ref3");
+  		assertEqual('{"_class": "Transition", "sourceState": ["/test/ref2", "/test/ref3", "/test/ref1"]}', Object.toJSON(mi.extractModel(tr)));
+		}},
+		
+  	testChangeValue: function() { with(this) {
+			var root = $('modelroot');
+  		var mi = createModelInterface(root);  	
+  		var ip = createIdentifierProvider(mi);
+    	mi.createElement(root, "bottom", {_class: "SimpleState", name: "S1"});
+    	var s1 = mi.elements()[0];
+  		assertEqual(s1, ip.getElement("/S1"));
+  		mi.changeValue(s1.down(".ct_value"), "S2");
+  		assertEqual(undefined, ip.getElement("/S1"));
+  		assertEqual(s1, ip.getElement("/S2"));
+  		mi.changeValue(s1.down(".ct_value"), "");
+  		assertEqual(undefined, ip.getElement("/S1"));
+  		assertEqual(undefined, ip.getElement("/S2"));
+  		assertEqual(undefined, ip.getIdentifier(s1));
+  		
+  		mi.createElement(root, "bottom", {_class: "Transition", sourceState: ["/test/ref1", "/test/ref2"]});
+  		var tr = mi.elements()[1];
+  		mi.changeValue(tr.down(".ct_slot").down(), "xxx");
+  		assertEqual('{"_class": "Transition", "sourceState": ["xxx", "/test/ref2"]}', Object.toJSON(mi.extractModel(tr)));
+		}},
+		  		
+  	testRemoveValue: function() { with(this) {
+			var root = $('modelroot');
+  		var mi = createModelInterface(root);  	
+  		var ip = createIdentifierProvider(mi);
+    	mi.createElement(root, "bottom", {_class: "SimpleState", name: "S1"});
+    	var s1 = mi.elements()[0];
+  		assertEqual(s1, ip.getElement("/S1"));
+  		mi.removeValue(s1.down(".ct_value"));
+  		assertEqual(undefined, ip.getElement("/S2"));
+  		mi.createElement(root, "bottom", {_class: "Transition", sourceState: ["/test/ref1", "/test/ref2"]});
+  		var tr = mi.elements()[1];
+  		mi.removeValue(tr.down(".ct_slot").down());
+  		assertEqual('{"_class": "Transition", "sourceState": "/test/ref2"}', Object.toJSON(mi.extractModel(tr)));
+  	}},
+  	
+  	testExtractRoundtrip: function() { with(this) {
+  		var root = $('modelroot');
+			var mi = createModelInterface(root);  	
+    	
+			mi.createElement(root, "bottom", $('testModel').textContent.evalJSON());
+    	var rootContent = root.innerHTML;
+    	
+  		var model = mi.extractModel(root.childElements()[0]);
+  		mi.removeElement(root.childElements()[0]);
+  		assertEqual("", root.innerHTML);
+
+			mi.createElement(root, "bottom", model);
+			assertEqual(rootContent, root.innerHTML);
+    }}
+  })
+  
+  function createModelInterface(root) {
+		var mp = new Concrete.MetamodelProvider($('statemachineMetamodel').textContent.evalJSON());
+		var tp = new Concrete.TemplateProvider($('genericTemplates'));
+		return new Concrete.ModelInterface(root, tp, mp);	
+  }
+  
+  function createIdentifierProvider(modelInterface) {
+		var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+		modelInterface.addModelChangeListener(ip);
+		return ip;  	
+  }
+// ]]>
+</script>
+</body>
+</html>  

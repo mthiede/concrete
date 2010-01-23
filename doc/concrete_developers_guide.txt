@@ -1,0 +1,340 @@
+= Concrete Developers Guide =
+
+This document describes the _Concrete_ model editor from a DSL developer's point of view. If you are interested in using the editor for a given DSL, refer to the users guide.
+
+
+== Metamodels ==
+
+_Concrete_ uses metamodels to define the abstract syntax of a DSL. A metamodel specifies the possible abstract content of models by means of _metamodel classes_. Each metamodel class defines the _features_ the instance model elements can have. Features are _attributes_, _references_ and _containments_. Attributes hold primitive values, references reference other model elements and containments contain other elements as part of the element itself. Each feature has a name and a type.
+
+In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool and Integer) or a custom defined enum datatype. Enum datatypes consist of a set of string literals. 
+
+In case of a reference, the type must be a metamodel class. Only instances of that metamodel class can be valid targets of the reference.
+
+In case of a containment, the type must be a metamodel class as well. Only instances of that metamodel class can be nested in the containment.
+
+Optionally, an upper and lower limit may be specified for each feature. For example, an upper limit of "1" means that only one attribute/reference value or contained element is allowed. A lower limit of "2" means that at least 2 values or contained elements are required.
+
+Some of the constraines defined by the metamodel are enforced by the editor, i.e. only valid changes can be done. For the other constraints, errors are annotated at the model.
+
+
+== Models ==
+
+Models are represented by DOM nodes with special (CSS) classes. Elements, attributes, references and containments are represented by DOM nodes with classes +ct_element+, +ct_attribute+, +ct_reference+ and +ct_containment+ respectively. Attribute, reference and containment nodes are child nodes of element nodes. However, they do not have to be direct children, there can be other nodes around them. 
+
+Within each attribute, reference or containment node, there has to be a _slot_ node marked by class +ct_slot+. Again, slots don't have to be direct children and may have other nodes around them. The slot is the place where attribute values, reference values or child elements are inserted. 
+
+Attribute and reference values are DOM nodes marked with class +ct_value+. These nodes contain plain text which is the actual attribute value or the identifier of the referenced element. Between the slot and the contained values or elements, there must not be any other nodes.
+
+Note, that other custom CSS classes may be added to all the nodes as long as no predefined, reserved class is used (see CSS Class Reference).
+
+For each element, the corresponding metamodel class is indicated by an additional CSS class. The CSS class name consists of the prefix +ctc_+ followed by the name of the metamodel class. For example, an instance of the metamodel class "State" is annotated with CSS class +ctc_State+.
+
+In order to indentify the features within each model element, they are annotated with CSS classes indicating the feature name. The CSS class name consists of the prefix +ctn_+ followed by the name of the feature. For example an instance of the feature "name" would be annotated with CSS class +ctn_name+.
+
+Here is an example:
+
+----
+<div class="ct_element ctc_Class1">
+	<p>Here comes an attribute:</p>
+	<span class="ct_attribuet ctn_feature1">
+		<p>Inside the attribute</p>
+		<span class="ct_slot">
+			<span class="ct_value">Value 1</span>
+			<span class="ct_value">Value 2</span>
+			<span class="ct_value">Value 3</span>
+		</span>
+		<p>After the slot</p>
+	</span>
+	<p>Here comes a reference:</p>
+	<span class="ct_reference ctn_feature2">
+		<p>Inside the reference</p>
+		<span class="ct_slot">
+			<span class="ct_value">/ref/to/elementA</span>
+			<span class="ct_value">/ref/to/elementB</span>
+			<span class="ct_value">/ref/to/elementC</span>
+		</span>
+		<p>After the slot</p>
+	</span>
+	<p>Here comes a containment:</p>
+	<div class="ct_containment ctn_feature3">
+		<p>Inside the containment</p>
+		<div class="ct_slot">
+			<div class="ct_element ctc_Class2">
+				<p>Here go the element's attributes, references and containments</p>
+			</div>
+			<div class="ct_element">
+				<p>Another element</p>
+			</div>
+		</div>
+		<p>After the slot</p>
+	</div>
+	<p>End of element</p>
+</div>
+----
+
+In this example, +div+ nodes are used for elements and +span+ nodes are used for attributes and references. Note however, that this is not mandatory. In fact, any valid HTML tag can be used.
+
+
+== DOM Templates ==
+
+The concrete syntax of a _Concrete_ DSL is specified using CSS. However, since CSS has it's limits and CSS based layouts often need special DOM nodes, also DOM nodes are part of the concrete syntax. In order to facilitate this, DOM templates can be specified for each metamodel class. Together with CSS, these templates define the graphical representation of instance elements of that class.
+
+DOM Templates are very similar to the model itself. The only difference is that all slots are empty and thus template definitions are not nested. In fact, a model is created by applying and nesting DOM templates.
+
+Here is an example:
+
+----
+<div class="ct_element ctc_Class1">
+	<p>Here comes an attribute:</p>
+	<span class="ct_attribuet ctn_feature1">
+		<p>Inside the attribute</p>
+		<span class="ct_slot">
+		</span>
+		<p>After the slot</p>
+	</span>
+	<p>Here comes a reference:</p>
+	<span class="ct_reference ctn_feature2">
+		<p>Inside the reference</p>
+		<span class="ct_slot">
+		</span>
+		<p>After the slot</p>
+	</span>
+	<p>Here comes a containment:</p>
+	<div class="ct_containment ctn_feature3">
+		<p>Inside the containment</p>
+		<div class="ct_slot">
+		</div>
+		<p>After the slot</p>
+	</div>
+	<p>End of element</p>
+</div>
+----
+
+This template describes the DOM representation used for elements which are instances of metamodel class "Class1". The example model shown in section "Models" could have been created by this template.
+
+CSS definitions can use the mandatory CSS classes as well as any additional custom CSS class. 
+
+
+== JSON Model Exchange Format ==
+
+As described above, models are represented by DOM nodes at runtime. However, neither DOM nodes nor the corresponding HTML code are well suited to exchange the model data. One reason is that the DOM representation also contains part of the concrete syntax which should not be part of the pure model.
+
+Instead of HTML, models are exchanged using the well known JSON format. JSON is basically the textual representation of objects/hashes/maps, arrays and primitive values in Javascript syntax. Today, JSON libraries are available for many major programming languages.
+
+_Concrete_ models are represented in JSON using the following conventions:
+
+* A model is an array holding the top-level model elements.
+* Model elements are hashes, the metamodel class name is stored in a hash property named "_class".
+* Feature values and contained elements are stored in properties named like the feature.
+* If a feature contains multiple values/elements, they are grouped in an array. Otherwise the value/element is assigned directly to the property.
+* Attribute values are converted to text using Javascript's default conversion mechanism.
+* Reference values are strings holding the identifier of the referenced element.
+
+Here is an example:
+
+----
+[{"_class": "Statemachine", "name": "AC", "states": [
+  {"_class": "SimpleState", "name": "Off", "transitions": 
+    {"_class": "Transition", "target": "/AC/On"}}, 
+  {"_class": "CompositeState", "name": "On", "subStates": [
+    {"_class": "SimpleState", "name": "Heating", "transitions": 
+      {"_class": "Transition", "target": "/AC/On/Cooling"}}, 
+    {"_class": "SimpleState", "name": "Cooling", "transitions": 
+      {"_class": "Transition", "target": "/AC/On/Heating"}}], "transitions": 
+    {"_class": "Transition", "target": "/AC/Off"}}]}]
+----
+		
+== Embedding Concrete ==
+
+=== Depencencies ===
+
+_Concrete_ depends on _Prototype_ and _Scriptaculous_. So you need to make sure, that these libraries are included before _Concrete_ itself:
+
+----
+<script src="../../lib/prototype.js" type="text/javascript"></script>
+<script src="../../lib/scriptaculous/scriptaculous.js" type="text/javascript"></script>
+<script src="../../concrete/concrete.js" type="text/javascript"></script>
+----
+
+Note that for the current version of _Concrete_, a slightly patched version of Scriptaculous is required which comes in the release package.
+
+=== Style Sheets ===
+
+In order to make the editor look right, you need to define styles for the CSS classes mentioned above (alse see the CSS Class Reference). You can start with one of the "theme" CSS files from the examples folder. Then for DSL specific styles, you can add another stylesheet overwriting some of the definitions in the "theme" stylesheet. Of course, another option is to create one single new stylesheet.
+
+----
+<link rel="stylesheet" href="../../example/themes/cobalt.css" type="text/css" />		
+<link rel="stylesheet" href="../../editor/specific/style.css" type="text/css" />
+----
+
+=== Template Provider ===
+
+_Concrete_ needs a place where the DOM templates can be located. This is the place where custom DOM templates are specified, as well as the place where the default DOM templates are prepared automatically in case there are no custom templates. There is no special CSS class required, just an ID to reference the node. Normally, this template container should be made invisible.
+
+----
+<div id="templates1" style="display: none">	
+</div>
+----
+
+Then, an instance of +TemplateProvider+ needs to be created. The constructor gets the template container DOM node and may take additional options. For example, by setting +identifierAttribute+ to "name", all attributes named "name" will be marked as identifier attributes when the default templates are created. This can be used to highlight these attributes differently.
+
+----
+var tp = new Concrete.TemplateProvider($("templates1"), {identifierAttribute: "name"});
+----
+
+=== Metamodel Provider ===
+
+_Concret_ knows about the metamodel by asking an instance of +MetamodelProvider+. The constructor takes the metamodel which is a model by itself, following the conventions described for the _Concrete_ JSON format. It can be convenient to put the metamodel as text in JSON format into the HTML code. In this case, the text content of the containing node has to be evaluated as JSON before the metamodel provider can use it.
+
+Here is a simple example metamodel:
+
+----
+<div id="metamodel1" style="display: none">
+[
+  {"_class": "Datatype", "name": "String"},
+  {"_class": "Class", "A": "Feature", "features": [
+    {"_class": "Feature", "name": "feat1", "kind": "attribute", "type": "String"},
+    {"_class": "Feature", "name": "feat2", "kind": "attribute", "type": "String"},
+  ]}
+]
+</div>
+----
+
+Here is how this metamodel can be fed into a new instance of +MetamodelProvider+.
+
+----
+var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());
+----
+
+=== Indentifier Provider ===
+
+In _Concrete_, identifiers are used to define reference targets. In order to create identifiers, the editor needs an identifier provider. Currently, the +QualifiedNameBasedIdentifierProvider+ is included with _Concrete_, but other providers implementing custom identifier calculation strategies could be used instead. The +QualifiedNameBasedIdentifierProvider+ needs to know the name of the attribute holding the local (non-qualified) name.
+
+In the following example, all attributes named "name" are used for qualified name calculation.
+
+----
+var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name"});
+----
+
+=== Clipboard ===
+
+By default, the editor uses a clipboard it creates internally. However, to let several editors share a clipboard, an instance of +Clipboard+ can be explicitly passed into each editor. This is also useful for making the clipboard content visible or editable. When a clipboard is created, a DOM node can be passed into the constructor which acts as the container of the clipboard data. If a HTML +Textarea+ node is used, the clipboard content will be visible and editable within this textarea. If another type of node is passed in, its text content will hold the clipboard data and make it visible. If no DOM node is given, the data will be held as plain text internally.
+
+Here is an example:
+
+----
+<textarea id="clipboard1" style="background-color: white; color: black; border: 1px solid grey" cols="80" rows="10" wrap="off">
+</textarea>
+----
+
+This textarea can be passed into the a new instance of +Clipboard+.
+
+----
+var cb = new Concrete.Clipboard($("clipboard1"));
+----
+
+=== Conrete Editor ===
+
+The editor itself is some kind of widget which lives in a DOM node with CSS class +ct_editor+. 
+
+----
+<div class="ct_editor" id="editor1">
+</div>
+----
+
+With all the objects created before, the editor can be instantiated. The constructor takes the DOM node the editor should live in, the template provider, the metamodel provider, the identifier provider and additional options. One of the options is an externally created clipboard as described above. Another option defines the metamodel classes which can be instantiated on root level. If not specified, all metamodel classes can be instantiated on root level.
+
+Here is an example:
+
+----
+var ed = new Concrete.Editor($("editor1"), tp, mp, ip, {clipboard: cb, 
+	rootClasses: mp.metaclasses.select(function(c) { return ["Class", "Datatype", "Enum"].include(c.name)})});
+----
+
+Once the editor has been created it has to be connected to the browser window events. Currently the +click+, +keydown+ and +mousemove+ events are supported. 
+
+----
+Event.observe(window, 'click', function(event) {
+	ed.handleEvent(event);
+});
+Event.observe(window, 'keydown', function(event) {
+	ed.handleEvent(event);
+});
+Event.observe(window, 'mousemove', function(event) {
+	ed.handleEvent(event);
+});
+----
+
+=== Loading and Storing Data ===
+
+A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the _Concrete_ editor provides the methods +getModel+ and +setModel+. In both cases the model is a set of Javascript objects following the JSON conventions as described above.
+
+One possible way to use this API is to get the data from a server via AJAX and also store it back in the same way. Another option for loading is to embed the model in an HTML element in JSON text format and load it from there. 
+
+----
+<div id="model1" style="display: none">
+	<!-- json model here -->
+</div>
+----
+
+Code for loading the model...
+
+----
+// load model only if present and valid JSON
+var modelData = $("model1").textContent;
+if (modelData.isJSON()) {
+	ed.setModel(modelData);
+}
+----
+
+...and for storing it via AJAX using the Prototype library.
+
+----
+new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
+----
+
+
+== CSS Class Reference ==
+
+.Model and Template Related CSS Classes
+[frame="topbot",grid="none"]
+|=======================
+| ct_element | model element
+| ct_attribute | model element attribute
+| ct_reference | model element reference to other model element
+| ct_containment | model element containment of other element
+| ct_slot | slot inside an attribute, reference or containment 
+| ct_value | attribute or reference value
+| ctc_<...> | class indicating an element's metamodel class
+| ctn_<...> | class indicating a feature's name
+| ct_handle | marks a DOM node which is used as an element's handle
+| ct_auto_hide | marks a feature as "auto hide"
+| ct_root | internal. marks the model root node
+|=======================
+
+.Editor Related CSS Classes
+[frame="topbot",grid="none"]
+|=======================
+| ct_editor | the editor itself
+| ct_inline_editor | inline editor for editing text inside the editor
+| ct_focus | this class is present at the editor node if it is focused
+| ct_select | this class is present at an element or value if it is selected
+| ct_cursor | cursor on the border of the currently selected eleemnt
+| ct_empty | empty value or element placeholder
+|=======================
+
+.Highlighting Related CSS Classes
+[frame="topbot",grid="none"]
+|=======================
+| ct_identifier_attribute | marks the attribute holding the identifier of an element
+| ct_class_name | marks an element's class name
+| ct_feature_name | marks the feature name
+| ct_error | marks elements and features for which a constraint check failed
+| ct_error_description | internal. error description to be displayed for a node
+| ct_error_popup | popup window shown when the mouse is over an erroneous element
+| ct_ref_source | marks a reference when it is highlighted
+| ct_ref_target | marks the target element when a reference is highlighted
+|=======================
+
+

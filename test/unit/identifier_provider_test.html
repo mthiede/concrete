@@ -1,0 +1,264 @@
+<html>
+<head>
+  <title>Concrete Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../lib/scriptaculous/unittest.js" type="text/javascript"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	// <![CDATA[
+		var Concrete = {}
+	// ]]>
+	</script>
+  <script src="../../concrete/helper.js" type="text/javascript"></script>	
+  <script src="../../concrete/element_extension.js" type="text/javascript"></script>	
+  <script src="../../concrete/identifier_provider.js" type="text/javascript"></script>	
+  <link rel="stylesheet" href="test.css" type="text/css" />
+</head>
+<body>
+<h1>Concrete Unit test file</h1>
+<p>
+  Tests for identifier_provider.js
+</p>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="testModelSource" style="display: none">
+	<!-- two nested elements -->
+	<div class="ct_element">
+		<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E1</span></span></span>
+		<div class="ct_containment"><div class="ct_slot">
+			<div class="ct_element">
+				<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E11</span></span></span>
+			</div>
+		</div></div>
+	</div>
+	<!-- two nested elements with some div in between and multiple child elements -->
+	<div>
+		<div class="ct_element">
+			<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E2</span></span></span>
+			<div>
+				<div class="ct_containment"><div class="ct_slot">
+					<div class="ct_element">
+						<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E21</span></span></span>
+					</div>
+					<div class="ct_element">
+						<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E22</span></span></span>
+					</div>
+				</div></div>
+				<div class="ct_containment"><div class="ct_slot">
+					<div class="ct_element">
+						<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E23</span></span></span>
+					</div>
+				</div></div>
+			</div>
+		</div>
+	</div>
+	<!-- two nested elements with other elements in between which don't have names -->
+	<div>
+		<div class="ct_element"> <!-- no name -->
+			<div class="ct_containment"><div class="ct_slot">
+				<div class="ct_element"> <!-- E3 -->
+					<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E3</span></span></span>
+					<div class="ct_containment"><div class="ct_slot">
+						<div class="ct_element"> <!-- no name -->
+							<div class="ct_containment"><div class="ct_slot">
+								<div class="ct_element"> <!-- E31 -->
+									<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E31</span></span></span>
+								</div>
+							</div></div>
+						</div>
+					</div></div>
+				</div>
+			</div></div>
+		</div>
+	</div>
+	<!-- duplicate identifier E1 -->
+	<div class="ct_element">
+		<span class="ct_attribute"><span class="ct_slot"><span class="ct_value">E1</span></span></span>
+	</div>
+</div>
+
+<div id="testModel" class="ct_root">
+</div>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+
+  new Test.Unit.Runner({
+
+    setup: function() {
+    	var testModel = $('testModel');
+    	testModel.innerHTML = $('testModelSource').innerHTML;
+    	setupModel(testModel);
+    },
+		
+    testSimple: function() { with(this) {
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+    	    	
+    	var e1 = rootElements[0];
+    	var e1e11 = rootElements[0].down(".ct_element");
+		
+    	ip.elementAdded(e1);
+
+    	assertEqual("/E1", ip.getIdentifier(e1));
+    	assertEqual(e1, ip.getElement("/E1"));
+    	assertEqual("/E1/E11", ip.getIdentifier(e1e11));
+    	assertEqual(e1e11, ip.getElement("/E1/E11"));
+    	
+    	var e2 = rootElements[1].down(".ct_element");
+    	var e2e21 = rootElements[1].down(".ct_element").select(".ct_element")[0];
+    	var e2e22 = rootElements[1].down(".ct_element").select(".ct_element")[1];
+    	var e2e23 = rootElements[1].down(".ct_element").select(".ct_element")[2];
+    	
+    	ip.elementAdded(e2);
+    	
+    	assertEqual("/E2", ip.getIdentifier(e2));
+    	assertEqual("/E2/E21", ip.getIdentifier(e2e21));
+    	assertEqual("/E2/E22", ip.getIdentifier(e2e22));
+    	assertEqual("/E2/E23", ip.getIdentifier(e2e23));
+    	assertEqual(e2, ip.getElement("/E2"));
+    	assertEqual(e2e21, ip.getElement("/E2/E21"));
+    	assertEqual(e2e22, ip.getElement("/E2/E22"));
+    	assertEqual(e2e23, ip.getElement("/E2/E23"));
+    	
+    	var e3 = rootElements[2].down(".ct_element").down(".ct_element");
+    	var e3e31 = rootElements[2].down(".ct_element").down(".ct_element").down(".ct_element").down(".ct_element");
+    	
+    	ip.elementAdded(e3);
+    	
+    	assertEqual("/E3", ip.getIdentifier(e3));
+    	assertEqual("/E3/E31", ip.getIdentifier(e3e31));
+    	assertEqual(e3, ip.getElement("/E3"));
+    	assertEqual(e3e31, ip.getElement("/E3/E31"));
+		}},
+		
+    testRename: function() { with(this) {
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+    	    	
+    	var e1 = rootElements[0];
+    	var e1e11 = rootElements[0].down(".ct_element");
+
+    	ip.elementAdded(e1);
+
+			e1.down(".ct_attribute").down(".ct_value").textContent = "X";
+
+    	ip.elementChanged(e1, undefined);
+
+    	assertEqual("/X", ip.getIdentifier(e1));
+    	assertEqual(undefined, ip.getElement("/E1"));
+    	assertEqual(e1, ip.getElement("/X"));
+    	assertEqual("/X/E11", ip.getIdentifier(e1e11));
+    	assertEqual(undefined, ip.getElement("/E1/E11"));
+    	assertEqual(e1e11, ip.getElement("/X/E11"));
+		}},
+
+    testRemoveName: function() { with(this) {
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+    	    	
+    	var e1 = rootElements[0];
+    	var e1e11 = rootElements[0].down(".ct_element");
+
+    	ip.elementAdded(e1);
+
+			e1.down(".ct_attribute").down(".ct_value").remove();
+
+    	ip.elementChanged(e1, undefined);
+    	assertEqual(undefined, ip.getIdentifier(e1));
+    	assertEqual(undefined, ip.getElement("/E1"));
+    	assertEqual("/E11", ip.getIdentifier(e1e11));
+    	assertEqual(undefined, ip.getElement("/E1/E11"));
+    	assertEqual(e1e11, ip.getElement("/E11"));
+    }},
+    
+    testRemoveElement: function() { with(this) {
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+    	    	
+    	var e1 = rootElements[0];
+    	var e1e11 = rootElements[0].down(".ct_element");
+
+    	ip.elementAdded(e1);
+    	ip.elementRemoved(e1);
+
+    	assertEqual(undefined, ip.getIdentifier(e1));
+    	assertEqual(undefined, ip.getElement("/E1"));
+    	assertEqual(undefined, ip.getIdentifier(e1e11));
+    	assertEqual(undefined, ip.getElement("/E1/E11"));
+		}},
+			    
+		testBeforeChange: function() { with(this) {	
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+    	    	
+    	var e1 = rootElements[0];
+    	var e1e11 = rootElements[0].down(".ct_element");
+
+    	assertEqual(undefined, ip.getIdentifier(e1));
+    	assertEqual(undefined, ip.getElement("/E1"));
+    	assertEqual(undefined, ip.getIdentifier(e1e11));
+    	assertEqual(undefined, ip.getElement("/E1/E11"));
+		}},
+		
+		testDuplicateIdentifier: function() { with(this) {
+    	var root = $('testModel');
+    	var rootElements = root.childElements();
+    	var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+
+    	var e1 = rootElements[0];
+    	var e4 = rootElements[3];
+		
+    	ip.elementAdded(e1);
+    	assertEqual("/E1", ip.getIdentifier(e1));
+    	assertEqual(e1, ip.getElement("/E1"));
+
+    	ip.elementAdded(e4);
+    	// e1 still has its old identifier
+    	assertEqual("/E1", ip.getIdentifier(e1));
+    	// e4 has the same identifier
+    	assertEqual("/E1", ip.getIdentifier(e4));
+    	// getElement returns an Array holding e1 and e4
+    	assertEqual(2, ip.getElement("/E1").size());
+    	assertEqual(e1, ip.getElement("/E1")[0]);
+    	assertEqual(e4, ip.getElement("/E1")[1]);
+    	
+    	ip.elementRemoved(e1);
+    	assertEqual(e4, ip.getElement("/E1"));
+    	
+    	ip.elementRemoved(e4)
+    	assertEqual(undefined, ip.getElement("/E1"));
+    }},
+       
+  })
+  
+  function setupModel(root) {
+  	root.select(".ct_element").each(function(e) {
+  		e.features = e.findFirstDescendants(["ct_attribute", "ct_reference", "ct_containment"], ["ct_element"]);
+  		var i = 1;
+  		e.features.each(function(f) {
+  			f.slot = f.down(".ct_slot");
+  			if (f.hasClassName("ct_attribute")) {
+  				f.mmFeature = {name: "name", kind: "attribute", type: "String"};
+  				f.mmFeature.isContainment = function() { return false; };  				
+  			}
+  			else if (f.hasClassName("ct_containment")) {
+  				f.mmFeature = {name: "sub"+i, kind: "containment"};
+  				f.mmFeature.isContainment = function() { return true; };
+  			}
+  			i++;
+  		});
+		});
+  }
+// ]]>
+</script>
+</body>
+</html>  

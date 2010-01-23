@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>Concrete Users Guide</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+</head>
+<body>
+<div id="header">
+<h1>Concrete Users Guide</h1>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p><em>Concrete</em> is a generic model editor which can be configured for different
+domain specific languages (DSLs). When you use it, you use it for a predefined DSL.
+The DSL describes what the model may look like, both from a content and a visual point of view.
+See the Developers Guide if you want to setup your own DSL.</p></div>
+<div class="paragraph"><p>This document describes the usage of the editor, independant of any specific DSL.</p></div>
+</div>
+</div>
+<h2 id="_models">Models</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Models consist of <tt>elements</tt> which may have attributes, references to other elements and may contain other elements.</p></div>
+<div class="paragraph"><p><tt>Attributes</tt> can take one or more primitive values. Currently
+primitive values are of type <tt>String</tt>, <tt>Integer</tt>, <tt>Boolean</tt>, or custom defined <tt>Enum</tt> datatypes. <tt>Enum</tt> types have
+a name and consist of a set of string literals, each of which is a valid instance of the type.</p></div>
+<div class="paragraph"><p><tt>References</tt> point to one or more other elements. References can not point to or take primitive values.</p></div>
+<div class="paragraph"><p><tt>Containment</tt> relationships are references with the difference that the contained element is part of the parent element,
+whereas the referenced elemenet normally is not (there may be exceptions). When the parent element is deleted, the contained
+elements are also deleted. When the parent element is collapsed the contained elements are hidden.</p></div>
+<div class="paragraph"><p>Attributes, reference and containmend relationships are called <em>features</em> of an element. Feataures have names,
+although they may not be visible.^</p></div>
+<div class="paragraph"><p>Attributes and reference contain <em>values</em> whereas containment relationships contain <em>elements</em>.</p></div>
+</div>
+<h2 id="_navigation_and_selection">Navigation and Selection</h2>
+<div class="sectionbody">
+<h3 id="_selecting_elements_values">Selecting Elements/Values</h3><div style="clear:left"></div>
+<div class="paragraph"><p>For all editing commands described below, at least one element or attribute/reference value needs to be selected.
+Selection can be done with the cursor keys (<tt>Left</tt>, <tt>Right</tt>, <tt>Up</tt>, <tt>Down</tt>), with <tt>Tab</tt> and <tt>Shift-Tab</tt> or with the mouse.</p></div>
+<div class="paragraph"><p>Selection with the mouse is straightforward, just click the element.</p></div>
+<div class="paragraph"><p>Using the key <tt>Tab</tt> and <tt>Shift-Tab</tt>, the next/previous element/value can be selected with respect to the logical order
+(instead of the graphical order on the screen). If an element has other elements or values inside, <tt>Tab</tt> will select
+the first child, and so on.</p></div>
+<div class="paragraph"><p>In contrast to the tab keys, the cursor keys select with respect to the graphical position on the screen.
+Press one of <tt>Left</tt>, <tt>Right</tt>, <tt>Up</tt>, <tt>Down</tt>, to move the selection in the respective direction.
+When an element has other elements or values inside, the next selected element may be one of these elements.
+In order to know if the next selected element is inside or outside of the current element, you need to be aware of
+the current <em>cursor</em> position. The <em>cursor</em> is a little dot on the border of the selected element/value.
+If the cursor is on the left border and you press <tt>Right</tt>, the next selected element will be inside of the
+current element (given that it has child elements). Otherwise, if you press <tt>Left</tt>, the next selected element
+will be outside, left of the current element (given that there are elements on the left). The same is true for the
+other directions, of course. If the next element would be outside but there are no elements in this direction, the
+parent element will be selected.</p></div>
+<div class="paragraph"><p>Hold <tt>Shift</tt> down shift while moving the selection with any of the methods described above to extend to selection (<em>multi select</em>).</p></div>
+<h3 id="_navigating_references">Navigating References</h3><div style="clear:left"></div>
+<div class="paragraph"><p>When you move the mouse over a valid reference value while prssing <tt>Ctrl</tt>, the reference target will be highlighted.
+However, you might not see the target if it is outside of the visible area on the screen.</p></div>
+<div class="paragraph"><p>You can click the left mouse button on a valid reference value while pressing <tt>Ctrl</tt> to select the reference target.
+This will automatically scroll to make the target visible.</p></div>
+<div class="paragraph"><p>References can also be followed by pressing <tt>Alt-Right</tt> while a valid reference value is selected. This will select
+the target element and scroll to make it visible. By pressing <tt>Alt-Left</tt> you can go back the references in reverse order.</p></div>
+<h3 id="_collapsing">Collapsing</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Elements with containment relationships can be collapsed using <tt>Ctrl-Left</tt>. This will hide the containment relationship
+including the contained elements. In order to expand the element again, press <tt>Ctrl-Right</tt>.</p></div>
+<div class="paragraph"><p>You can collapse and expand elements recursively using <tt>Ctrl-Shift-Left</tt> and <tt>Ctrl-Shift-Right</tt>. This will also
+collapse/expand child elements.</p></div>
+<div class="paragraph"><p>In addition to this, empty features may collapse depending on the DSL configuration. This happens when you leave
+the currently selected element (i.e. select another element which is not a child). You can show all hidden featurs
+be pressing <tt>Shift-Return</tt>.</p></div>
+<div class="paragraph"><p>All collapsing commands also work with multiple elements selected.</p></div>
+</div>
+<h2 id="_editing">Editing</h2>
+<div class="sectionbody">
+<h3 id="_edit_mode">Edit Mode</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Whenever you want to actually edit text (e.g. to edit an attribute value or choose an element&#8217;s type) you need to be in <em>edit mode</em>.
+The easiest way to enter edit mode is by just typing text while an element/value is selected. More explicitly you may also
+click the element or value while it is already selected or press <tt>F2</tt> or <tt>Ctrl-Space</tt>.</p></div>
+<div class="paragraph"><p>You can leave edit mode and cancel your edit by pressing <tt>Esc</tt> or click the mouse somewhere outside of the current edit box.</p></div>
+<div class="paragraph"><p>In order to leaave edit mode and actually use your changes, press <tt>Return</tt>, <tt>Tab</tt> or <tt>Shift-Tab</tt>.
+If an error is detected with your input (e.g. because you entered letters for an Integer value),
+you can not successfully leave edit mode. In this case, either correct your input or cancel edit mode.</p></div>
+<div class="paragraph"><p>If a set of completion options is available for the current element/value, a dropdown box will be shown in edit mode
+when you start typing. You can bring up the dropdown box without typing by pressing one of the cursor keys.</p></div>
+<h3 id="_creating_elements">Creating Elements</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Elements can be created on toplevel or as children in a containment relationship. If in either place, there are no
+other elements yet, an empty placeholder element will be shown.
+In this case, select the placeholder, enter edit mode and type the name of the element class to be created.
+Once in edit mode, a dropdown box appears showing possible completion options.</p></div>
+<div class="paragraph"><p>If an element should be added to a set of existing elements, select one of the existing ones and press <tt>Return</tt>.
+This will insert a placeholder after the selected element and immediately enter edit mode.</p></div>
+<div class="paragraph"><p>When an element is created, all features are shown although they are empty. Depending on the configuration of the
+editor, empty features may be hidden when you select a different element which is not a child. In oder to
+show the hidden features again, press <tt>Shift-Return</tt>.</p></div>
+<h3 id="_changing_the_element_type">Changing the Element Type</h3><div style="clear:left"></div>
+<div class="paragraph"><p>When you enter edit mode while an element is selected, the element&#8217;s type can be changed. When the type changes,
+feature values will be preserved for features which also exist in the new type.</p></div>
+<h3 id="_deleting_elements">Deleting Elements</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Elements can be deleted by pressing <tt>Del</tt>. This also works if multiple elements are selected.</p></div>
+<h3 id="_editing_attribute_values">Editing Attribute Values</h3><div style="clear:left"></div>
+<div class="paragraph"><p>In a newly created element, no attribute values exist. You can create an attribute value by entering edit mode on
+an empty value placeholder. As with elements, pressing <tt>Return</tt> on a value will insert another value, pressing <tt>Del</tt> removes the value.
+In case the attribute to be edited is hidden, press <tt>Shift-Return</tt> to show it.</p></div>
+<h3 id="_editing_reference_values">Editing Reference Values</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Reference values can be edited in the same way as attribute values. The content of a reference value is the identifier
+of the referenced element. Use the dropdown box in edit mode to choose one of the possible target elements.
+Note, that only elements with an identifier can be referenced.</p></div>
+<h3 id="_copy_and_paste">Copy and Paste</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Both element and values can be cut, copied and pasted with <tt>Ctrl-X</tt>, <tt>Ctrl-C</tt> and <tt>Ctrl-V</tt> respectively. This also works
+with multiples elements selected. Note however, that you can not paste an attribute or reference value where an element
+is expected and vice versa.</p></div>
+</div>
+<h2 id="_errors">Errors</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The DSL defines constraints on possible models. For example, for some attributes only a single value might be
+allowed, whereas for other attributes you may provide more than one value.
+If a constraint is violated for an element or feature, the element/feature will be marked as erroneous.
+Move the mouse over such an element in order to show the error message in a popup window.</p></div>
+</div>
+<h2 id="_command_reference">Command Reference</h2>
+<div class="sectionbody">
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Keyboard</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Left, Right, Up, Down</p></td>
+<td align="left" valign="top"><p class="table">move selection</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Tab, Shift-Tab</p></td>
+<td align="left" valign="top"><p class="table">move selection in sequential order, select first child if available, stop editing when in edit mode</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Shift-Left, Shift-Right, Shift-Up, Shift-Down</p></td>
+<td align="left" valign="top"><p class="table">extend selection (multi select)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-A</p></td>
+<td align="left" valign="top"><p class="table">select all</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Return</p></td>
+<td align="left" valign="top"><p class="table">insert new element/value after current element/value, stop editing when in edit mode</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Del</p></td>
+<td align="left" valign="top"><p class="table">delete selected element/value(s)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">start typing, F2, Ctrl-Space</p></td>
+<td align="left" valign="top"><p class="table">edit selected element/value (enter edit mode)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Esc</p></td>
+<td align="left" valign="top"><p class="table">stop editing when in edit mode</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-C</p></td>
+<td align="left" valign="top"><p class="table">copy selection to clipboard</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-X</p></td>
+<td align="left" valign="top"><p class="table">cut selection to clipboard</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-V</p></td>
+<td align="left" valign="top"><p class="table">insert from clipboard after selected element/value</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Left</p></td>
+<td align="left" valign="top"><p class="table">collapse element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Shift-Left</p></td>
+<td align="left" valign="top"><p class="table">collapse element and all child elements</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Right</p></td>
+<td align="left" valign="top"><p class="table">expand element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Shift-Right</p></td>
+<td align="left" valign="top"><p class="table">expand element and all child elements</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Shift-Return</p></td>
+<td align="left" valign="top"><p class="table">show hidden features (auto-hide features will hide again when selection leaves the element)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Alt-Right</p></td>
+<td align="left" valign="top"><p class="table">select reference target (jump to reference target) if a reference is selected</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Alt-Left</p></td>
+<td align="left" valign="top"><p class="table">jump back references in reverse order</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Mouse</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Left Click</p></td>
+<td align="left" valign="top"><p class="table">move selection, stop editing when in edit mode</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Shift-Left Click</p></td>
+<td align="left" valign="top"><p class="table">extend selection (multi select)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Left click already selected element/value</p></td>
+<td align="left" valign="top"><p class="table">edit selected element/value (enter edit mode)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Hover over element/value</p></td>
+<td align="left" valign="top"><p class="table">show errors if present</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Hover over reference</p></td>
+<td align="left" valign="top"><p class="table">highlight reference target</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Left Click</p></td>
+<td align="left" valign="top"><p class="table">select reference target (jump to reference target)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2010-01-21 19:07:30 WEDT
+</div>
+</div>
+</body>
+</html>

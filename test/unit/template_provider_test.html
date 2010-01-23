@@ -1,0 +1,171 @@
+<html>
+<head>
+  <title>Concrete Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../lib/scriptaculous/unittest.js" type="text/javascript"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	// <![CDATA[
+		var Concrete = {}
+	// ]]>
+	</script>
+  <script src="../../concrete/metamodel_provider.js" type="text/javascript"></script>	
+  <script src="../../concrete/element_extension.js" type="text/javascript"></script>	
+  <script src="../../concrete/template_provider.js" type="text/javascript"></script>	
+  <link rel="stylesheet" href="test.css" type="text/css" />
+</head>
+<body>
+<h1>Concrete Unit test file</h1>
+<p>
+  Tests for template_provider.js
+</p>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="metamodel" style="display: none">
+	[
+		{_class: "Class", name: "ClassA", features: [ 
+			{_class: "Feature", name: "feat1", kind: "attribute"}, 
+			{_class: "Feature", name: "feat2", kind: "reference"},
+			{_class: "Feature", name: "feat3", kind: "containment"},
+			{_class: "Feature", name: "feat4", kind: "attribute"} 
+		]},
+		{_class: "Class", name: "ClassB", features: [
+			{_class: "Feature", name: "feat1", kind: "attribute"}
+		]},
+		{_class: "Class", name: "ClassC", features: [
+			{_class: "Feature", name: "feat1", kind: "attribute"}
+		]},
+		{_class: "Class", name: "ClassD"},
+		{_class: "Class", name: "ClassE", superTypes: ["ClassB"], features: [
+			{_class: "Feature", name: "feat2", kind: "attribute"}
+		]},
+	]
+</div>
+
+<div id="genericTemplates" style="display: none">
+	<!-- generic templates will be created here -->
+</div>
+
+<div id="domBasedTemplates" style="display: none">
+	<div class="ct_element ctc_ClassA">
+		<div class="ct_attribute ctn_feat1">
+			<span class="ct_slot"></slot>
+		</div>
+		<div class="ct_reference ctn_feat2">
+			<span class="ct_slot"></slot>
+		</div>
+		<div class="ct_containment ctn_feat3">
+			<span class="ct_slot"></slot>
+		</div>
+		<div class="ct_attribute ctn_feat4">
+			<span class="ct_slot"></slot>
+		</div>
+	</div>
+	<div class="ct_element ctc_ClassB">
+		<div class="ct_attribute ctn_feat1">
+		</div>
+	</div>
+	<div class="ct_element ctc_ClassC">
+	</div>
+	<div class="ct_element ctc_ClassE">
+		<div class="ct_attribute ctn_feat1">
+			<span class="ct_slot"></slot>
+		</div>
+		<div class="ct_attribute ctn_feat2">
+			<span class="ct_slot"></slot>
+		</div>
+	</div>
+</div>
+
+	
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+
+  new Test.Unit.Runner({
+
+    setup: function() {
+    },
+
+    testGeneric: function() { with(this) {
+    	var tp = new Concrete.TemplateProvider($('genericTemplates'));
+    	var mp = new Concrete.MetamodelProvider($('metamodel').textContent.evalJSON());
+  	
+    	checkTemplateClassA(this, tp, mp);
+    	checkTemplateClassE(this, tp, mp);
+    }},
+    
+    testDomBased: function() { with(this) {
+    	var tp = new Concrete.TemplateProvider($('domBasedTemplates'));
+    	var mp = new Concrete.MetamodelProvider($('metamodel').textContent.evalJSON());
+    	
+    	checkTemplateClassA(this, tp, mp);
+    	checkTemplateClassE(this, tp, mp);
+    }},
+
+    testDomBasedErrors: function() { with(this) {
+    	var tp = new Concrete.TemplateProvider($('domBasedTemplates'));
+    	var mp = new Concrete.MetamodelProvider($('metamodel').textContent.evalJSON());
+    	
+    	var classB = mp.metaclasses[1];
+    	// slot not found
+    	assertRaise("Error", function() {
+    		tp.templateByClass(classB);
+    	});
+    	var classC = mp.metaclasses[2];
+    	// feature not found
+    	assertRaise("Error", function() {
+    		tp.templateByClass(classC);
+    	});
+    }},
+  })
+  
+  function checkTemplateClassA(runner, tp, mp) { with(runner) {
+		var classA = mp.metaclasses[0];
+		
+		var tmplA = tp.templateByClass(classA);
+		// call second time
+		assertEqual(tmplA, tp.templateByClass(classA))
+		assertEqual(classA, tmplA.mmClass);
+		
+		assert(tmplA.hasClassName("ct_element"));
+		assert(tmplA.hasClassName("ctc_ClassA"));
+		
+		var attrs = tmplA.select(".ct_attribute");
+		assertEqual(2, attrs.size());
+		assertEqual(classA.features[0], attrs[0].mmFeature);
+		assertEqual(classA.features[3], attrs[1].mmFeature);
+		
+		var refs = tmplA.select(".ct_reference");
+		assertEqual(1, refs.size());
+		assertEqual(classA.features[1], refs[0].mmFeature);
+		
+		var conts = tmplA.select(".ct_containment");
+		assertEqual(1, conts.size());
+		assertEqual(classA.features[2], conts[0].mmFeature);    	
+	}};
+	
+  function checkTemplateClassE(runner, tp, mp) { with(runner) {
+		var classB = mp.metaclasses[1];
+		var classE = mp.metaclasses[4];
+		
+		var tmplE = tp.templateByClass(classE);
+		// call second time
+		assertEqual(tmplE, tp.templateByClass(classE))
+		assertEqual(classE, tmplE.mmClass);
+		
+		assert(tmplE.hasClassName("ct_element"));
+		assert(tmplE.hasClassName("ctc_ClassE"));
+		
+		var attrs = tmplE.select(".ct_attribute");
+		assertEqual(2, attrs.size());
+		assertEqual(classB.features[0], attrs[0].mmFeature);
+		assertEqual(classE.features[0], attrs[1].mmFeature);
+	}};
+    
+// ]]>
+</script>
+</body>
+</html>  

@@ -1,0 +1,31 @@
+
+/* Metamodel Specific Styles
+ *****************************************************************************/
+
+/* overwrite indentation of contained elements (default) */
+
+.ct_containment {
+	padding: 0;
+}
+
+.ct_containment .ct_element {
+	margin: 0;
+}
+
+.ct_containment > .ct_slot > .ct_inline_editor {
+	margin: 0;	
+}
+
+/* use images for the square root */
+
+div.ctc_Sqrt {
+	padding-left: 19px; background: url(sqrt_vert.png) no-repeat left bottom;
+}
+
+div.ctc_Sqrt.ct_selected {
+	padding-left: 19px; background: url(sqrt_vert.png) no-repeat left bottom #001120;
+}
+
+div.ctc_Sqrt > div {
+	background: url(sqrt_horz.png) no-repeat right top;
+}

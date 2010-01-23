@@ -1,0 +1,805 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>Concrete Developers Guide</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+</head>
+<body>
+<div id="header">
+<h1>Concrete Developers Guide</h1>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>This document describes the <em>Concrete</em> model editor from a DSL developer&#8217;s point of view. If you are interested in using the editor for a given DSL, refer to the users guide.</p></div>
+</div>
+</div>
+<h2 id="_metamodels">Metamodels</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><em>Concrete</em> uses metamodels to define the abstract syntax of a DSL. A metamodel specifies the possible abstract content of models by means of <em>metamodel classes</em>. Each metamodel class defines the <em>features</em> the instance model elements can have. Features are <em>attributes</em>, <em>references</em> and <em>containments</em>. Attributes hold primitive values, references reference other model elements and containments contain other elements as part of the element itself. Each feature has a name and a type.</p></div>
+<div class="paragraph"><p>In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool and Integer) or a custom defined enum datatype. Enum datatypes consist of a set of string literals.</p></div>
+<div class="paragraph"><p>In case of a reference, the type must be a metamodel class. Only instances of that metamodel class can be valid targets of the reference.</p></div>
+<div class="paragraph"><p>In case of a containment, the type must be a metamodel class as well. Only instances of that metamodel class can be nested in the containment.</p></div>
+<div class="paragraph"><p>Optionally, an upper and lower limit may be specified for each feature. For example, an upper limit of "1" means that only one attribute/reference value or contained element is allowed. A lower limit of "2" means that at least 2 values or contained elements are required.</p></div>
+<div class="paragraph"><p>Some of the constraines defined by the metamodel are enforced by the editor, i.e. only valid changes can be done. For the other constraints, errors are annotated at the model.</p></div>
+</div>
+<h2 id="_models">Models</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Models are represented by DOM nodes with special (CSS) classes. Elements, attributes, references and containments are represented by DOM nodes with classes <tt>ct_element</tt>, <tt>ct_attribute</tt>, <tt>ct_reference</tt> and <tt>ct_containment</tt> respectively. Attribute, reference and containment nodes are child nodes of element nodes. However, they do not have to be direct children, there can be other nodes around them.</p></div>
+<div class="paragraph"><p>Within each attribute, reference or containment node, there has to be a <em>slot</em> node marked by class <tt>ct_slot</tt>. Again, slots don&#8217;t have to be direct children and may have other nodes around them. The slot is the place where attribute values, reference values or child elements are inserted.</p></div>
+<div class="paragraph"><p>Attribute and reference values are DOM nodes marked with class <tt>ct_value</tt>. These nodes contain plain text which is the actual attribute value or the identifier of the referenced element. Between the slot and the contained values or elements, there must not be any other nodes.</p></div>
+<div class="paragraph"><p>Note, that other custom CSS classes may be added to all the nodes as long as no predefined, reserved class is used (see CSS Class Reference).</p></div>
+<div class="paragraph"><p>For each element, the corresponding metamodel class is indicated by an additional CSS class. The CSS class name consists of the prefix <tt>ctc_</tt> followed by the name of the metamodel class. For example, an instance of the metamodel class "State" is annotated with CSS class <tt>ctc_State</tt>.</p></div>
+<div class="paragraph"><p>In order to indentify the features within each model element, they are annotated with CSS classes indicating the feature name. The CSS class name consists of the prefix <tt>ctn_</tt> followed by the name of the feature. For example an instance of the feature "name" would be annotated with CSS class <tt>ctn_name</tt>.</p></div>
+<div class="paragraph"><p>Here is an example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div class="ct_element ctc_Class1"&gt;
+        &lt;p&gt;Here comes an attribute:&lt;/p&gt;
+        &lt;span class="ct_attribuet ctn_feature1"&gt;
+                &lt;p&gt;Inside the attribute&lt;/p&gt;
+                &lt;span class="ct_slot"&gt;
+                        &lt;span class="ct_value"&gt;Value 1&lt;/span&gt;
+                        &lt;span class="ct_value"&gt;Value 2&lt;/span&gt;
+                        &lt;span class="ct_value"&gt;Value 3&lt;/span&gt;
+                &lt;/span&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/span&gt;
+        &lt;p&gt;Here comes a reference:&lt;/p&gt;
+        &lt;span class="ct_reference ctn_feature2"&gt;
+                &lt;p&gt;Inside the reference&lt;/p&gt;
+                &lt;span class="ct_slot"&gt;
+                        &lt;span class="ct_value"&gt;/ref/to/elementA&lt;/span&gt;
+                        &lt;span class="ct_value"&gt;/ref/to/elementB&lt;/span&gt;
+                        &lt;span class="ct_value"&gt;/ref/to/elementC&lt;/span&gt;
+                &lt;/span&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/span&gt;
+        &lt;p&gt;Here comes a containment:&lt;/p&gt;
+        &lt;div class="ct_containment ctn_feature3"&gt;
+                &lt;p&gt;Inside the containment&lt;/p&gt;
+                &lt;div class="ct_slot"&gt;
+                        &lt;div class="ct_element ctc_Class2"&gt;
+                                &lt;p&gt;Here go the element's attributes, references and containments&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class="ct_element"&gt;
+                                &lt;p&gt;Another element&lt;/p&gt;
+                        &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;End of element&lt;/p&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>In this example, <tt>div</tt> nodes are used for elements and <tt>span</tt> nodes are used for attributes and references. Note however, that this is not mandatory. In fact, any valid HTML tag can be used.</p></div>
+</div>
+<h2 id="_dom_templates">DOM Templates</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The concrete syntax of a <em>Concrete</em> DSL is specified using CSS. However, since CSS has it&#8217;s limits and CSS based layouts often need special DOM nodes, also DOM nodes are part of the concrete syntax. In order to facilitate this, DOM templates can be specified for each metamodel class. Together with CSS, these templates define the graphical representation of instance elements of that class.</p></div>
+<div class="paragraph"><p>DOM Templates are very similar to the model itself. The only difference is that all slots are empty and thus template definitions are not nested. In fact, a model is created by applying and nesting DOM templates.</p></div>
+<div class="paragraph"><p>Here is an example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div class="ct_element ctc_Class1"&gt;
+        &lt;p&gt;Here comes an attribute:&lt;/p&gt;
+        &lt;span class="ct_attribuet ctn_feature1"&gt;
+                &lt;p&gt;Inside the attribute&lt;/p&gt;
+                &lt;span class="ct_slot"&gt;
+                &lt;/span&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/span&gt;
+        &lt;p&gt;Here comes a reference:&lt;/p&gt;
+        &lt;span class="ct_reference ctn_feature2"&gt;
+                &lt;p&gt;Inside the reference&lt;/p&gt;
+                &lt;span class="ct_slot"&gt;
+                &lt;/span&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/span&gt;
+        &lt;p&gt;Here comes a containment:&lt;/p&gt;
+        &lt;div class="ct_containment ctn_feature3"&gt;
+                &lt;p&gt;Inside the containment&lt;/p&gt;
+                &lt;div class="ct_slot"&gt;
+                &lt;/div&gt;
+                &lt;p&gt;After the slot&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;End of element&lt;/p&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>This template describes the DOM representation used for elements which are instances of metamodel class "Class1". The example model shown in section "Models" could have been created by this template.</p></div>
+<div class="paragraph"><p>CSS definitions can use the mandatory CSS classes as well as any additional custom CSS class.</p></div>
+</div>
+<h2 id="_json_model_exchange_format">JSON Model Exchange Format</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>As described above, models are represented by DOM nodes at runtime. However, neither DOM nodes nor the corresponding HTML code are well suited to exchange the model data. One reason is that the DOM representation also contains part of the concrete syntax which should not be part of the pure model.</p></div>
+<div class="paragraph"><p>Instead of HTML, models are exchanged using the well known JSON format. JSON is basically the textual representation of objects/hashes/maps, arrays and primitive values in Javascript syntax. Today, JSON libraries are available for many major programming languages.</p></div>
+<div class="paragraph"><p><em>Concrete</em> models are represented in JSON using the following conventions:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+A model is an array holding the top-level model elements.
+</p>
+</li>
+<li>
+<p>
+Model elements are hashes, the metamodel class name is stored in a hash property named "_class".
+</p>
+</li>
+<li>
+<p>
+Feature values and contained elements are stored in properties named like the feature.
+</p>
+</li>
+<li>
+<p>
+If a feature contains multiple values/elements, they are grouped in an array. Otherwise the value/element is assigned directly to the property.
+</p>
+</li>
+<li>
+<p>
+Attribute values are converted to text using Javascript&#8217;s default conversion mechanism.
+</p>
+</li>
+<li>
+<p>
+Reference values are strings holding the identifier of the referenced element.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Here is an example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[{"_class": "Statemachine", "name": "AC", "states": [
+  {"_class": "SimpleState", "name": "Off", "transitions":
+    {"_class": "Transition", "target": "/AC/On"}},
+  {"_class": "CompositeState", "name": "On", "subStates": [
+    {"_class": "SimpleState", "name": "Heating", "transitions":
+      {"_class": "Transition", "target": "/AC/On/Cooling"}},
+    {"_class": "SimpleState", "name": "Cooling", "transitions":
+      {"_class": "Transition", "target": "/AC/On/Heating"}}], "transitions":
+    {"_class": "Transition", "target": "/AC/Off"}}]}]</tt></pre>
+</div></div>
+</div>
+<h2 id="_embedding_concrete">Embedding Concrete</h2>
+<div class="sectionbody">
+<h3 id="_depencencies">Depencencies</h3><div style="clear:left"></div>
+<div class="paragraph"><p><em>Concrete</em> depends on <em>Prototype</em> and <em>Scriptaculous</em>. So you need to make sure, that these libraries are included before <em>Concrete</em> itself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;script src="../../lib/prototype.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="../../lib/scriptaculous/scriptaculous.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="../../concrete/concrete.js" type="text/javascript"&gt;&lt;/script&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>Note that for the current version of <em>Concrete</em>, a slightly patched version of Scriptaculous is required which comes in the release package.</p></div>
+<h3 id="_style_sheets">Style Sheets</h3><div style="clear:left"></div>
+<div class="paragraph"><p>In order to make the editor look right, you need to define styles for the CSS classes mentioned above (alse see the CSS Class Reference). You can start with one of the "theme" CSS files from the examples folder. Then for DSL specific styles, you can add another stylesheet overwriting some of the definitions in the "theme" stylesheet. Of course, another option is to create one single new stylesheet.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;link rel="stylesheet" href="../../example/themes/cobalt.css" type="text/css" /&gt;
+&lt;link rel="stylesheet" href="../../editor/specific/style.css" type="text/css" /&gt;</tt></pre>
+</div></div>
+<h3 id="_template_provider">Template Provider</h3><div style="clear:left"></div>
+<div class="paragraph"><p><em>Concrete</em> needs a place where the DOM templates can be located. This is the place where custom DOM templates are specified, as well as the place where the default DOM templates are prepared automatically in case there are no custom templates. There is no special CSS class required, just an ID to reference the node. Normally, this template container should be made invisible.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div id="templates1" style="display: none"&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>Then, an instance of <tt>TemplateProvider</tt> needs to be created. The constructor gets the template container DOM node and may take additional options. For example, by setting <tt>identifierAttribute</tt> to "name", all attributes named "name" will be marked as identifier attributes when the default templates are created. This can be used to highlight these attributes differently.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>var tp = new Concrete.TemplateProvider($("templates1"), {identifierAttribute: "name"});</tt></pre>
+</div></div>
+<h3 id="_metamodel_provider">Metamodel Provider</h3><div style="clear:left"></div>
+<div class="paragraph"><p><em>Concret</em> knows about the metamodel by asking an instance of <tt>MetamodelProvider</tt>. The constructor takes the metamodel which is a model by itself, following the conventions described for the <em>Concrete</em> JSON format. It can be convenient to put the metamodel as text in JSON format into the HTML code. In this case, the text content of the containing node has to be evaluated as JSON before the metamodel provider can use it.</p></div>
+<div class="paragraph"><p>Here is a simple example metamodel:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div id="metamodel1" style="display: none"&gt;
+[
+  {"_class": "Datatype", "name": "String"},
+  {"_class": "Class", "A": "Feature", "features": [
+    {"_class": "Feature", "name": "feat1", "kind": "attribute", "type": "String"},
+    {"_class": "Feature", "name": "feat2", "kind": "attribute", "type": "String"},
+  ]}
+]
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>Here is how this metamodel can be fed into a new instance of <tt>MetamodelProvider</tt>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());</tt></pre>
+</div></div>
+<h3 id="_indentifier_provider">Indentifier Provider</h3><div style="clear:left"></div>
+<div class="paragraph"><p>In <em>Concrete</em>, identifiers are used to define reference targets. In order to create identifiers, the editor needs an identifier provider. Currently, the <tt>QualifiedNameBasedIdentifierProvider</tt> is included with <em>Concrete</em>, but other providers implementing custom identifier calculation strategies could be used instead. The <tt>QualifiedNameBasedIdentifierProvider</tt> needs to know the name of the attribute holding the local (non-qualified) name.</p></div>
+<div class="paragraph"><p>In the following example, all attributes named "name" are used for qualified name calculation.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name"});</tt></pre>
+</div></div>
+<h3 id="_clipboard">Clipboard</h3><div style="clear:left"></div>
+<div class="paragraph"><p>By default, the editor uses a clipboard it creates internally. However, to let several editors share a clipboard, an instance of <tt>Clipboard</tt> can be explicitly passed into each editor. This is also useful for making the clipboard content visible or editable. When a clipboard is created, a DOM node can be passed into the constructor which acts as the container of the clipboard data. If a HTML <tt>Textarea</tt> node is used, the clipboard content will be visible and editable within this textarea. If another type of node is passed in, its text content will hold the clipboard data and make it visible. If no DOM node is given, the data will be held as plain text internally.</p></div>
+<div class="paragraph"><p>Here is an example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;textarea id="clipboard1" style="background-color: white; color: black; border: 1px solid grey" cols="80" rows="10" wrap="off"&gt;
+&lt;/textarea&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>This textarea can be passed into the a new instance of <tt>Clipboard</tt>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>var cb = new Concrete.Clipboard($("clipboard1"));</tt></pre>
+</div></div>
+<h3 id="_conrete_editor">Conrete Editor</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The editor itself is some kind of widget which lives in a DOM node with CSS class <tt>ct_editor</tt>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div class="ct_editor" id="editor1"&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>With all the objects created before, the editor can be instantiated. The constructor takes the DOM node the editor should live in, the template provider, the metamodel provider, the identifier provider and additional options. One of the options is an externally created clipboard as described above. Another option defines the metamodel classes which can be instantiated on root level. If not specified, all metamodel classes can be instantiated on root level.</p></div>
+<div class="paragraph"><p>Here is an example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>var ed = new Concrete.Editor($("editor1"), tp, mp, ip, {clipboard: cb,
+        rootClasses: mp.metaclasses.select(function(c) { return ["Class", "Datatype", "Enum"].include(c.name)})});</tt></pre>
+</div></div>
+<div class="paragraph"><p>Once the editor has been created it has to be connected to the browser window events. Currently the <tt>click</tt>, <tt>keydown</tt> and <tt>mousemove</tt> events are supported.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Event.observe(window, 'click', function(event) {
+        ed.handleEvent(event);
+});
+Event.observe(window, 'keydown', function(event) {
+        ed.handleEvent(event);
+});
+Event.observe(window, 'mousemove', function(event) {
+        ed.handleEvent(event);
+});</tt></pre>
+</div></div>
+<h3 id="_loading_and_storing_data">Loading and Storing Data</h3><div style="clear:left"></div>
+<div class="paragraph"><p>A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the <em>Concrete</em> editor provides the methods <tt>getModel</tt> and <tt>setModel</tt>. In both cases the model is a set of Javascript objects following the JSON conventions as described above.</p></div>
+<div class="paragraph"><p>One possible way to use this API is to get the data from a server via AJAX and also store it back in the same way. Another option for loading is to embed the model in an HTML element in JSON text format and load it from there.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div id="model1" style="display: none"&gt;
+        &lt;!-- json model here --&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>Code for loading the model&#8230;</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>// load model only if present and valid JSON
+var modelData = $("model1").textContent;
+if (modelData.isJSON()) {
+        ed.setModel(modelData);
+}</tt></pre>
+</div></div>
+<div class="paragraph"><p>&#8230;and for storing it via AJAX using the Prototype library.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });</tt></pre>
+</div></div>
+</div>
+<h2 id="_css_class_reference">CSS Class Reference</h2>
+<div class="sectionbody">
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Model and Template Related CSS Classes</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">ct_element</p></td>
+<td align="left" valign="top"><p class="table">model element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_attribute</p></td>
+<td align="left" valign="top"><p class="table">model element attribute</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_reference</p></td>
+<td align="left" valign="top"><p class="table">model element reference to other model element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_containment</p></td>
+<td align="left" valign="top"><p class="table">model element containment of other element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_slot</p></td>
+<td align="left" valign="top"><p class="table">slot inside an attribute, reference or containment</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_value</p></td>
+<td align="left" valign="top"><p class="table">attribute or reference value</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ctc_&lt;&#8230;&gt;</p></td>
+<td align="left" valign="top"><p class="table">class indicating an element&#8217;s metamodel class</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ctn_&lt;&#8230;&gt;</p></td>
+<td align="left" valign="top"><p class="table">class indicating a feature&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_handle</p></td>
+<td align="left" valign="top"><p class="table">marks a DOM node which is used as an element&#8217;s handle</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_auto_hide</p></td>
+<td align="left" valign="top"><p class="table">marks a feature as "auto hide"</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_root</p></td>
+<td align="left" valign="top"><p class="table">internal. marks the model root node</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Editor Related CSS Classes</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">ct_editor</p></td>
+<td align="left" valign="top"><p class="table">the editor itself</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_inline_editor</p></td>
+<td align="left" valign="top"><p class="table">inline editor for editing text inside the editor</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_focus</p></td>
+<td align="left" valign="top"><p class="table">this class is present at the editor node if it is focused</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_select</p></td>
+<td align="left" valign="top"><p class="table">this class is present at an element or value if it is selected</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_cursor</p></td>
+<td align="left" valign="top"><p class="table">cursor on the border of the currently selected eleemnt</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_empty</p></td>
+<td align="left" valign="top"><p class="table">empty value or element placeholder</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Highlighting Related CSS Classes</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">ct_identifier_attribute</p></td>
+<td align="left" valign="top"><p class="table">marks the attribute holding the identifier of an element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_class_name</p></td>
+<td align="left" valign="top"><p class="table">marks an element&#8217;s class name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_feature_name</p></td>
+<td align="left" valign="top"><p class="table">marks the feature name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_error</p></td>
+<td align="left" valign="top"><p class="table">marks elements and features for which a constraint check failed</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_error_description</p></td>
+<td align="left" valign="top"><p class="table">internal. error description to be displayed for a node</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_error_popup</p></td>
+<td align="left" valign="top"><p class="table">popup window shown when the mouse is over an erroneous element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_ref_source</p></td>
+<td align="left" valign="top"><p class="table">marks a reference when it is highlighted</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_ref_target</p></td>
+<td align="left" valign="top"><p class="table">marks the target element when a reference is highlighted</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2010-01-21 19:11:11 WEDT
+</div>
+</div>
+</body>
+</html>

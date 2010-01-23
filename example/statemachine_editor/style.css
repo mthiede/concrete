@@ -1,0 +1,43 @@
+
+/* Metamodel Specific Styles
+ *****************************************************************************/
+
+.ctc_Statemachine {
+	border: 1px solid black;
+	padding: 10px;
+	margin: 10px;
+}
+
+.ctc_SimpleState {
+	border: 1px solid black; 
+	-moz-border-radius: 0.5em; 
+	margin: 10px;
+	background: url(state_background.png) no-repeat top right #fcf2e3;
+}
+
+.ctc_SimpleState.ct_selected, .ct_selected .ctc_SimpleState {
+	background: #aaf;
+}
+
+.ctc_CompositeState {
+	border: 1px solid black; 
+	-moz-border-radius: 0.5em; 
+	margin: 10px;	
+	background: url(state_background.png) no-repeat top right #fcf2e3;
+}
+
+.ctc_CompositeState.ct_selected, .ct_selected .ctc_CompositeState {
+	background: #aaf;
+}
+
+.ctc_AndExpression .ct_containment { padding: 0; }
+.ctc_AndExpression .ct_containment .ct_element { margin: 0; }
+.ctc_AndExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
+
+.ctc_OrExpression .ct_containment { padding: 0; }
+.ctc_OrExpression .ct_containment .ct_element { margin: 0; }
+.ctc_OrExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
+
+.ctc_NotExpression .ct_containment { padding: 0; }
+.ctc_NotExpression .ct_containment .ct_element { margin: 0; }
+.ctc_NotExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
