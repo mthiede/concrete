@@ -23,7 +23,7 @@ whereas the referenced elemenet normally is not (there may be exceptions). When 
 elements are also deleted. When the parent element is collapsed the contained elements are hidden.
  
 Attributes, reference and containmend relationships are called _features_ of an element. Feataures have names, 
-although they may not be visible.^
+although they may not be visible.
 
 Attributes and reference contain _values_ whereas containment relationships contain _elements_.
 
@@ -33,7 +33,7 @@ Attributes and reference contain _values_ whereas containment relationships cont
 === Selecting Elements/Values ===
 
 For all editing commands described below, at least one element or attribute/reference value needs to be selected. 
-Selection can be done with the cursor keys (+Left+, +Right+, +Up+, +Down+), with +Tab+ and +Shift-Tab+ or with the mouse.
+Selection can be done with the arrow keys (+Left+, +Right+, +Up+, +Down+), with +Tab+ and +Shift-Tab+ or with the mouse.
 
 Selection with the mouse is straightforward, just click the element.
 
@@ -41,7 +41,7 @@ Using the key +Tab+ and +Shift-Tab+, the next/previous element/value can be sele
 (instead of the graphical order on the screen). If an element has other elements or values inside, +Tab+ will select 
 the first child, and so on.
 
-In contrast to the tab keys, the cursor keys select with respect to the graphical position on the screen.
+In contrast to the tab keys, the arrow keys select with respect to the graphical position on the screen.
 Press one of +Left+, +Right+, +Up+, +Down+, to move the selection in the respective direction.
 When an element has other elements or values inside, the next selected element may be one of these elements.
 In order to know if the next selected element is inside or outside of the current element, you need to be aware of 
@@ -95,7 +95,7 @@ If an error is detected with your input (e.g. because you entered letters for an
 you can not successfully leave edit mode. In this case, either correct your input or cancel edit mode.
 
 If a set of completion options is available for the current element/value, a dropdown box will be shown in edit mode
-when you start typing. You can bring up the dropdown box without typing by pressing one of the cursor keys.
+when you start typing. You can bring up the dropdown box without typing by pressing one of the arrow keys.
 
 
 === Creating Elements ===

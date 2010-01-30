@@ -320,7 +320,7 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 | ct_inline_editor | inline editor for editing text inside the editor
 | ct_focus | this class is present at the editor node if it is focused
 | ct_select | this class is present at an element or value if it is selected
-| ct_cursor | cursor on the border of the currently selected eleemnt
+| ct_cursor | cursor on the border of the currently selected element
 | ct_empty | empty value or element placeholder
 |=======================
 
