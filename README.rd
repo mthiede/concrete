@@ -1,4 +1,4 @@
-== Concrete Model Editor 
+= Concrete Model Editor 
 
 Concrete is a lightweight, web-based model editor which can be configured for different DSLs (Domain Specific Languages). 
 
@@ -9,22 +9,27 @@ Concrete is a Javascript widget based on Prototype and Scriptaculous. It exchang
 Note that until now, Concrete has only been tested sucessfully with Firefox.
 
 
-= Download
+== Screencast
+
+See Concrete in action by watching the screencast[http://vimeo.com/9164866].
+
+
+== Download
 
 You can get the latest version from github.
 
 
-= Installation
+== Installation
 
 Concrete is not a standalone editor but needs to be integrated into a (web) application. For more information how to do this, see the developers guide and the examples included.
 
 
-= Documentation
+== Documentation
 
 There is a Users Guide and a Developers Guide in the doc folder. The Users Guide explains the usage of the editor independant of any specific DSL. The Developers Guide describes how to create own DSLs and how to integrate Concrete.
 
 
-= Examples
+== Examples
 
 Currently, the examples folder contains: 
 * A metamodel editor which can be used to create and edit Concrete metamodels
@@ -37,12 +42,12 @@ In the metamodel example, there is also a little Ruby program which shows server
 
 To edit the statemachine example metamodel, you would do:
 
-example/metamodel_editor> ruby edit.rb example_data/statemachine_metamodel.json
+  example/metamodel_editor> ruby edit.rb example_data/statemachine_metamodel.json
 
 If you want to try the respective editor with the changed metamodel, you have to put it into the HTML file. It will not load the metamodel from the "example_data" folder.
 
 
-= License
+== License
 
 Concrete is licensed under the terms of the MIT license, see the included MIT-LICENSE file.
 
