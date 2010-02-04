@@ -65,9 +65,9 @@ This will automatically scroll to make the target visible.
 References can also be followed by pressing +Alt-Right+ while a valid reference value is selected. This will select
 the target element and scroll to make it visible. By pressing +Alt-Left+ you can go back the references in reverse order.
 
-=== Collapsing ===
+=== Folding ===
 
-Elements with containment relationships can be collapsed using +Ctrl-Left+. This will hide the containment relationship
+Elements with containment relationships can be collapsed using +Ctrl-Left+. This will hide the containment relationships
 including the contained elements. In order to expand the element again, press +Ctrl-Right+.
 
 You can collapse and expand elements recursively using +Ctrl-Shift-Left+ and +Ctrl-Shift-Right+. This will also
@@ -75,9 +75,11 @@ collapse/expand child elements.
 
 In addition to this, empty features may collapse depending on the DSL configuration. This happens when you leave
 the currently selected element (i.e. select another element which is not a child). You can show all hidden featurs
-be pressing +Shift-Return+.
+be pressing +Shift-Return+. This command also expands the current element.
 
 All collapsing commands also work with multiple elements selected.
+
+Depending on the DSL, folding may also be triggered by clicking on the fold button (e.g. a plus or minus sign).
 
 
 == Editing ==

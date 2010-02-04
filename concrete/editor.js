@@ -106,7 +106,10 @@ Concrete.Editor = Class.create({
 		}
 		else {
 			if (event.type == "click" && event.isLeftClick()) {
-				if (event.ctrlKey) {
+        if (Event.element(event).hasClassName("ct_fold_button")) {
+          this.toggleFoldButton(Event.element(event));
+        }
+        else if (event.ctrlKey) {
 					this.jumpReference(Event.element(event));
 				}
 				else if (this.selector.selected == this.selector.surroundingSelectable(Event.element(event))) {
@@ -279,6 +282,8 @@ Concrete.Editor = Class.create({
 	},
 		
 	showHiddenFeatures: function(n) {
+    // expand to make fold button state consistent (code below will show all features)
+    this.expandElement(n);
 		n.findFirstDescendants(["ct_attribute", "ct_reference", "ct_containment"], ["ct_element"]).each(function(f) {
 			f.show();
 			var slot = f.down(".ct_slot");
@@ -294,36 +299,51 @@ Concrete.Editor = Class.create({
 		this.adjustMarker();
 	},
 
+  toggleFoldButton: function(fb) {
+    if (fb.hasClassName("ct_fold_open")) {
+      this.collapseElement(fb.up(".ct_element"));
+    }
+    else if (fb.hasClassName("ct_fold_closed")) {
+      this.expandElement(fb.up(".ct_element"));
+    }
+  },
+
 	collapseElement: function(n) {
-		n.findFirstDescendants(["ct_containment"], ["ct_element"]).each(function(f) {
-			f.hide();
+		n.features.each(function(f) {
+			if (f.mmFeature.isContainment()) f.hide();
 		});
+    if (n.foldButton) {
+      n.foldButton.removeClassName("ct_fold_open");
+      n.foldButton.addClassName("ct_fold_closed");
+    }
 		this.adjustMarker();
 	},
 
 	expandElement: function(n) {
-		n.findFirstDescendants(["ct_containment"], ["ct_element"]).each(function(f) {
-			if (!Concrete.Editor.CommandHelper.canAutoHide(f)) {
+		n.features.each(function(f) {
+			if (f.mmFeature.isContainment() && !Concrete.Editor.CommandHelper.canAutoHide(f)) {
 				f.show();
 			}
 		});
+    if (n.foldButton) {
+      n.foldButton.removeClassName("ct_fold_closed");
+      n.foldButton.addClassName("ct_fold_open");
+    }
 		this.adjustMarker();
 	},	
 	
 	collapseElementRecursive: function(n) {
-		n.select(".ct_containment").each(function(f) {
-			f.hide();
-		});
-		this.adjustMarker();		
+		n.select(".ct_element").each(function(e) {
+      this.collapseElement(e);
+		}, this);
+    this.collapseElement(n);
 	},
 	
 	expandElementRecursive: function(n) {
-		n.select(".ct_containment").each(function(f) {
-			if (!Concrete.Editor.CommandHelper.canAutoHide(f)) {
-				f.show();
-			}
-		});
-		this.adjustMarker();
+		n.select(".ct_element").each(function(e) {
+      this.expandElement(e);
+		}, this);
+    this.expandElement(n);
 	},
 
 	copyToClipboard: function(nodes, editor) {

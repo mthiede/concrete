@@ -11,6 +11,7 @@ Concrete.TemplateProvider = Class.create({
 		this.templateRoot = templateRoot;
 		this._templateByClass = {};
 		this.options = opts || {};
+    this.options.foldButton = true;
 	},
 	
 	emptyValue: function() {
@@ -46,6 +47,9 @@ Concrete.TemplateProvider = Class.create({
 		var tmpl = this.templateRoot.childElements().last();
 		tmpl.mmClass = clazz;
 		var headDiv = tmpl.down();
+    if (this.options.foldButton) {
+		  headDiv.insert({bottom: "<span class='ct_fold_button'></span> "});
+    }
 		headDiv.insert({bottom: "<span class='ct_handle ct_class_name'>"+clazz.name+"</span> "});
 		var ftmpls = [];
 		clazz.allFeatures().each(function(f) {

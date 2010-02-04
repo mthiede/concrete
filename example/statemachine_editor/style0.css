@@ -1,0 +1,8 @@
+
+/* Metamodel Specific Styles
+ *****************************************************************************/
+
+/* add some space around the classes to make reading easier */
+.ctc_Class {
+	padding: 2px 0 2px 0;
+

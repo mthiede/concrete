@@ -1,0 +1,18 @@
+/* Folding
+ *****************************************************************************/
+
+.ct_fold_open {
+  display: none;
+}
+
+.ct_fold_closed {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-image: url("dots_12px.png");
+}
+
+.ct_fold_empty {
+  display: none;
+}
+

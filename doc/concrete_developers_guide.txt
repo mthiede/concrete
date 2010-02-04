@@ -322,6 +322,10 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 | ct_select | this class is present at an element or value if it is selected
 | ct_cursor | cursor on the border of the currently selected element
 | ct_empty | empty value or element placeholder
+| ct_fold_button | marks the fold button
+| ct_fold_open | present at the fold button when the fold is open
+| ct_fold_closed | present at the fold button when the fold is closed
+| ct_fold_empty | present at the fold button when the containing element has no contained elements
 |=======================
 
 .Highlighting Related CSS Classes

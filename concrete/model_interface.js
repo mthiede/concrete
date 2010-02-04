@@ -74,6 +74,9 @@ Concrete.ModelInterface = Class.create({
 		parent = parent || this.modelRoot;
 		this._notifyModelChangeListeners("changed", parent, feature);
 		this._notifyModelChangeListeners("commit");
+    if (parent != this.modelRoot) {
+      if (parent.foldButton) parent.foldButton.removeClassName("ct_fold_empty");
+    }
 	},
 	
 	moveElement: function(element) {
@@ -84,12 +87,15 @@ Concrete.ModelInterface = Class.create({
 		if (!(elements instanceof Array)) elements = [ elements ];
 		elements.each(function(element) {
 			if (!element.hasClassName("ct_element")) throw new Error ("not an element");
-			element.remove();
-			this._notifyModelChangeListeners("removed", element);
 			var parent = element.up(".ct_element");
 			var feature = parent && element.up(".ct_containment");
 			parent = parent || this.modelRoot;
-			this._notifyModelChangeListeners("changed", parent, feature);
+      element.remove();
+			this._notifyModelChangeListeners("removed", element);
+      this._notifyModelChangeListeners("changed", parent, feature);
+      if (parent != this.modelRoot) {
+        if (parent.foldButton && !this._hasChildElements(parent)) parent.foldButton.addClassName("ct_fold_empty");
+      }
 		}, this);
 		this._notifyModelChangeListeners("commit");
 	},
@@ -156,7 +162,15 @@ Concrete.ModelInterface = Class.create({
 	},
 	
 	// Private
-	
+
+  _hasChildElements: function(element) {
+    return element.features.any(function(f) { 
+        return f.mmFeature.isContainment() && f.slot.childElements().any(function(c) { 
+          return !c.hasClassName("ct_empty");
+        });
+      });
+  },
+
 	_notifyModelChangeListeners: function(type, element, feature) {
 		if (type == "changed")
 			if (element == this.modelRoot)
@@ -213,6 +227,7 @@ Concrete.ModelInterface = Class.create({
 
 		inst.features = [];
 		var childs = inst.allChildren();
+    var hasChildElements = false;
 		for (var i=0; i<tmpl.featurePositions.length; i++) {
 			var mmf = tmpl.mmFeatures[i];
 			var f = childs[tmpl.featurePositions[i]];
@@ -226,6 +241,7 @@ Concrete.ModelInterface = Class.create({
 				if (mmf.isContainment()) {
 					values.each(function(v) {
 						this._instantiateTemplateRecursive(v, slot, "bottom");
+            hasChildElements = true;
 					}, this);
 				}
 				else {
@@ -239,6 +255,11 @@ Concrete.ModelInterface = Class.create({
 				f.hide();
 			}
 		}
+    if (tmpl.foldButtonPosition != undefined) {
+      inst.foldButton = childs[tmpl.foldButtonPosition];
+      inst.foldButton.addClassName("ct_fold_open");
+      if (!hasChildElements) inst.foldButton.addClassName("ct_fold_empty");
+    }
 		return inst;
 	},
 		
@@ -249,6 +270,8 @@ Concrete.ModelInterface = Class.create({
 		tmpl.featurePositions = ftmpls.collect(function(ft) { return allChilds.indexOf(ft); });
 		tmpl.mmFeatures = ftmpls.collect(function(ft) { return ft.mmFeature; });
 		tmpl.slotPositions = ftmpls.collect(function(ft) { return allChilds.indexOf(ft.down(".ct_slot")); });
+    var foldButton = tmpl.down(".ct_fold_button");
+    tmpl.foldButtonPosition = foldButton && allChilds.indexOf(foldButton);
 	}
 
 });
