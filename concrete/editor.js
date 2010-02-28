@@ -5,8 +5,15 @@
 // Concrete is freely distributable under the terms of an MIT-style license.
 
 Concrete.Editor = Class.create({
-	
+
+  // Options:
+  //   readOnlyMode: if set, the model can not be modified via user events, default: false
+  //   clipboard:    if a DOM node is provided it is used as clipboard, default: internal clipboard
+  //   rootClasses:  set of classes which can be instaniated on root level, default: all 
+  //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
+    this.options = options || {};
+    if (this.options.readOnlyMode == undefined) this.options.readOnlyMode = false;
 		this.editorRoot = editorRoot;
 		this._setupRoot();
 		this.templateProvider = templateProvider;
@@ -247,7 +254,9 @@ Concrete.Editor = Class.create({
 	
 	runCommand: function(eventId) {
 		var se = this.selector.selected
-		var cmd = Concrete.Editor.Commands.select(function(c) { return c.enable && c.enable(se, this) && c.trigger == eventId }, this).first()
+		var cmd = Concrete.Editor.Commands.select(function(c) { 
+      return (!this.options.readOnlyMode || c.readOnly) && c.enable && c.enable(se, this) && c.trigger == eventId 
+    }, this).first();
 		if (cmd) {
 			cmd.run(se, this);
 		}
@@ -647,6 +656,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Hide Empty Features",
 		trigger: "hide_empty_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_element");
 		},
@@ -660,6 +670,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Show Hidden Features",
 		trigger: "show_hidden_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return true;
 		},
@@ -673,6 +684,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Collapse Element",
 		trigger: "collapse_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_element");
 		},
@@ -686,6 +698,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Expand Element",
 		trigger: "expand_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_element");
 		},
@@ -699,6 +712,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Collapse Element Recursive",
 		trigger: "collapse_recursive_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_element");
 		},
@@ -712,6 +726,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Expand Element Recursive",
 		trigger: "expand_recursive_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_element");
 		},
@@ -725,6 +740,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Copy",
 		trigger: "copy_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return !n.hasClassName("ct_empty");
 		},
@@ -782,6 +798,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Jump Reference",
 		trigger: "jump_forward_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return n.hasClassName("ct_value") && n.mmFeature().isReference();
 		},
@@ -793,6 +810,7 @@ Concrete.Editor.Commands = [
 	{
 		name: "Jump Reference Back",
 		trigger: "jump_backward_event",
+    readOnly: true,
 		enable: function(n, editor) {
 			return true;
 		},
