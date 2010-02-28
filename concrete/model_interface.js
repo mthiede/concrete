@@ -142,6 +142,9 @@ Concrete.ModelInterface = Class.create({
 						if (f.mmFeature.type.isInteger()) {
 							return parseInt(v.textContent);
 						}
+						else if (f.mmFeature.type.isFloat()) {
+							return parseFloat(v.textContent);
+						}
 						else if (f.mmFeature.type.isBoolean()) {
 							return v.textContent == "true";
 						}

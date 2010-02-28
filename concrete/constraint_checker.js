@@ -63,6 +63,9 @@ Concrete.ConstraintChecker = Class.create({
 		else if (mmFeature.type.isInteger()) {
 			return /^(-?[1-9]\d*|0)$/;
 		}
+		else if (mmFeature.type.isFloat()) {
+			return /^(-?[1-9]\d*|0)(\.\d+)?$/;
+		}
 		else {
 			return undefined;
 		}			

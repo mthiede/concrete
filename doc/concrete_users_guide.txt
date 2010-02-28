@@ -13,7 +13,7 @@ This document describes the usage of the editor, independant of any specific DSL
 Models consist of +elements+ which may have attributes, references to other elements and may contain other elements. 
 
 +Attributes+ can take one or more primitive values. Currently
-primitive values are of type +String+, +Integer+, +Boolean+, or custom defined +Enum+ datatypes. +Enum+ types have
+primitive values are of type +String+, +Integer+, +Float+, +Boolean+, or custom defined +Enum+ datatypes. +Enum+ types have
 a name and consist of a set of string literals, each of which is a valid instance of the type.
 
 +References+ point to one or more other elements. References can not point to or take primitive values.

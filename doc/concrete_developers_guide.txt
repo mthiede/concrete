@@ -7,7 +7,7 @@ This document describes the _Concrete_ model editor from a DSL developer's point
 
 _Concrete_ uses metamodels to define the abstract syntax of a DSL. A metamodel specifies the possible abstract content of models by means of _metamodel classes_. Each metamodel class defines the _features_ the instance model elements can have. Features are _attributes_, _references_ and _containments_. Attributes hold primitive values, references reference other model elements and containments contain other elements as part of the element itself. Each feature has a name and a type.
 
-In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool and Integer) or a custom defined enum datatype. Enum datatypes consist of a set of string literals. 
+In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool, Integer and Float) or a custom defined enum datatype. Enum datatypes consist of a set of string literals. 
 
 In case of a reference, the type must be a metamodel class. Only instances of that metamodel class can be valid targets of the reference.
 

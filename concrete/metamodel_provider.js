@@ -112,7 +112,7 @@ Concrete.MetamodelProvider = Class.create({
 			if (!(type.literals instanceof Array) || !type.literals.all(function(l) { return Object.isString(l); })) throw new Error("Enum literals must be an Array of Strings in type '"+type.name+"'");
 		}
 		if (type._class == "Datatype") {
-			if (!(["String", "Integer", "Boolean"].include(type.name))) throw new Error("Plain Datatypes (excluding Enums) must be named one of [String, Integer, Boolean]");
+			if (!(["String", "Integer", "Float", "Boolean"].include(type.name))) throw new Error("Plain Datatypes (excluding Enums) must be named one of [String, Integer, Float, Boolean]");
 		}
 	},
 	
@@ -159,6 +159,7 @@ Concrete.MetamodelExtension.Datatype = {
 	isEnum: function() { return this._class == "Enum"; },
 	isString: function() { return this.name == "String"; },
 	isInteger: function() { return this.name == "Integer"; },
+	isFloat: function() { return this.name == "Float"; },
 	isBoolean: function() { return this.name == "Boolean"; }
 };
 

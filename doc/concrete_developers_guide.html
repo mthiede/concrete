@@ -394,7 +394,7 @@ div#toc a:visited { color: blue; }
 <h2 id="_metamodels">Metamodels</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>Concrete</em> uses metamodels to define the abstract syntax of a DSL. A metamodel specifies the possible abstract content of models by means of <em>metamodel classes</em>. Each metamodel class defines the <em>features</em> the instance model elements can have. Features are <em>attributes</em>, <em>references</em> and <em>containments</em>. Attributes hold primitive values, references reference other model elements and containments contain other elements as part of the element itself. Each feature has a name and a type.</p></div>
-<div class="paragraph"><p>In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool and Integer) or a custom defined enum datatype. Enum datatypes consist of a set of string literals.</p></div>
+<div class="paragraph"><p>In case of an attribute, the type must be one of the predefined primitive datatypes (currently String, Bool, Integer and Float) or a custom defined enum datatype. Enum datatypes consist of a set of string literals.</p></div>
 <div class="paragraph"><p>In case of a reference, the type must be a metamodel class. Only instances of that metamodel class can be valid targets of the reference.</p></div>
 <div class="paragraph"><p>In case of a containment, the type must be a metamodel class as well. Only instances of that metamodel class can be nested in the containment.</p></div>
 <div class="paragraph"><p>Optionally, an upper and lower limit may be specified for each feature. For example, an upper limit of "1" means that only one attribute/reference value or contained element is allowed. A lower limit of "2" means that at least 2 values or contained elements are required.</p></div>
@@ -814,7 +814,7 @@ cellspacing="0" cellpadding="4">
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-06 14:56:16 WEDT
+Last updated 2010-02-28 13:41:52 WEDT
 </div>
 </div>
 </body>

@@ -64,9 +64,9 @@
 				
 				ed.constraintChecker.addConstraint(new Concrete.ConstraintChecker.FeatureValueConstraint({
 					class: "Datatype", feature: "name",
-					message: "primitive types (Datatype) must be named 'String', 'Integer' or 'Boolean'",
+					message: "primitive types (Datatype) must be named 'String', 'Integer', 'Float' or 'Boolean'",
 					checker: function(element, value) {
-						return ["String", "Integer", "Boolean"].include(value);
+						return ["String", "Integer", "Float", "Boolean"].include(value);
 					}
 				}));
 					
