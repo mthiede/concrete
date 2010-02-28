@@ -19,13 +19,13 @@ a name and consist of a set of string literals, each of which is a valid instanc
 +References+ point to one or more other elements. References can not point to or take primitive values.
 
 +Containment+ relationships are references with the difference that the contained element is part of the parent element,
-whereas the referenced elemenet normally is not (there may be exceptions). When the parent element is deleted, the contained
+whereas the referenced element normally is not (there may be exceptions). When the parent element is deleted, the contained
 elements are also deleted. When the parent element is collapsed the contained elements are hidden.
  
-Attributes, reference and containmend relationships are called _features_ of an element. Feataures have names, 
+Attributes, reference and containmend relationships are called _features_ of an element. Features have names, 
 although they may not be visible.
 
-Attributes and reference contain _values_ whereas containment relationships contain _elements_.
+Attributes and references contain _values_ whereas containment relationships contain _elements_.
 
 
 == Navigation and Selection ==
