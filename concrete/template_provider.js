@@ -7,12 +7,15 @@
 Concrete.TemplateProvider = Class.create({
 	
 	// +templateRoot+ is the DOM element containing the templates
-	initialize: function(templateRoot, opts) {
+  //
+  // Options:
+  //   identifierAttribute: name of the feature that holds the identifier, default: none
+  //   featureSortFunc: function providing values for features used to sort them, default: none 
+  //
+	initialize: function(templateRoot, options) {
 		this.templateRoot = templateRoot;
 		this._templateByClass = {};
-		this.options = opts || {};
-    this.options.foldButton = true;
-    this.options.icon = true;
+		this.options = options || {};
 	},
 	
 	emptyValue: function() {
@@ -48,15 +51,13 @@ Concrete.TemplateProvider = Class.create({
 		var tmpl = this.templateRoot.childElements().last();
 		tmpl.mmClass = clazz;
 		var headDiv = tmpl.down();
-    if (this.options.foldButton) {
-		  headDiv.insert({bottom: "<span class='ct_fold_button'></span> "});
-    }
-    if (this.options.icon) {
-		  headDiv.insert({bottom: "<span class='ct_element_icon'></span> "});
-    }
+    headDiv.insert({bottom: "<span class='ct_fold_button'></span> "});
+    headDiv.insert({bottom: "<span class='ct_element_icon'></span> "});
 		headDiv.insert({bottom: "<span class='ct_handle ct_class_name'>"+clazz.name+"</span> "});
 		var ftmpls = [];
-		clazz.allFeatures().each(function(f) {
+    var features = clazz.allFeatures();
+    if (this.options.featureSortFunc) features = features.sortBy(this.options.featureSortFunc);
+		features.each(function(f) {
 			var ft;
 			if (f.kind == "attribute") {
 				if (this.options.identifierAttribute && f.name == this.options.identifierAttribute) {
