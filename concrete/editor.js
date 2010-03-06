@@ -10,6 +10,14 @@ Concrete.Editor = Class.create({
   //   readOnlyMode: if set, the model can not be modified via user events, default: false
   //   clipboard:    if a DOM node is provided it is used as clipboard, default: internal clipboard
   //   rootClasses:  set of classes which can be instaniated on root level, default: all 
+  //   externalIdentifierProvider: 
+  //                 an object providing access to identifiers of objects which are not
+  //                 part of the model being edited in this instance of the editor, default: none
+  //   onFollowExternalReference:
+  //                 a function which will be called when an external reference is invoked, 
+  //                 it gets two arguments, the module (provided by the identifier provider) and the identifier,
+  //                 if not defined, external references can not be followed, default: none
+  //                 
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     this.options = options || {};
@@ -24,7 +32,8 @@ Concrete.Editor = Class.create({
 		this.modelInterface.addModelChangeListener(this.identifierProvider);
 		this.rootClasses = (options && options.rootClasses) || this.metamodelProvider.metaclasses;
 		this.maxRootElements = -1;
-		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider);
+    this.externalIdentifierProvider = options.externalIdentifierProvider;
+		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, this.externalIdentifierProvider);
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
 		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
 		this.selector = this._createSelector();
@@ -32,6 +41,7 @@ Concrete.Editor = Class.create({
 		this.adjustMarker();
 		this.jumpStack = [];
 		this.clipboard = (options && options.clipboard) || new Concrete.Clipboard();
+    this.onFollowExternalReference = options.onFollowExternalReference;
 		this._hasFocus = false;
 	},
 	
@@ -239,14 +249,26 @@ Concrete.Editor = Class.create({
 		var element = Event.element(event);
 		if (this.refHighlight) {
 			this.refHighlight.source.removeClassName("ct_ref_source");
-			this.refHighlight.target.removeClassName("ct_ref_target");
+			if (this.refHighlight.target) this.refHighlight.target.removeClassName("ct_ref_target");
 			this.refHighlight = undefined;
 		}
 		if (event.ctrlKey && element.hasClassName("ct_value") && !element.hasClassName("ct_empty") && element.mmFeature().isReference()) {
-			var target = this.identifierProvider.getElement(element.textContent);
-			if (target && !(target instanceof Array)) {
-				element.addClassName("ct_ref_source");
-				target.addClassName("ct_ref_target");
+			var targets = this.identifierProvider.getElement(element.textContent);
+      if (!(targets instanceof Array)) targets = [targets].compact();
+      if (this.externalIdentifierProvider) {
+        var ei = this.externalIdentifierProvider.getElementInfo(element.textContent);
+        if (ei) {
+          // here we add a type instead of an element
+          targets = targets.concat(ei.type);
+        }
+      }
+      if (targets.size() == 1) {
+        element.addClassName("ct_ref_source");
+        if (targets[0].mmClass) {
+          // if target is an element in this editor
+          var target = targets[0]; 
+          target.addClassName("ct_ref_target");
+        }
 				this.refHighlight = {source: element, target: target};
 			}
 		}		
@@ -372,6 +394,12 @@ Concrete.Editor = Class.create({
 			this.jumpStack.push(n);
 			this.selector.selectDirect(target);
 		}
+    else {
+      var ei = this.externalIdentifierProvider && this.externalIdentifierProvider.getElementInfo(n.textContent);
+      if (ei && this.onFollowExternalReference) {
+        this.onFollowExternalReference(ei.module, n.textContent);
+      }
+    }
 	},
 			
 	adjustMarker: function() {
@@ -394,11 +422,14 @@ Concrete.Editor = Class.create({
 Concrete.Editor.CommandHelper = {
 	
 	referenceOptions: function(type, editor) {
-		return editor.modelInterface.elements().
+    var idents = editor.modelInterface.elements().
 			select(function(e) { return editor.constraintChecker.isValidInstance(type, e);}).
-			collect(function(e) { return editor.identifierProvider.getIdentifier(e); }).
-			select(function(s) {return s && s.length > 0});
-		},
+			collect(function(e) { return editor.identifierProvider.getIdentifier(e); });
+    if (editor.externalIdentifierProvider) {
+      idents = idents.concat(editor.externalIdentifierProvider.getIdentifiers(type));
+    }
+	  return idents.select(function(i) {return i && i.length > 0});
+  },
 		
 	canAutoHide: function(feature) {
 		return (feature.hasClassName("ct_auto_hide") && !feature.hasClassName("ct_error") &&

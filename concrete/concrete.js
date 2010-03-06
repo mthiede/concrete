@@ -44,6 +44,7 @@ var Concrete = {
 				'model_interface',
 				'metamodel_provider',
 				'identifier_provider',
+				'external_identifier_provider',
 				'constraint_checker',
 				'clipboard',
 				'helper'

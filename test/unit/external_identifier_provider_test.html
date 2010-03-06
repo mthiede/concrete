@@ -1,0 +1,109 @@
+<html>
+<head>
+  <title>Concrete Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../lib/scriptaculous/unittest.js" type="text/javascript"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	// <![CDATA[
+		var Concrete = {}
+	// ]]>
+	</script>
+  <script src="../../concrete/external_identifier_provider.js" type="text/javascript"></script>	
+  <link rel="stylesheet" href="test.css" type="text/css" />
+</head>
+<body>
+<h1>Concrete Unit test file</h1>
+<p>
+  Tests for external_identifier_provider.js
+</p>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+
+  var Index1 = 
+  [ { name: "Module1", elements: [
+      { name: "A", _class: "ClassA", elements: [
+        { name: "A1", _class: "ClassA" },
+        { name: "A2", _class: "ClassA" } ]},
+      { name: "B", _class: "ClassB", elements: [
+        { name: "B1", _class: "ClassB", elements:  // value of "elements" not an Array here
+          { name: "B11", _class: "ClassB" } } ]} ]}, 
+    { name: "Module2", elements: [
+      { name: "AA", _class: "ClassA", elements: [
+        { name: "AA1", _class: "ClassA" },
+        { name: "AA2", _class: "ClassAA" } ]} ]}
+  ];
+
+  new Test.Unit.Runner({
+
+    testGetElementInfo: function() { with(this) {
+      var mmp = {metaclassesByName: {"ClassA": "ClassAType"}};
+      var ip = new Concrete.IndexBasedExternalIdentifierProvider(Index1, mmp);
+
+      var ei = ip.getElementInfo(undefined);
+      assertEqual(false, ei);
+
+      ei = ip.getElementInfo("/A/A1");
+      assertEqual("ClassAType", ei.type);
+      assertEqual("Module1", ei.module);
+       
+      ei = ip.getElementInfo("A/A2");
+      assertEqual("ClassAType", ei.type);
+      assertEqual("Module1", ei.module);
+
+      // /A/A3 does not exist
+      assertEqual(false, ip.getElementInfo("/A/A3"));
+
+      ei = ip.getElementInfo("/AA/AA1");
+      assertEqual("ClassAType", ei.type);
+      assertEqual("Module2", ei.module);
+
+      // /AA/AA2 exists but the classname can not be found in metamodel provider
+      assertEqual(false, ip.getElementInfo("/AA/AA2"));
+    }},
+
+    testGetIdentifiers: function() { with(this) {
+      var mmp = {metaclassesByName: {}};
+      var ip = new Concrete.IndexBasedExternalIdentifierProvider(Index1, mmp);
+  
+      var classAType = {name: "ClassA", allSubTypes: function() {return []}};
+      var idents = ip.getIdentifiers(classAType);
+
+      assertEqual(5, idents.size());
+      assertEqual("/A", idents[0]);
+      assertEqual("/A/A1", idents[1]);
+      assertEqual("/A/A2", idents[2]);
+      assertEqual("/AA", idents[3]);
+      assertEqual("/AA/AA1", idents[4]);
+
+      var classATypeWithSubtypes = {name: "ClassA", allSubTypes: function() {return [{name: "ClassAA", allSubTypes: function(){return []}}]}};
+      idents = ip.getIdentifiers(classATypeWithSubtypes);
+
+      assertEqual(6, idents.size());
+      assertEqual("/A", idents[0]);
+      assertEqual("/A/A1", idents[1]);
+      assertEqual("/A/A2", idents[2]);
+      assertEqual("/AA", idents[3]);
+      assertEqual("/AA/AA1", idents[4]);
+      assertEqual("/AA/AA2", idents[5]);
+
+      var classBType = {name: "ClassB", allSubTypes: function() {return []}};
+      idents = ip.getIdentifiers(classBType);
+
+      assertEqual(3, idents.size());
+      assertEqual("/B", idents[0]);
+      assertEqual("/B/B1", idents[1]);
+      assertEqual("/B/B1/B11", idents[2]);
+    }}
+
+  });
+
+// ]]>
+</script>
+</body>
+</html>  

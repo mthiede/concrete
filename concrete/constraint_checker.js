@@ -6,10 +6,11 @@
 
 Concrete.ConstraintChecker = Class.create({
 	
-	initialize: function(modelRoot, rootClasses, identifierProvider) {
+	initialize: function(modelRoot, rootClasses, identifierProvider, externalIdentifierProvider) {
 		this.modelRoot = modelRoot;
 		this.rootClasses = rootClasses;	
 		this.identifierProvider = identifierProvider;
+		this.externalIdentifierProvider = externalIdentifierProvider;
 		this.featureConstraints = {};
 	},
 
@@ -117,6 +118,13 @@ Concrete.ConstraintChecker = Class.create({
 		if (this.identifierProvider.getElement(ident) instanceof Array) {
 			problems.push("duplicate identifier '"+ident+"'");
 		}	
+    else if (this.externalIdentifierProvider) {
+      var ei = this.externalIdentifierProvider.getElementInfo(ident);
+      if (ei) {
+        var loc = Object.isString(ei.module) ? ei.module : "external module";
+        problems.push("duplicate identifier '"+ident+"', also defined in "+loc);
+      }
+    }
 		return problems;
 	},
 	
@@ -152,17 +160,30 @@ Concrete.ConstraintChecker = Class.create({
 		}
 		else if (mmf.isReference()) {
 			children.each(function(c) {				
-				var target = this.identifierProvider.getElement(c.textContent)
-				if (target && !(target instanceof Array)) {
-					if (!this.isValidInstance(mmf.type, target)) {
-						problems.push("reference to class '"+target.mmClass.name+"' not allowed");				
-					}
-					else {
-						this._checkFeatureConstraints(featureConstraints, element, target, problems);
-					}
-				}
-				else {
+				var targets = this.identifierProvider.getElement(c.textContent);
+        if (!(targets instanceof Array)) targets = [targets].compact();
+        if (this.externalIdentifierProvider) {
+          var ei = this.externalIdentifierProvider.getElementInfo(c.textContent);
+          if (ei) {
+            // here we add a type instead of an element
+            targets = targets.concat(ei.type);
+          }
+        }
+				if (targets.size() == 0) {
 					problems.push("can not resolve reference");
+        }
+        else if (targets.size() > 1) {
+					problems.push("multiple targets for reference");
+        }
+        else {
+          var type = targets[0].mmClass ? targets[0].mmClass : targets[0];
+					if (!(mmf.type.allSubTypes().concat(mmf.type).include(type))) {
+						problems.push("reference to class '"+type.name+"' not allowed");				
+          }
+          else if (targets[0].mmClass) {
+            // if target is an element, i.e. is local
+						this._checkFeatureConstraints(featureConstraints, element, targets[0], problems);
+					}
 				}
 			}, this);			
 		}
