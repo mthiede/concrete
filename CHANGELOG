@@ -8,3 +8,4 @@
 * Added read only mode
 * Added float datatype support
 * Added support for feature sort function in TemplateProvider
+* Bugfix: show hovers only for focused editor

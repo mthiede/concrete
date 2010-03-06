@@ -71,10 +71,6 @@ Concrete.Editor = Class.create({
 	},
 		
 	handleEvent: function(event) {
-		if (event.type == "mousemove") {
-			this._handleErrorHighlight(event);
-			this._handleRefHighlight(event);
-		}
 		if (event.type == "click" && event.isLeftClick()) {
 			if (Event.element(event).ancestors().concat(Event.element(event)).include(this.editorRoot)) {
 				this._hasFocus = true;
@@ -87,6 +83,10 @@ Concrete.Editor = Class.create({
 		}
 		if (!this._hasFocus) return;
 		
+		if (event.type == "mousemove") {
+			this._handleErrorHighlight(event);
+			this._handleRefHighlight(event);
+		}
 		if (this.inlineEditor.isActive) {
 			if (event.type == "click" && event.isLeftClick()) {
 				this.inlineEditor.cancel()
@@ -225,7 +225,7 @@ Concrete.Editor = Class.create({
 	_handleErrorHighlight: function(event) {
 		var element = Event.element(event);
 		var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
-		if (errorElement) {
+		if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
 			this.popup.innerHTML = errorElement.childElements().select(function(e) { return e.hasClassName("ct_error_description")}).first().innerHTML;
 			this.popup.setStyle({left: Event.pointerX(event)+20, top: Event.pointerY(event)+20});
 			this.popup.show();			
