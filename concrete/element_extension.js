@@ -63,15 +63,6 @@ Element.addMethods({
 		}, this).flatten();
 	},
 	allChildren: function(e) {
-		var result = []
-		var cn = e.childNodes
-		for (var i=0; i<cn.length; i++) {
-			var c = cn[i]
-			if (c.nodeType == 1) {
-				result.push(c)
-				result = result.concat(c.allChildren())
-			}
-		}
-		return result
+    return $A(e.getElementsByTagName("*"));
 	}
 })
