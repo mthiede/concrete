@@ -13,6 +13,12 @@ Concrete.Editor = Class.create({
   //   externalIdentifierProvider: 
   //                 an object providing access to identifiers of objects which are not
   //                 part of the model being edited in this instance of the editor, default: none
+  //   followReferenceSupport:
+  //                 if set to true, this editor will provide the functionality to follow references
+  //                 and to step back and forward in the jump history, default: true
+  //   onFollowReference:
+  //                 a function which will be called when a reference is invoked
+  //                 it gets two argments, the source reference element and the target element, default: none
   //   onFollowExternalReference:
   //                 a function which will be called when an external reference is invoked, 
   //                 it gets two arguments, the module (provided by the identifier provider) and the identifier,
@@ -22,6 +28,7 @@ Concrete.Editor = Class.create({
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     this.options = options || {};
     if (this.options.readOnlyMode == undefined) this.options.readOnlyMode = false;
+    if (this.options.followReferenceSupport == undefined) this.options.followReferenceSupport = true;
 		this.editorRoot = editorRoot;
 		this._setupRoot();
 		this.templateProvider = templateProvider;
@@ -41,6 +48,7 @@ Concrete.Editor = Class.create({
 		this.adjustMarker();
 		this.jumpStack = [];
 		this.clipboard = (options && options.clipboard) || new Concrete.Clipboard();
+    this.onFollowReference = options.onFollowReference;
     this.onFollowExternalReference = options.onFollowExternalReference;
 		this._hasFocus = false;
 	},
@@ -156,12 +164,16 @@ Concrete.Editor = Class.create({
 				event.stop();
 			}
 			else if (event.keyCode == Event.KEY_LEFT && event.altKey) {
-				this.runCommand("jump_backward_event")
-				event.stop();
+        if (this.options.followReferenceSupport) {
+          this.runCommand("jump_backward_event");
+          event.stop();
+        }
 			}
 			else if (event.keyCode == Event.KEY_RIGHT && event.altKey) {
-				this.runCommand("jump_forward_event")
-				event.stop();
+        if (this.options.followReferenceSupport) {
+          this.runCommand("jump_forward_event");
+          event.stop();
+        }
 			}
 			else if (event.keyCode == Event.KEY_UP) {
 				this.selector.selectCursor("up", event.shiftKey);
@@ -391,8 +403,11 @@ Concrete.Editor = Class.create({
 		if (!n.hasClassName("ct_value") || !n.mmFeature().isReference()) return;
 		var target = this.identifierProvider.getElement(n.textContent);
 		if (target && !(target instanceof Array)) {
-			this.jumpStack.push(n);
-			this.selector.selectDirect(target);
+      if (this.onFollowReference) this.onFollowReference(n, target);
+      if (this.options.followReferenceSupport) {
+        this.jumpStack.push(n);
+        this.selector.selectDirect(target);
+      }
 		}
     else {
       var ei = this.externalIdentifierProvider && this.externalIdentifierProvider.getElementInfo(n.textContent);
