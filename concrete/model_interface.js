@@ -59,14 +59,14 @@ Concrete.ModelInterface = Class.create({
 
 	// creates the element or elements described be +model+ before or after the element +target+
 	// or at the bottom of slot +target+
-	createElement: function(target, where, model) {
+	createElement: function(target, where, model, options) {
 		if (!(["before", "after", "bottom"].include(where))) throw new Error ("unknown position");
 		if (where == "bottom" && target != this.modelRoot && !target.hasClassName("ct_slot")) throw new Error ("not a slot");
 		if (where != "bottom" && !target.hasClassName("ct_element")) throw new Error ("not an element");
 		if (!(model instanceof Array)) model = [ model ];
 		if (where == "after") model = model.reverse();
 		model.each(function(e) {
-			var inst = this._instantiateTemplateRecursive(e, target, where);
+			var inst = this._instantiateTemplateRecursive(e, target, where, options);
 			this._notifyModelChangeListeners("added", inst);
 		}, this);
 		var parent = target.up(".ct_element");
@@ -205,7 +205,8 @@ Concrete.ModelInterface = Class.create({
 	// inserts a instance of the template representing element into slot
 	// also inserts template instances for all contained elements
 	// this function is optimized to minimize model load time
-	_instantiateTemplateRecursive: function(element, target, where) {
+	_instantiateTemplateRecursive: function(element, target, where, options) {
+    options = options || {};
 		var clazz = this.metamodelProvider.metaclassesByName[element._class];
 		if (!clazz) return;
 		var tmpl = this.templateProvider.templateByClass(clazz);
@@ -242,8 +243,9 @@ Concrete.ModelInterface = Class.create({
 			f.slot = slot;
 			if (values.size() > 0) {
 				if (mmf.isContainment()) {
+          if (options.collapse) f.hide();
 					values.each(function(v) {
-						this._instantiateTemplateRecursive(v, slot, "bottom");
+						this._instantiateTemplateRecursive(v, slot, "bottom", options);
             hasChildElements = true;
 					}, this);
 				}
@@ -260,7 +262,12 @@ Concrete.ModelInterface = Class.create({
 		}
     if (tmpl.foldButtonPosition != undefined) {
       inst.foldButton = childs[tmpl.foldButtonPosition];
-      inst.foldButton.addClassName("ct_fold_open");
+      if (options.collapse) {
+        inst.foldButton.addClassName("ct_fold_closed");
+      }
+      else {
+        inst.foldButton.addClassName("ct_fold_open");
+      }
       if (!hasChildElements) inst.foldButton.addClassName("ct_fold_empty");
     }
 		return inst;
