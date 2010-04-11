@@ -8,7 +8,9 @@ Concrete.Scroller = {};
 
 // scrolls the window or the first scrollable container by the smallest possible offset
 // which meximizes the visible part of element e 
-Concrete.Scroller.scrollTo = function(e) {
+// +direction+ can be on of "horizontal", "vertical" or "both"
+Concrete.Scroller.scrollTo = function(e, direction) {
+  if (!["horizontal", "vertical", "both"].include(direction)) throw "invalid direction";
 
   var isScrollable = function(f) {
     return (f.getDimensions().width > f.up().getDimensions().width ||
@@ -48,25 +50,24 @@ Concrete.Scroller.scrollTo = function(e) {
     var topBorderDist = eoff.top - coff.top - scrollContainer.scrollTop;
     var bottomBorderDist = coff.top + cdim.height - (eoff.top + edim.height) + scrollContainer.scrollTop;
 
-    if (leftBorderDist < 0 && rightBorderDist > 0) {
-      scrollContainer.scrollLeft = scrollContainer.scrollLeft - maxScroll(leftBorderDist, rightBorderDist);
-    }
-    else if (rightBorderDist < 0 && leftBorderDist > 0) {
-      scrollContainer.scrollLeft = scrollContainer.scrollLeft + maxScroll(rightBorderDist, leftBorderDist);
-    }
-    else {
-      // no scrolling required
+    if (direction == "horizontal" || direction == "both") {
+      if (leftBorderDist < 0 && rightBorderDist > 0) {
+        scrollContainer.scrollLeft = scrollContainer.scrollLeft - maxScroll(leftBorderDist, rightBorderDist);
+      }
+      else if (rightBorderDist < 0 && leftBorderDist > 0) {
+        scrollContainer.scrollLeft = scrollContainer.scrollLeft + maxScroll(rightBorderDist, leftBorderDist);
+      }
     }
 
-    if (topBorderDist < 0 && bottomBorderDist > 0) {
-      scrollContainer.scrollTop = scrollContainer.scrollTop - maxScroll(topBorderDist, bottomBorderDist);
+    if (direction == "vertical" || direction == "both") {
+      if (topBorderDist < 0 && bottomBorderDist > 0) {
+        scrollContainer.scrollTop = scrollContainer.scrollTop - maxScroll(topBorderDist, bottomBorderDist);
+      }
+      else if (bottomBorderDist < 0 && topBorderDist > 0) {
+        scrollContainer.scrollTop = scrollContainer.scrollTop + maxScroll(bottomBorderDist, topBorderDist); 
+      }
     }
-    else if (bottomBorderDist < 0 && topBorderDist > 0) {
-      scrollContainer.scrollTop = scrollContainer.scrollTop + maxScroll(bottomBorderDist, topBorderDist); 
-    }
-    else {
-      // no scrolling required
-    }
+
   }
   else {
     var vpLeft = document.viewport.getScrollOffsets().left;
@@ -79,28 +80,27 @@ Concrete.Scroller.scrollTo = function(e) {
     var topBorderDist = e.top()-vpTop;
     var bottomBorderDist = vpBottom-e.bottom();
     
-    var scrollPosX;
-    var scrollPosY;
+    var scrollPosX = vpLeft;
+    var scrollPosY = vpTop;
     
-    if (leftBorderDist < 0 && rightBorderDist > 0) {
-      scrollPosX = vpLeft - maxScroll(leftBorderDist, rightBorderDist);
-    }
-    else if (rightBorderDist < 0 && leftBorderDist > 0) {
-      scrollPosX = vpLeft + maxScroll(rightBorderDist, leftBorderDist);
-    }
-    else {
-      scrollPosX = vpLeft;
+    if (direction == "horizontal" || direction == "both") {
+      if (leftBorderDist < 0 && rightBorderDist > 0) {
+        scrollPosX = vpLeft - maxScroll(leftBorderDist, rightBorderDist);
+      }
+      else if (rightBorderDist < 0 && leftBorderDist > 0) {
+        scrollPosX = vpLeft + maxScroll(rightBorderDist, leftBorderDist);
+      }
     }
 
-    if (topBorderDist < 0 && bottomBorderDist > 0) {
-      scrollPosY = vpTop - maxScroll(topBorderDist, bottomBorderDist);
+    if (direction == "vertical" || direction == "both") {
+      if (topBorderDist < 0 && bottomBorderDist > 0) {
+        scrollPosY = vpTop - maxScroll(topBorderDist, bottomBorderDist);
+      }
+      else if (bottomBorderDist < 0 && topBorderDist > 0) {
+        scrollPosY = vpTop + maxScroll(bottomBorderDist, topBorderDist);
+      }
     }
-    else if (bottomBorderDist < 0 && topBorderDist > 0) {
-      scrollPosY = vpTop + maxScroll(bottomBorderDist, topBorderDist);
-    }
-    else {
-      scrollPosY = vpTop;
-    }
+
     window.scrollTo(scrollPosX, scrollPosY);
   }
 }

@@ -23,12 +23,15 @@ Concrete.Editor = Class.create({
   //                 a function which will be called when an external reference is invoked, 
   //                 it gets two arguments, the module (provided by the identifier provider) and the identifier,
   //                 if not defined, external references can not be followed, default: none
+  //   scrolling:    specifies if the current element should scroll into view
+  //                 possible values: none, horizontal, vertical, both, default: both
   //                 
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     this.options = options || {};
     if (this.options.readOnlyMode == undefined) this.options.readOnlyMode = false;
     if (this.options.followReferenceSupport == undefined) this.options.followReferenceSupport = true;
+    this.options.scrolling = this.options.scrolling || "both";
 		this.editorRoot = editorRoot;
 		this._setupRoot();
 		this.templateProvider = templateProvider;
@@ -78,7 +81,7 @@ Concrete.Editor = Class.create({
 		var editor = this;
 		return new Concrete.Selector( 
 			function(oldNode, newNode) {
-				Concrete.Scroller.scrollTo(newNode);
+				if (editor.options.scrolling != "none") Concrete.Scroller.scrollTo(newNode, editor.options.scrolling);
 				if (oldNode) {
 					if (!newNode.ancestors().include(oldNode) && newNode != oldNode) {
 						editor.hideEmptyFeatures(oldNode);
