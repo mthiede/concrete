@@ -277,15 +277,16 @@ Concrete.Editor = Class.create({
           targets = targets.concat(ei.type);
         }
       }
-      if (targets.size() == 1) {
+      if (targets.size() > 0) {
+        // highlight the first reference
         element.addClassName("ct_ref_source");
         if (targets[0].mmClass) {
           // if target is an element in this editor
           var target = targets[0]; 
           target.addClassName("ct_ref_target");
         }
-				this.refHighlight = {source: element, target: target};
-			}
+        this.refHighlight = {source: element, target: target};
+      }
 		}		
 	},
 	
