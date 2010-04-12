@@ -13,6 +13,9 @@ Concrete.Editor = Class.create({
   //   externalIdentifierProvider: 
   //                 an object providing access to identifiers of objects which are not
   //                 part of the model being edited in this instance of the editor, default: none
+  //   externalModule: name of the external module which represents the module being edited
+  //                 by this instance of the editor (see externalIdentifierProvider)
+  //                 if set, external identifiers from the named module will be ignored, default: none
   //   followReferenceSupport:
   //                 if set to true, this editor will provide the functionality to follow references
   //                 and to step back and forward in the jump history, default: true
@@ -43,7 +46,7 @@ Concrete.Editor = Class.create({
 		this.rootClasses = (options && options.rootClasses) || this.metamodelProvider.metaclasses;
 		this.maxRootElements = -1;
     this.externalIdentifierProvider = options.externalIdentifierProvider;
-		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, this.externalIdentifierProvider);
+		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, this.externalIdentifierProvider, this.options.externalModule);
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
 		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
 		this.selector = this._createSelector();
