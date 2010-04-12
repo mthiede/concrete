@@ -123,19 +123,19 @@ body {
 
 /* element/feature with an error */
 .ct_error {
-	border-left: 5px solid #700;	
+	border-left: 5px solid #F77;	
 }
 
 /* error popup shown when hovering over an element/feature with error */
 .ct_error_popup {
-	background-color: #700;	
-	border: 1px solid #F88;
+	background-color: #F77;	
+	border: 1px solid #700;
 	padding: 2px;		
 }
 
 /* inline editor showing an error while editing */
 .inline_editor.ct_error {
-	background-color: #700;	
+	background-color: #F77;	
 }
 
 /* References
