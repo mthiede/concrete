@@ -22,13 +22,10 @@ Concrete.BasicInlineEditor = Class.create({
 		input = element.next().down();
 		this.input = input
 		input.select();
-		Event.observe(input, 'keypress', function(event) {
-			// delay to make sure the keypress already affected the input value
-			window.setTimeout(function() { 
-				// set size one larger than the text, otherwise the first char is shifted out left when new chars are added at the right
-				input.size = input.value.length + 1;
-			}, 50);
-		});
+    this._interval = window.setInterval(function() { 
+      // set size one larger than the text, otherwise the first char is shifted out left when new chars are added at the right
+      input.size = input.value.length + 1;
+    }, 50);
 		new Autocompleter.Local(input, input.next(), completionOptions, {partialSearch: partial, fullSearch: partial, minChars: 0, partialChars: 0 })
 	},
 	
@@ -41,6 +38,7 @@ Concrete.BasicInlineEditor = Class.create({
 	},
 	
 	hide: function() {
+    if (this._interval) window.clearInterval(this._interval);
 		this.element.show();
 		this.element.next().remove();
 		this.element = undefined;
