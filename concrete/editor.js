@@ -61,7 +61,7 @@ Concrete.Editor = Class.create({
 		this.modelRoot = this.editorRoot.childElements().first();
 		this.editorRoot.insert({bottom: "<div style='position: absolute; left: 0; top: 0' class='ct_cursor'></div>"});
 		this.marker = this.editorRoot.childElements().last();
-		this.editorRoot.insert({bottom: "<div style='position: absolute; display: none; left: 0; top: 0;' class='ct_error_popup'></div>"});
+		this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_error_popup'></div>"});
 		this.popup = this.editorRoot.childElements().last();
 	},
 	
@@ -252,7 +252,7 @@ Concrete.Editor = Class.create({
 		var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
 		if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
 			this.popup.innerHTML = errorElement.childElements().select(function(e) { return e.hasClassName("ct_error_description")}).first().innerHTML;
-			this.popup.setStyle({left: Event.pointerX(event)+20, top: Event.pointerY(event)+20});
+			this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
 			this.popup.show();			
 		}
 		else {
