@@ -6,9 +6,10 @@
 
 // Interface ExternalIdentifierProvider
 //
-//  getElementInfo: function(ident) {}
+//  getElementInfo: function(ident, options) {}
 //    returns the element info if +ident+ is the identifier of an element, false otherwise
 //    the element info is an object with properties +type+ and +module+
+//    if option +ignoreModule+ is specified, elements from that module will be ignored
 //
 //  getIdentifiers: function(types) {}
 //    returns the identifiers of all elements of classes given in +types+ 
@@ -28,13 +29,15 @@ Concrete.IndexBasedExternalIdentifierProvider = Class.create({
     this._separator = "/";
   },
 
-  getElementInfo: function(ident) {
+  getElementInfo: function(ident, options) {
     if (!Object.isString(ident)) return false;
     for (var i=0; i<this._index.size(); i++) {
       var m = this._index[i];
-      var parts = ident.split(this._separator);
-      var type = this._getType(m, parts);
-      if (type) return { type: type, module: m.name };
+      if (!options || !options.ignoreModule || options.ignoreModule != m.name) {
+        var parts = ident.split(this._separator);
+        var type = this._getType(m, parts);
+        if (type) return { type: type, module: m.name };
+      }
     };
     return false;
   },

@@ -127,8 +127,8 @@ Concrete.ConstraintChecker = Class.create({
         problems.push("duplicate identifier '"+ident+"'");
       }	
       else if (this.externalIdentifierProvider) {
-        var ei = this.externalIdentifierProvider.getElementInfo(ident);
-        if (ei && ei.module != this.options.externalModule) {
+        var ei = this.externalIdentifierProvider.getElementInfo(ident, {ignoreModule: this.options.externalModule});
+        if (ei) {
           var loc = Object.isString(ei.module) ? ei.module : "external module";
           problems.push("duplicate identifier '"+ident+"', also defined in "+loc);
         }
@@ -172,8 +172,8 @@ Concrete.ConstraintChecker = Class.create({
 				var targets = this.identifierProvider.getElement(c.textContent);
         if (!(targets instanceof Array)) targets = [targets].compact();
         if (this.externalIdentifierProvider) {
-          var ei = this.externalIdentifierProvider.getElementInfo(c.textContent);
-          if (ei && ei.module != this.options.externalModule) {
+          var ei = this.externalIdentifierProvider.getElementInfo(c.textContent, {ignoreModule: this.options.externalModule});
+          if (ei) {
             // here we add a type instead of an element
             targets = targets.concat(ei.type);
           }

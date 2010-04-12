@@ -36,7 +36,10 @@
     { name: "Module2", elements: [
       { name: "AA", _class: "ClassA", elements: [
         { name: "AA1", _class: "ClassA" },
-        { name: "AA2", _class: "ClassAA" } ]} ]}
+        { name: "AA2", _class: "ClassAA" } ]} ]},
+    { name: "Module3", elements: [
+      { name: "A", _class: "ClassA", elements: [
+        { name: "A1", _class: "ClassA" }]}]}
   ];
 
   new Test.Unit.Runner({
@@ -51,6 +54,10 @@
       ei = ip.getElementInfo("/A/A1");
       assertEqual("ClassAType", ei.type);
       assertEqual("Module1", ei.module);
+       
+      ei = ip.getElementInfo("/A/A1", {ignoreModule: "Module1"});
+      assertEqual("ClassAType", ei.type);
+      assertEqual("Module3", ei.module);
        
       ei = ip.getElementInfo("A/A2");
       assertEqual("ClassAType", ei.type);
@@ -74,23 +81,27 @@
       var classAType = {name: "ClassA", allSubTypes: function() {return []}};
       var idents = ip.getIdentifiers(classAType);
 
-      assertEqual(5, idents.size());
+      assertEqual(7, idents.size());
       assertEqual("/A", idents[0]);
       assertEqual("/A/A1", idents[1]);
       assertEqual("/A/A2", idents[2]);
       assertEqual("/AA", idents[3]);
       assertEqual("/AA/AA1", idents[4]);
+      assertEqual("/A", idents[5]);
+      assertEqual("/A/A1", idents[6]);
 
       var classATypeWithSubtypes = {name: "ClassA", allSubTypes: function() {return [{name: "ClassAA", allSubTypes: function(){return []}}]}};
       idents = ip.getIdentifiers(classATypeWithSubtypes);
 
-      assertEqual(6, idents.size());
+      assertEqual(8, idents.size());
       assertEqual("/A", idents[0]);
       assertEqual("/A/A1", idents[1]);
       assertEqual("/A/A2", idents[2]);
       assertEqual("/AA", idents[3]);
       assertEqual("/AA/AA1", idents[4]);
       assertEqual("/AA/AA2", idents[5]);
+      assertEqual("/A", idents[6]);
+      assertEqual("/A/A1", idents[7]);
 
       var classBType = {name: "ClassB", allSubTypes: function() {return []}};
       idents = ip.getIdentifiers(classBType);
