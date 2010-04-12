@@ -6,12 +6,17 @@
 
 Concrete.ConstraintChecker = Class.create({
 	
-	initialize: function(modelRoot, rootClasses, identifierProvider, externalIdentifierProvider, externalModule) {
+  // Options:
+  //   externalIdentifierProvider: external identifier provider, default: none
+  //   externalModule: name of the current module within external index, default: none 
+  //   allowDuplicates: classes of which instances with same indentifier may exist, default: none
+	initialize: function(modelRoot, rootClasses, identifierProvider, options) {
+    this.options = options || {};
+    this.options.allowDuplicates = this.options.allowDuplicates || [];
 		this.modelRoot = modelRoot;
 		this.rootClasses = rootClasses;	
 		this.identifierProvider = identifierProvider;
-		this.externalIdentifierProvider = externalIdentifierProvider;
-    this.externalModule = externalModule;
+		this.externalIdentifierProvider = this.options.externalIdentifierProvider;
 		this.featureConstraints = {};
 	},
 
@@ -44,8 +49,9 @@ Concrete.ConstraintChecker = Class.create({
 	// ModelChangeListener End
 	
 	isValidInstance: function(type, element) {
-		var allowedTypes = type.allSubTypes().concat(type);
-		return allowedTypes.include(element.mmClass);
+    this._allowedTypes = this._allowedTypes || {};
+    this._allowedTypes[type.name] = this._allowedTypes[type.name] || type.allSubTypes().concat(type);
+		return this._allowedTypes[type.name].include(element.mmClass);
 	},
 	
 	isValidValue: function(mmFeature, value) {
@@ -115,15 +121,17 @@ Concrete.ConstraintChecker = Class.create({
 		if (element.mmClass.abstract) {
 			problems.push("class '"+element.mmClass.name+"' is abstract");
 		}
-		var ident = this.identifierProvider.getIdentifier(element);
-		if (this.identifierProvider.getElement(ident) instanceof Array) {
-			problems.push("duplicate identifier '"+ident+"'");
-		}	
-    else if (this.externalIdentifierProvider) {
-      var ei = this.externalIdentifierProvider.getElementInfo(ident);
-      if (ei && ei.module != this.externalModule) {
-        var loc = Object.isString(ei.module) ? ei.module : "external module";
-        problems.push("duplicate identifier '"+ident+"', also defined in "+loc);
+    if (!this.options.allowDuplicates.include(element.mmClass)) {
+      var ident = this.identifierProvider.getIdentifier(element);
+      if (this.identifierProvider.getElement(ident) instanceof Array) {
+        problems.push("duplicate identifier '"+ident+"'");
+      }	
+      else if (this.externalIdentifierProvider) {
+        var ei = this.externalIdentifierProvider.getElementInfo(ident);
+        if (ei && ei.module != this.options.externalModule) {
+          var loc = Object.isString(ei.module) ? ei.module : "external module";
+          problems.push("duplicate identifier '"+ident+"', also defined in "+loc);
+        }
       }
     }
 		return problems;
@@ -165,7 +173,7 @@ Concrete.ConstraintChecker = Class.create({
         if (!(targets instanceof Array)) targets = [targets].compact();
         if (this.externalIdentifierProvider) {
           var ei = this.externalIdentifierProvider.getElementInfo(c.textContent);
-          if (ei && ei.module != this.externalModule) {
+          if (ei && ei.module != this.options.externalModule) {
             // here we add a type instead of an element
             targets = targets.concat(ei.type);
           }

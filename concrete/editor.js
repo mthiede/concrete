@@ -28,7 +28,7 @@ Concrete.Editor = Class.create({
   //                 if not defined, external references can not be followed, default: none
   //   scrolling:    specifies if the current element should scroll into view
   //                 possible values: none, horizontal, vertical, both, default: both
-  //                 
+  //   allowDuplicates: classes of which instances with the same identifier may exist, default: none              
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     this.options = options || {};
@@ -46,7 +46,10 @@ Concrete.Editor = Class.create({
 		this.rootClasses = (options && options.rootClasses) || this.metamodelProvider.metaclasses;
 		this.maxRootElements = -1;
     this.externalIdentifierProvider = options.externalIdentifierProvider;
-		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, this.externalIdentifierProvider, this.options.externalModule);
+		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, 
+      {externalIdentifierProvider: this.externalIdentifierProvider, 
+       externalModule: this.options.externalModule,
+       allowDuplicates: this.options.allowDuplicates});
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
 		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
 		this.selector = this._createSelector();
