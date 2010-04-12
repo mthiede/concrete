@@ -259,6 +259,9 @@ Concrete.ModelInterface = Class.create({
 			else if (f.hasClassName("ct_auto_hide")) {
 				f.hide();
 			}
+      if (f.hasClassName("ct_always_hide")) {
+				f.hide();
+      }
 		}
     if (tmpl.foldButtonPosition != undefined) {
       inst.foldButton = childs[tmpl.foldButtonPosition];

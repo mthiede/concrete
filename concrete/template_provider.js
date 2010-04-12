@@ -11,11 +11,13 @@ Concrete.TemplateProvider = Class.create({
   // Options:
   //   identifierAttribute: name of the feature that holds the identifier, default: none
   //   featureSortFunc: function providing values for features used to sort them, default: none 
+  //   alwaysHideFeatures: names of the features which should always be hidden, default: none
   //
 	initialize: function(templateRoot, options) {
 		this.templateRoot = templateRoot;
 		this._templateByClass = {};
 		this.options = options || {};
+    this.options.alwaysHideFeatures = this.options.alwaysHideFeatures || [];
 	},
 	
 	emptyValue: function() {
@@ -59,21 +61,22 @@ Concrete.TemplateProvider = Class.create({
     if (this.options.featureSortFunc) features = features.sortBy(this.options.featureSortFunc);
 		features.each(function(f) {
 			var ft;
+      var hideStrat = this.options.alwaysHideFeatures.include(f.name) ? "ct_always_hide" : "ct_auto_hide";
 			if (f.kind == "attribute") {
 				if (this.options.identifierAttribute && f.name == this.options.identifierAttribute) {
 					headDiv.insert({bottom: "<span class='ct_attribute ctn_"+f.name+" ct_identifier_attribute'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
 				}
 				else {
-					headDiv.insert({bottom: "<span class='ct_attribute ctn_"+f.name+" ct_auto_hide'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
+					headDiv.insert({bottom: "<span class='ct_attribute ctn_"+f.name+" "+hideStrat+"'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
 				}
 				ft = headDiv.childElements().last();
 			}
 			else if (f.kind == "reference") {
-				headDiv.insert({bottom: "<span class='ct_reference ctn_"+f.name+" ct_auto_hide'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
+				headDiv.insert({bottom: "<span class='ct_reference ctn_"+f.name+" "+hideStrat+"'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
 				ft = headDiv.childElements().last();
 			}
 			else if (f.kind == "containment") {
-				tmpl.insert({bottom: "<div class='ct_containment ctn_"+f.name+" ct_auto_hide'><span class='ct_feature_name'>"+f.name+":</span><div class='ct_slot'></div></div>"});
+				tmpl.insert({bottom: "<div class='ct_containment ctn_"+f.name+" "+hideStrat+"'><span class='ct_feature_name'>"+f.name+":</span><div class='ct_slot'></div></div>"});
 				ft = tmpl.childElements().last();
 			}
 			else {

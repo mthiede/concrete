@@ -451,8 +451,9 @@ Concrete.Editor.CommandHelper = {
   },
 		
 	canAutoHide: function(feature) {
-		return (feature.hasClassName("ct_auto_hide") && !feature.hasClassName("ct_error") &&
-			(feature.down(".ct_slot").childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).size() == 0));
+		return (!feature.hasClassName("ct_error") &&
+      (feature.hasClassName("ct_always_hide") || 
+			(feature.hasClassName("ct_auto_hide") && (feature.down(".ct_slot").childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).size() == 0))));
 		},
 		
 	canAddElement: function(slot, editor) {
@@ -467,7 +468,7 @@ Concrete.Editor.CommandHelper = {
 	
 	showAllNonAutoHideFeatures: function(n, editor) {
 		n.select(".ct_attribute, .ct_reference, .ct_containment").each(function(f) {
-			if (!f.hasClassName("ct_auto_hide")) {
+			if (!f.hasClassName("ct_auto_hide") && !f.hasClassName("ct_always_hide")) {
 				f.show();
 				var slot = f.down(".ct_slot");
 				if (slot.childElements().size() == 0) {

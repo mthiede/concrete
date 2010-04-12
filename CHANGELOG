@@ -11,4 +11,5 @@
 * Bugfix: show hovers only for focused editor
 * Added external identifier support
 * Scrolling to selected element also works in scroll containers
+* Added "always hide" strategy for features
 
