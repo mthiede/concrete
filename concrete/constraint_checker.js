@@ -215,18 +215,23 @@ Concrete.ConstraintChecker = Class.create({
 	},
 		
 	_addError: function(node, text) {
-		node.addClassName("ct_error");
-		node.appendChild(Concrete.Helper.createDOMNode("div", {class: "ct_error_description", style: "display: none"}, text));	
+    if (!node._errorDescriptions) {
+      node._errorDescriptions = [];
+      node.addClassName("ct_error");
+    }
+    var desc = Concrete.Helper.createDOMNode("div", {class: "ct_error_description", style: "display: none"}, text);
+		node.appendChild(desc);	
+    node._errorDescriptions.push(desc);
 	},
 	
 	_removeErrors: function(node) {
-		node.select(".ct_error_description").each(function(c) {
-			c.remove();
-		});
-		if (node.hasClassName("ct_error")) node.removeClassName("ct_error");
-		node.select(".ct_error").each(function(c) {
-			c.removeClassName("ct_error");
-		});
+    if (node._errorDescriptions) {
+      node._errorDescriptions.each(function(d) {
+        d.remove();
+      });
+			node.removeClassName("ct_error");
+      node._errorDescriptions = undefined;
+    }
 	}
 	
 });
