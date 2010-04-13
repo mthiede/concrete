@@ -257,9 +257,12 @@ Concrete.Editor = Class.create({
 		var element = Event.element(event);
 		var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
 		if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
-			this.popup.innerHTML = errorElement.childElements().select(function(e) { return e.hasClassName("ct_error_description")}).first().innerHTML;
-			this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
-			this.popup.show();			
+      var desc = errorElement.childElements().find(function(e) { return e.hasClassName("ct_error_description")});
+      if (desc) {
+        this.popup.innerHTML = desc.innerHTML;
+        this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
+        this.popup.show();			
+      }
 		}
 		else {
 			this.popup.hide();
