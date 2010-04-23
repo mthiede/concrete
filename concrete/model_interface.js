@@ -18,17 +18,19 @@ Element.addMethods({
 		return feat.mmFeature;
 	},
 	
-	featureValues: function(e, featureName) {
-		if (!e.featuresByName) {
-			e.featuresByName = {};
-			e.features.each(function(f) { e.featuresByName[f.mmFeature.name] = f; });
-		}
-		var feat = e.featuresByName[featureName];
-		if (feat.mmFeature.isContainment()) {
-			return feat.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")});
+	featureValues: function(e, feature) {
+    if (Object.isString(feature)) {
+      if (!e.featuresByName) {
+        e.featuresByName = {};
+        e.features.each(function(f) { e.featuresByName[f.mmFeature.name] = f; });
+      }
+      feature = e.featuresByName[feature];
+    }
+		if (feature.mmFeature.isContainment()) {
+			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")});
 		}
 		else {
-			return feat.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")}).collect(function(c) {return c.textContent});
+			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")}).collect(function(c) {return c.textContent});
 		}
 	}
 })
