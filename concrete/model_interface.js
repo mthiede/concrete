@@ -26,13 +26,20 @@ Element.addMethods({
       }
       feature = e.featuresByName[feature];
     }
+    else if (!feature.mmFeature) {
+      feature = e.features.find(function(f) {return f.mmFeature == feature; });
+    }
 		if (feature.mmFeature.isContainment()) {
 			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")});
 		}
 		else {
 			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")}).collect(function(c) {return c.textContent});
 		}
-	}
+	},
+
+  isElement: function(e) {
+    return e.mmClass != undefined;
+  }
 })
 
 Concrete.ModelInterface = Class.create({

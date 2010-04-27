@@ -402,6 +402,20 @@ Concrete.Editor = Class.create({
     this.expandElement(n);
 	},
 
+  // expands the parent elements of an element or attribute/reference value
+  expandParentElements: function(n) {
+    if (!n.mmClass) {
+      // node is a value, expand parents of containing element
+      n = n.up(".ct_element");
+    }
+    var parentElements = n.ancestors().select(function(a) {return a.mmClass;});
+    parentElements.each(function(e) {
+      if (e.foldButton.hasClassName("ct_fold_closed")) {
+        this.expandElement(e);
+      }
+    }, this);
+  },
+
 	copyToClipboard: function(nodes, editor) {
 		if (nodes.first().hasClassName("ct_value")) {
 			// in case of a value, we expect only one node
