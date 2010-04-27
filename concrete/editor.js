@@ -88,10 +88,16 @@ Concrete.Editor = Class.create({
 		return new Concrete.Selector( 
 			function(oldNode, newNode) {
 				if (editor.options.scrolling != "none") Concrete.Scroller.scrollTo(newNode, editor.options.scrolling);
-				if (oldNode) {
-					if (!newNode.ancestors().include(oldNode) && newNode != oldNode) {
-						editor.hideEmptyFeatures(oldNode);
-					}
+				if (oldNode && newNode != oldNode) {
+          var oa = oldNode.ancestors();
+          oa.unshift(oldNode);
+          var na = newNode.ancestors();
+          na.unshift(newNode);
+          oa.reverse().each(function(n) {
+            if (n != na.pop() && n.isElement()) {
+              editor.hideEmptyFeatures(n);
+            }
+          });
 				}
 				editor.adjustMarker();
 			});
