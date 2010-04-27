@@ -29,11 +29,30 @@ Element.addMethods({
     else if (!feature.mmFeature) {
       feature = e.features.find(function(f) {return f.mmFeature == feature; });
     }
+    var values = feature.slot.childElements();
 		if (feature.mmFeature.isContainment()) {
-			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")});
+      if (values.size() > 1) {
+        // optimization: empty placeholder values can not appear amoung other childs
+        return values; 
+      }
+      else if (values.size() == 1 && !values[0].hasClassName("ct_empty")) {
+        return [values[0]];
+      }
+      else {
+        return [];
+      }
 		}
 		else {
-			return feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty")}).collect(function(c) {return c.textContent});
+      if (values.size() > 1) {
+        // optimization: empty placeholder values can not appear amoung other childs
+        return values.collect(function(c) {return c.textContent});
+      }
+      else if (values.size() == 1 && !values[0].hasClassName("ct_empty")) {
+        return [values[0].textContent]; 
+      }
+      else {
+        return []; 
+      }
 		}
 	},
 
