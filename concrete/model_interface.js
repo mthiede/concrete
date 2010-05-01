@@ -316,3 +316,42 @@ Concrete.ModelInterface = Class.create({
 	}
 
 });
+
+Concrete.ModelInterface.Helper = {
+
+  // returns the next element in depth first order 
+  // or false if the last element in the model has been reached
+  nextElement: function(element) {
+    var fIndex = 0;
+    while (true) {
+      var feature = element.features[fIndex];
+      var values = feature && element.featureValues(feature.mmFeature.name);
+      if (feature && feature.mmFeature.isContainment() && values.size() > 0) {
+        // found first child in feature
+        return values[0];
+      }
+      else if (fIndex < element.features.size()-1) {
+        // next feature
+        fIndex++;
+      }
+      else if (element.next()) {
+        // next element
+        return element.next();
+      }
+      else {
+        var parentFeature = element.up(".ct_containment");
+        if (parentFeature) {
+          // go up to parent
+          var parentElement = parentFeature.up(".ct_element");
+          var fIndex = parentElement.features.indexOf(parentFeature) + 1;
+          element = parentElement;
+        }
+        else {
+          return false;
+        }
+      }
+    }
+  }
+
+};
+
