@@ -90,19 +90,31 @@ Concrete.ConstraintChecker = Class.create({
 	},
 
 	_updateAllProblems: function() {
-		this.modelRoot.childElements().each(function(e) { this._updateElementProblems(e); }, this);
+    var element = this.modelRoot.childElements().first();
+    if (!element || !element.isElement()) return;
+    var stack = [];
+    if (this._intervalTimer) window.clearInterval(this._intervalTimer);
+    this._intervalTimer = window.setInterval(function() {
+      var i;
+      for (i=0; i<100; i++) {
+        this._updateElementProblems(element);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        if (!element) {
+          window.clearInterval(this._intervalTimer);
+          this._intervalTimer = undefined;
+          break;
+        }
+      }
+    }.bind(this), 0.01);
 	},
 			
 	_updateElementProblems: function(element) {
-		if (!element.hasClassName("ct_element") || element.hasClassName("ct_empty")) return [];
+		if (!element || !element.isElement()) return [];
 		this._removeErrors(element);
 		this._checkElement(element).each(function(p) { this._addError(element, p); }, this);
 		element.features.each(function(f) {
 			this._removeErrors(f);
 			this._checkFeature(element, f).each(function(p) { this._addError(f, p); }, this);
-			if (f.mmFeature.isContainment()) {
-				f.slot.childElements().each(function(c) { this._updateElementProblems(c); }, this);
-			}
 		}, this);
 	},
 		
