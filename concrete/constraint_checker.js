@@ -10,6 +10,8 @@ Concrete.ConstraintChecker = Class.create({
   //   externalIdentifierProvider: external identifier provider, default: none
   //   externalModule: name of the current module within external index, default: none 
   //   allowDuplicates: classes of which instances with same indentifier may exist, default: none
+  //   automaticChecking: if set to false, do not run constraint checks when model changes, default: true
+  //
 	initialize: function(modelRoot, rootClasses, identifierProvider, options) {
     this.options = options || {};
     this.options.allowDuplicates = this.options.allowDuplicates || [];
@@ -18,6 +20,7 @@ Concrete.ConstraintChecker = Class.create({
 		this.identifierProvider = identifierProvider;
 		this.externalIdentifierProvider = this.options.externalIdentifierProvider;
 		this.featureConstraints = {};
+    this._automaticChecking = (this.options.automaticChecking == undefined) ? true : this.options.automaticChecking;
 	},
 
 	addConstraint: function(constraint) {
@@ -43,7 +46,9 @@ Concrete.ConstraintChecker = Class.create({
 	},
 
 	commitChanges: function() {
-		this._updateAllProblems();
+    if (this._automaticChecking) {
+      this.updateAllProblems();
+    }
 	},
 
 	// ModelChangeListener End
@@ -89,7 +94,15 @@ Concrete.ConstraintChecker = Class.create({
 		}
 	},
 
-	_updateAllProblems: function() {
+  // enable and disable automatic checking
+  setAutomaticChecking: function(checking) {
+    this._automaticChecking = checking;
+  },
+
+  // run all constraint checks and update the error annotations
+  // this method must be called explicitly if automatic checking is disabled
+  //
+	updateAllProblems: function() {
     var element = this.modelRoot.childElements().first();
     if (!element || !element.isElement()) return;
     var stack = [];
@@ -107,6 +120,8 @@ Concrete.ConstraintChecker = Class.create({
       }
     }.bind(this), 0.01);
 	},
+
+  // private
 			
 	_updateElementProblems: function(element) {
 		if (!element || !element.isElement()) return [];
