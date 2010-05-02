@@ -104,7 +104,9 @@ Concrete.ConstraintChecker = Class.create({
   //
 	updateAllProblems: function() {
     var element = this.modelRoot.childElements().first();
-    if (!element || !element.isElement()) return;
+    // in case the first element is an empty element, skip to next
+    if (element && !element.isElement()) element = element.next();
+    if (!element) return;
     var stack = [];
     if (this._intervalTimer) window.clearInterval(this._intervalTimer);
     this._intervalTimer = window.setInterval(function() {
