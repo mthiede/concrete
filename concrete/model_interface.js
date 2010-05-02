@@ -319,15 +319,25 @@ Concrete.ModelInterface = Class.create({
 
 Concrete.ModelInterface.Helper = {
 
-  // returns the next element in depth first order 
+  // returns the next element in depth first search order 
   // or false if the last element in the model has been reached
-  nextElement: function(element) {
+  // 
+  // as a speed optimization an optional stack can be used which keeps the
+  // parent containers over several invocations of this method
+  // in this case the stack must either be empty or it must be in the state
+  // established by the last call of this method (i.e. it must not be modified)
+  //
+  nextElement: function(element, stack) {
     var fIndex = 0;
     while (true) {
       var feature = element.features[fIndex];
       var values = feature && element.featureValues(feature.mmFeature.name);
-      if (feature && feature.mmFeature.isContainment() && values.size() > 0) {
+      if (feature && feature.mmFeature.isContainment() && values.size() > 0 && values[0].isElement()) {
         // found first child in feature
+        if (stack) {
+          stack.push(element);
+          stack.push(feature);
+        }
         return values[0];
       }
       else if (fIndex < element.features.size()-1) {
@@ -339,10 +349,10 @@ Concrete.ModelInterface.Helper = {
         return element.next();
       }
       else {
-        var parentFeature = element.up(".ct_containment");
+        var parentFeature = (stack && stack.pop()) || element.up(".ct_containment");
         if (parentFeature) {
           // go up to parent
-          var parentElement = parentFeature.up(".ct_element");
+          var parentElement = (stack && stack.pop()) || parentFeature.up(".ct_element");
           var fIndex = parentElement.features.indexOf(parentFeature) + 1;
           element = parentElement;
         }

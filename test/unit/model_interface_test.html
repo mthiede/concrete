@@ -219,19 +219,24 @@
 
       mi.createElement(root, "bottom", $('testModel').textContent.evalJSON());
 
-      var element = root.childElements().first();
-      assertEqual("M1", element.featureValues("name")[0]);
-
-      element = Concrete.ModelInterface.Helper.nextElement(element);
-      assertEqual("S1", element.featureValues("name")[0]);
-      element = Concrete.ModelInterface.Helper.nextElement(element);
-      assertEqual("S2", element.featureValues("name")[0]);
-      element = Concrete.ModelInterface.Helper.nextElement(element);
-      assertEqual("S21", element.featureValues("name")[0]);
-      element = Concrete.ModelInterface.Helper.nextElement(element);
-      assertEqual("S22", element.featureValues("name")[0]);
-      element = Concrete.ModelInterface.Helper.nextElement(element);
-      assertEqual("S2/S21", element.featureValues("sourceState")[0]);
+      var check = function(stack) {
+        var element = root.childElements().first();
+        assertEqual("M1", element.featureValues("name")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assertEqual("S1", element.featureValues("name")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assertEqual("S2", element.featureValues("name")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assertEqual("S21", element.featureValues("name")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assertEqual("S22", element.featureValues("name")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assertEqual("S2/S21", element.featureValues("sourceState")[0]);
+        element = Concrete.ModelInterface.Helper.nextElement(element, stack);
+        assert(element == false);
+      }
+      check(undefined);
+      check([]);
     }}
   })
   
