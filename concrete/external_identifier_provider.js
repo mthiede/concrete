@@ -51,6 +51,14 @@ Concrete.IndexBasedExternalIdentifierProvider = Class.create({
     return result;
   },
 
+  getAllElementInfo: function() {
+    var result = [];
+    this._index.each(function(m) {
+      result = result.concat(this._getAllElementInfo(m, "", m));
+    }, this);
+    return result;
+  },
+
   // private
 
   _getType: function(cont, parts) {
@@ -85,7 +93,20 @@ Concrete.IndexBasedExternalIdentifierProvider = Class.create({
       result = result.concat(this._getIdentifiers(e, typenames, epath));
     }, this);
     return result; 
+  },
+
+  _getAllElementInfo: function(cont, path, module) {
+    var result = [];
+    var elements = cont.elements
+    if (!(elements instanceof Array)) elements = [elements].compact();
+    elements.each(function(e) {
+      var epath = path + this._separator + e.name;
+      result.push({identifier: epath, type: e._class, module: module.name});
+      result = result.concat(this._getAllElementInfo(e, epath, module));
+    }, this);
+    return result; 
   }
+
 
 });
 

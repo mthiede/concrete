@@ -110,6 +110,24 @@
       assertEqual("/B", idents[0]);
       assertEqual("/B/B1", idents[1]);
       assertEqual("/B/B1/B11", idents[2]);
+    }}, 
+
+    testGetAllElementInfo: function() { with(this) {
+      var mmp = {metaclassesByName: {}};
+      var ip = new Concrete.IndexBasedExternalIdentifierProvider(Index1, mmp);
+
+      var eis = ip.getAllElementInfo();
+
+      assertEqual(11, eis.size());
+      assertEqual("/A", eis[0].identifier);
+      assertEqual("ClassA", eis[0].type);
+      assertEqual("Module1", eis[0].module);
+      assertEqual("/B/B1/B11", eis[5].identifier);
+      assertEqual("ClassB", eis[5].type);
+      assertEqual("Module1", eis[5].module);
+      assertEqual("/A/A1", eis[10].identifier);
+      assertEqual("ClassA", eis[10].type);
+      assertEqual("Module3", eis[10].module);
     }}
 
   });
