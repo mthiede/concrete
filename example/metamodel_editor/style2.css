@@ -1,0 +1,15 @@
+
+/* Metamodel Specific Styles
+ *****************************************************************************/
+
+body {
+  font-family: verdana;
+}
+
+/* add some space around the classes to make reading easier */
+.ctc_Class {
+	padding: 2px 0 2px 0;
+  border: 1px solid grey;
+  display: inline-block;
+  margin: 10px;
+}
