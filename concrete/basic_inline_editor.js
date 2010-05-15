@@ -26,7 +26,19 @@ Concrete.BasicInlineEditor = Class.create({
       // set size one larger than the text, otherwise the first char is shifted out left when new chars are added at the right
       input.size = input.value.length + 1;
     }, 50);
-		new Autocompleter.Local(input, input.next(), completionOptions, {partialSearch: partial, fullSearch: partial, minChars: 0, partialChars: 0 })
+		new Autocompleter.Local(input, input.next(), completionOptions, {partialSearch: partial, fullSearch: partial, minChars: 0, partialChars: 0, onShow:
+      function(element, update){
+        if(!update.style.position || update.style.position=='absolute') {
+          update.style.position = 'absolute';
+          Position.clone(element, update, {
+            setHeight: false,
+            setWidth: false, // in contrast to the original built-in default, do not set width
+            offsetTop: element.offsetHeight
+          });
+        }
+        Effect.Appear(update,{duration:0.15});
+      }
+    })
 	},
 	
 	getText: function() {
