@@ -13,3 +13,7 @@ body {
   display: inline-block;
   margin: 10px;
 }
+
+.ctn_superTypes .ct_value {
+  display: block;
+}
