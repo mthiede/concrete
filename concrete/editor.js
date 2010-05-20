@@ -13,6 +13,8 @@ Concrete.Editor = Class.create({
   //   externalIdentifierProvider: 
   //                 an object providing access to identifiers of objects which are not
   //                 part of the model being edited in this instance of the editor, default: none
+  //   constraintChecker:
+  //                 a custom constraint checker, default: none (built in constraint checker)
   //   externalModule: name of the external module which represents the module being edited
   //                 by this instance of the editor (see externalIdentifierProvider)
   //                 if set, external identifiers from the named module will be ignored, default: none
@@ -28,13 +30,13 @@ Concrete.Editor = Class.create({
   //                 if not defined, external references can not be followed, default: none
   //   scrolling:    specifies if the current element should scroll into view
   //                 possible values: none, horizontal, vertical, both, default: both
-  //   allowDuplicates: classes of which instances with the same identifier may exist, default: none              
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
-    this.options = options || {};
-    if (this.options.readOnlyMode == undefined) this.options.readOnlyMode = false;
-    if (this.options.followReferenceSupport == undefined) this.options.followReferenceSupport = true;
-    this.options.scrolling = this.options.scrolling || "both";
+    options = options || {};
+    this.options = options;
+    if (options.readOnlyMode == undefined) options.readOnlyMode = false;
+    if (options.followReferenceSupport == undefined) options.followReferenceSupport = true;
+    options.scrolling = options.scrolling || "both";
 		this.editorRoot = editorRoot;
 		this._setupRoot();
 		this.templateProvider = templateProvider;
@@ -43,20 +45,21 @@ Concrete.Editor = Class.create({
 		this._createInlineEditor();
 		this.modelInterface = new Concrete.ModelInterface(this.modelRoot, this.templateProvider, this.metamodelProvider);
 		this.modelInterface.addModelChangeListener(this.identifierProvider);
-		this.rootClasses = (options && options.rootClasses) || this.metamodelProvider.metaclasses;
+		this.rootClasses = options.rootClasses || this.metamodelProvider.metaclasses;
 		this.maxRootElements = -1;
     this.externalIdentifierProvider = options.externalIdentifierProvider;
-		this.constraintChecker = new Concrete.ConstraintChecker(this.modelRoot, this.rootClasses, this.identifierProvider, 
-      {externalIdentifierProvider: this.externalIdentifierProvider, 
-       externalModule: this.options.externalModule,
-       allowDuplicates: this.options.allowDuplicates});
+		this.constraintChecker = options.constraintChecker || 
+      new Concrete.ConstraintChecker(this.rootClasses, this.identifierProvider, 
+        {externalIdentifierProvider: this.externalIdentifierProvider, 
+         externalModule: options.externalModule});
+    this.constraintChecker.setModelRoot(this.modelRoot);
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
 		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
 		this.selector = this._createSelector();
 		this.selector.selectDirect(this.modelRoot.down());
 		this.adjustMarker();
 		this.jumpStack = [];
-		this.clipboard = (options && options.clipboard) || new Concrete.Clipboard();
+		this.clipboard = options.clipboard || new Concrete.Clipboard();
     this.onFollowReference = options.onFollowReference;
     this.onFollowExternalReference = options.onFollowExternalReference;
 		this._hasFocus = false;

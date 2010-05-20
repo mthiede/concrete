@@ -12,16 +12,20 @@ Concrete.ConstraintChecker = Class.create({
   //   allowDuplicates: classes of which instances with same indentifier may exist, default: none
   //   automaticChecking: if set to false, do not run constraint checks when model changes, default: true
   //
-	initialize: function(modelRoot, rootClasses, identifierProvider, options) {
+	initialize: function(rootClasses, identifierProvider, options) {
     this.options = options || {};
     this.options.allowDuplicates = this.options.allowDuplicates || [];
-		this.modelRoot = modelRoot;
 		this.rootClasses = rootClasses;	
 		this.identifierProvider = identifierProvider;
 		this.externalIdentifierProvider = this.options.externalIdentifierProvider;
 		this.featureConstraints = {};
     this._automaticChecking = (this.options.automaticChecking == undefined) ? true : this.options.automaticChecking;
 	},
+
+  // model root must be set for the checker to work
+  setModelRoot: function(modelRoot) {
+		this.modelRoot = modelRoot;
+  },
 
 	addConstraint: function(constraint) {
 		if (constraint instanceof Concrete.ConstraintChecker.FeatureValueConstraint) {
