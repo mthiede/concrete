@@ -5,18 +5,17 @@ Concrete.UI.Workbench = {
   // 
   // Options:
   //
-  // moduleBrowser: if set to true, add module browser in side pane, default: true
   // moduleBrowserOptions: options passed to the module browser, default: none
   // moduleEditorOptions: options passed to the module editor, default: none
   //
-  setup: function(options) {
+  setup: function(metamodel, indexMetamodel, options) {
     options = options || {};
 
     var layoutManager = new Concrete.UI.LayoutManager();
 
     var toolbar = new Concrete.UI.Toolbar(layoutManager.toolbar);
 
-    var mp = new Concrete.MetamodelProvider(Metamodel);
+    var mp = new Concrete.MetamodelProvider(metamodel);
 
     var index = []; 
     var eip = new Concrete.IndexBasedExternalIdentifierProvider(index, mp);
@@ -31,7 +30,7 @@ Concrete.UI.Workbench = {
     browserOptions.onOpenModule = function(module, ident) {
       jumpReference(module, ident);
     };
-    var moduleBrowser = new Concrete.UI.ModuleBrowser(layoutManager.sidebar, IndexMetamodel, browserOptions);
+    var moduleBrowser = new Concrete.UI.ModuleBrowser(layoutManager.sidebar, indexMetamodel, browserOptions);
 
     var openElementDialog = new Concrete.UI.OpenElementDialog(eip, {
       onOpenReference: function(module, ident) {
