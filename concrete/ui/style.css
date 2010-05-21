@@ -1,0 +1,258 @@
+/* Layout */
+
+#ct_layout_toolbar {
+  background-color: #ccf;
+  border-bottom: 1px solid grey; 
+}
+
+#ct_layout_sidebar_drag {
+  background-color: #ccf;
+  border-left: 1px solid grey; 
+  border-right: 1px solid grey; 
+}
+
+/* Toolbar */
+
+a.ct_toolbar_icon {
+  width: 32px;
+  height: 32px;
+  margin: 6px 6px 6px 6px;
+}
+
+a.ct_toolbar_icon:hover {
+  margin: 3px 6px 9px 6px;
+}
+
+.ct_save_button {
+  float:left; 
+  background-image: url(images/document-save.png);
+}
+
+.ct_open_element_button {
+  float:left;
+  background-image: url(images/system-search.png);
+}
+
+.ct_search_replace_button {
+  float:left;
+  background-image: url(images/edit-find-replace.png);
+}
+
+.ct_stop_server_button {
+  float:right;
+  background-image: url(images/process-stop.png);
+}
+
+/* Browser */
+
+.ct_module_browser.ct_editor {
+  border: 0px;
+}
+
+.ct_module_browser.ct_editor.ct_focus {
+  border: 0px;
+}
+
+.ct_module_browser .ct_class_name {
+}
+
+.ct_module_browser .ct_feature_name {
+  display: none;
+}
+
+.ct_module_browser .ct_fold_open {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  background-image: url("images/minus_11px.png");
+}
+
+.ct_module_browser .ct_fold_closed {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  background-image: url("images/plus_11px.png");
+}
+
+.ct_module_browser .ct_fold_empty {
+  display: none;
+}
+
+/* Editor */
+
+.ct_module_editor.ct_editor {
+  border: 0px;
+}
+
+.ct_module_editor.ct_editor.ct_focus {
+  border: 0px;
+}
+
+.ct_module_editor .ct_fold_open {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  background-image: url("images/minus_11px.png");
+}
+
+.ct_module_editor .ct_fold_closed {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  background-image: url("images/plus_11px.png");
+}
+
+.ct_module_editor .ct_fold_empty {
+  display: none;
+}
+
+/* Clipboard */
+
+.ct_clipboard_area {
+  margin: 30px 10px 10px 10px; 
+  background-color: white; 
+  color: black; 
+  border: 1px solid grey;
+}
+
+/* Auto Completer */
+
+.auto_complete_dropdown {
+  position: absolute; 
+  border: 1px solid grey; 
+  background-color: white;
+  padding: 0;
+  margin: 0;
+}
+
+.auto_complete_dropdown ul {
+	padding: 0;
+	margin: 0;
+}
+
+.auto_complete_dropdown ul li {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	color: black;
+	text-align: left;	
+}
+
+.auto_complete_dropdown ul li.selected {
+	background-color: #ccf;		
+}
+
+/* Popup Dialog General */
+
+.popup_dialog {
+	font-family: "arial";
+	font-size: 14;
+}
+
+.popup_dialog .dialog_box {
+	background-color: white;
+	border: 1px solid gray;
+}
+
+.popup_dialog .shadow {
+  background-color: grey;
+  left: -5px;
+  top: -5px;
+  position: absolute;
+  opacity: 0.2;
+  z-index: -1;
+  border-radius: 5px;
+}
+
+.popup_dialog .title_bar {
+  padding: 5px;
+  background-color: #ccf;
+	font-size: 16;
+  font-weight: bold;
+  border-bottom: 1px solid gray;
+  cursor: move;
+}
+
+.popup_dialog .container {
+  margin: 15px;
+}
+
+.popup_dialog .label {
+  padding: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
+	font-size: 16;
+	color: black;
+}
+
+.popup_dialog .text_input {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border: 1px solid grey;
+	color: black;
+}
+
+.popup_dialog .button_input {
+  padding: 5px 20px 5px 20px;
+  border: 1px solid grey;
+  background-color: #ccf;
+	color: black;
+}
+
+.popup_dialog .close_button {
+  width: 16px;
+  height: 16px;
+  float: right;
+  background-image: url(images/close.png);
+  cursor: default;
+}
+
+/* Open Element Dialog */
+
+#ct_open_element_dialog {
+	width: 600px;
+}
+
+#ct_open_element_dialog .search_box_list_container {
+  margin-top: 10px;
+  background-color: white;
+  border: 1px solid grey;
+  width: 100%;
+  height: 200px;
+}
+
+/* in this dialog there is already a box around the dropdown area */
+#ct_open_element_dialog .auto_complete_dropdown {
+  border: 0;
+}
+
+#ct_open_element_dialog .search_box_list {
+  width: 100%;
+  height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#ct_open_element_dialog .search_box_list li {
+  padding: 3px;
+}
+
+#ct_open_element_dialog .search_box_identifier {
+  color: #aa0000;
+}
+
+#ct_open_element_dialog .search_box_class_name {
+  color: #0000aa;
+}
+
+#ct_open_element_dialog .search_box_module_name {
+  font-size: 90%;
+}
+
+/* Search Replace Dialog */
+
+#ct_search_replace_dialog {
+	width: 600px;
+}
+
