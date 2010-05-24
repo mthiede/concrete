@@ -30,6 +30,7 @@ Concrete.Editor = Class.create({
   //                 if not defined, external references can not be followed, default: none
   //   scrolling:    specifies if the current element should scroll into view
   //                 possible values: none, horizontal, vertical, both, default: both
+  //   selector:     if a selector is provided, use this instead of the internal selector, default: none
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     options = options || {};
@@ -55,7 +56,8 @@ Concrete.Editor = Class.create({
     this.constraintChecker.setModelRoot(this.modelRoot);
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
 		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
-		this.selector = this._createSelector();
+		this.selector = options.selector || new Concrete.Selector(); 
+    this._setupSelector(this.selector);
 		this.selector.selectDirect(this.modelRoot.down());
 		this.adjustMarker();
 		this.jumpStack = [];
@@ -86,9 +88,9 @@ Concrete.Editor = Class.create({
 		});
 	},
 	
-	_createSelector: function() {
+	_setupSelector: function(selector) {
 		var editor = this;
-		return new Concrete.Selector( 
+    selector.setOnChangeFunction(
 			function(oldNode, newNode) {
 				if (editor.options.scrolling != "none") Concrete.Scroller.scrollTo(newNode, editor.options.scrolling);
 				if (oldNode && newNode != oldNode) {

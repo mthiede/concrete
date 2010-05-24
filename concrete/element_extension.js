@@ -6,16 +6,16 @@
 
 Element.addMethods({
 	left: function(e) {
-		return e.offsetLeft;
+		return e.cumulativeOffset().left;
 	},
 	right: function(e) {
-		return e.offsetLeft + Element.getWidth(e);
+		return e.cumulativeOffset().left + Element.getWidth(e);
 	},
 	top: function(e) {
-		return e.offsetTop;
+		return e.cumulativeOffset().top;
 	},
 	bottom: function(e) {
-		return e.offsetTop + Element.getHeight(e);
+		return e.cumulativeOffset().top + Element.getHeight(e);
 	},
 	matchesClasses: function(e, classes) {
 		for (var i=0; i<classes.length; i++) {

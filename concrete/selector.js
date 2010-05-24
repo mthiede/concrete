@@ -5,22 +5,29 @@
 // Concrete is freely distributable under the terms of an MIT-style license.
 
 Concrete.Selector = Class.create({
-	
-	initialize: function(changeActionFunc) {
-		this.changeActionFunc = changeActionFunc;
+
+  // Options:
+  //   cursorEdgeOnly: if set to true snap cursor to element edges, default: true
+  //	
+	initialize: function(options) {
+    options = options || {};
 		this.cursor = {x: 0, y: 0};
 		this._inlineFirst = true;
-		this._cursorEdgeOnly = true;
+		this._cursorEdgeOnly = options.cursorEdgeOnly == undefined ? true : options.cursorEdgeOnly;
 		this.selected = undefined;
 		this.multiSelected = [];
 	},
+
+  setOnChangeFunction: function(f) {
+    this.changeActionFunc = f;
+  },
 	
 	selectDirect: function(s, multi) {
 		var selectable = this.surroundingSelectable(s);
 		if (selectable) {
 			var last = this.selected;
 			this._setSelected(selectable, multi);
-			this.changeActionFunc(last, selectable);
+			this.changeActionFunc && this.changeActionFunc(last, selectable);
 		}
 	},
 	
@@ -96,22 +103,22 @@ Concrete.Selector = Class.create({
 			var last = this.selected;
 			this._setSelected(next, multi);
 			this._adjustCursorNext(dir, next);
-			this.changeActionFunc(last, this.selected);
+			this.changeActionFunc && this.changeActionFunc(last, this.selected);
 		}
 		else if (parent) {
 			next = parent;
 			var last = this.selected;
 			this._setSelected(next, multi);
 			this._adjustCursorParent(dir, next);
-			this.changeActionFunc(last, this.selected);
+			this.changeActionFunc && this.changeActionFunc(last, this.selected);
 		}
 	},
 	
 	getCursorPosition: function() {
-		if (this.selected) {
+		if (this.cursor.element) {
 			return {
-				x: this.selected.left()+this.cursor.x*Element.getWidth(this.selected),
-				y: this.selected.top()+this.cursor.y*Element.getHeight(this.selected) };
+				x: this.cursor.element.left()+this.cursor.x*Element.getWidth(this.cursor.element),
+				y: this.cursor.element.top()+this.cursor.y*Element.getHeight(this.cursor.element) };
 		}
 		else {
 			return {x: 0, y: 0};
@@ -271,6 +278,7 @@ Concrete.Selector = Class.create({
 	
 	_adjustCursor: function(s) {
 		var cur = this.getCursorPosition();
+    this.cursor.element = s;
 		if (this._cursorEdgeOnly) {
 			this.cursor.x = (cur.x < (s.left()+s.right())/2) ? 0 : 1;
 			this.cursor.y = (cur.y < (s.top()+s.bottom())/2) ? 0 : 1;

@@ -12,14 +12,28 @@ Concrete.BasicInlineEditor = Class.create({
 			this.hide();
 		}
 		this.element = element;
-		Element.insert(element, { after: 
-			"<div class='ct_inline_editor' style='display: inline'>" +
-				"<input type='text' size='"+initialText.length+"' value='"+initialText+"'/>" +
-				"<div style='display: none; position: absolute;	border: 1px solid grey; background-color: white;'></div>" + 
-			"</div>"
-		});
+    if (element.parentNode.tagName.toUpperCase() == "TBODY") {
+      cols = element.up("table").select("tr").max(function(r) { return r.childElements().select(function(c) {return c.tagName.toUpperCase() == "TD";}).size(); });
+      Element.insert(element, { after: 
+        "<tr><td colspan='"+cols+"'>" +
+        "<div class='ct_inline_editor' style='display: inline'>" +
+          "<input type='text' size='"+initialText.length+"' value='"+initialText+"'/>" +
+          "<div style='display: none; position: absolute;	border: 1px solid grey; background-color: white;'></div>" + 
+        "</div>" +
+        "</td></tr>"
+      });
+      input = element.next().down().down().down();
+    }
+    else {
+      Element.insert(element, { after: 
+        "<div class='ct_inline_editor' style='display: inline'>" +
+          "<input type='text' size='"+initialText.length+"' value='"+initialText+"'/>" +
+          "<div style='display: none; position: absolute;	border: 1px solid grey; background-color: white;'></div>" + 
+        "</div>"
+      });
+      input = element.next().down();
+    }
 		element.hide();
-		input = element.next().down();
 		this.input = input
 		input.select();
     this._interval = window.setInterval(function() { 

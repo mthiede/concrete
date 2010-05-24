@@ -12,4 +12,6 @@
 * Added external identifier support
 * Scrolling to selected element also works in scroll containers
 * Added "always hide" strategy for features
+* Added selector option "cursorEdgeOnly", added editor option 'selector', fixed non-edge-only mode
+* Added support for table based element layouts 
 

@@ -240,7 +240,7 @@ Concrete.ModelInterface = Class.create({
 		var tmpl = this.templateProvider.templateByClass(clazz);
 		if (!tmpl.featurePositions) this._addTemplateInfo(tmpl);
 
-		var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {class: tmpl.className, style: tmpl.readAttribute("style")}, tmpl.innerHTML);
+		var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {class: tmpl.className, style: tmpl.readAttribute("style")});
 		if (where == "bottom") {
 			target.appendChild(inst);
 		}
@@ -255,6 +255,9 @@ Concrete.ModelInterface = Class.create({
 				target.parentNode.appendChild(inst);
 			}
 		}
+    // set inner HTML only after the new node has been hooked into its parent
+    // (otherwise the browser filters nodes like "tr" which it considers invalid at this place)
+    inst.innerHTML = tmpl.innerHTML;
 		inst.mmClass = tmpl.mmClass;
 
 		inst.features = [];
