@@ -1,0 +1,35 @@
+
+/* Metamodel Specific Styles
+ *****************************************************************************/
+
+/* add some space around the classes to make reading easier */
+.ctc_Class {
+	padding: 2px 0 2px 0;
+}
+
+.ctn_features table {
+	font-family: "courier new";
+	font-size: 12;
+  border-collapse: collapse;
+  border-spacing: 0px;
+  margin: 2px;
+  margin-left: 10px;
+}
+
+.ctn_features thead {
+  color: black;
+  background-color: #bbb;
+}
+
+.ctn_features table td {
+  border: 1px solid #777;
+  padding: 2px;
+}
+
+.ctn_features .ct_error {
+	border-left: 5px solid #F77;	
+}
+
+.ctn_features .ct_element.ct_empty {
+  margin: 0;
+}
