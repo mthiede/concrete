@@ -55,7 +55,7 @@ Concrete.Editor = Class.create({
          externalModule: options.externalModule});
     this.constraintChecker.setModelRoot(this.modelRoot);
 		this.modelInterface.addModelChangeListener(this.constraintChecker);
-		this.modelRoot.insert({top: this.templateProvider.emptyElement()});
+		this.modelRoot.insert({top: this.templateProvider.emptyElement(this.modelRoot)});
 		this.selector = options.selector || new Concrete.Selector(); 
     this._setupSelector(this.selector);
 		this.selector.selectDirect(this.modelRoot.down());
@@ -327,7 +327,7 @@ Concrete.Editor = Class.create({
 	// assumption all nodes have the same parent
 	removeElements: function(nodes) {
 		if (nodes.first().siblings().select(function(s){ return s.hasClassName("ct_element")}).size() == nodes.size()-1) {
-			nodes.last().insert({after: this.templateProvider.emptyElement()});
+			nodes.last().insert({after: this.templateProvider.emptyElement(nodes.last().parentNode)});
 		}
 		if (nodes.last().next()) {
 			this.selector.selectDirect(nodes.last().next());
@@ -356,7 +356,7 @@ Concrete.Editor = Class.create({
 			var slot = f.down(".ct_slot");
 			if (slot.childElements().size() == 0) {
 				if (f.mmFeature.isContainment()) {
-					slot.insert({bottom: this.templateProvider.emptyElement()});
+					slot.insert({bottom: this.templateProvider.emptyElement(slot)});
 				}
 				else {
 					slot.insert({bottom: this.templateProvider.emptyValue()});
@@ -507,7 +507,7 @@ Concrete.Editor.CommandHelper = {
 				var slot = f.down(".ct_slot");
 				if (slot.childElements().size() == 0) {
 					if (f.mmFeature.isContainment()) {
-						slot.insert({bottom: editor.templateProvider.emptyElement()});
+						slot.insert({bottom: editor.templateProvider.emptyElement(slot)});
 					}
 					else {
 						slot.insert({bottom: editor.templateProvider.emptyValue()});
@@ -707,7 +707,7 @@ Concrete.Editor.Commands = [
 			return n.hasClassName("ct_element") && !n.hasClassName("ct_empty") && Concrete.Editor.CommandHelper.canAddElement(n.up(), editor);
 		},
 		run: function(n, editor) {
-			n.insert({after: editor.templateProvider.emptyElement()})
+			n.insert({after: editor.templateProvider.emptyElement(n.parentNode)})
 			var temp = n.next()
 			editor.selector.selectDirect(temp)
 			editor.inlineEditor.edit(temp, { init: "", 

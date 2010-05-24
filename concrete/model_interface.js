@@ -240,7 +240,7 @@ Concrete.ModelInterface = Class.create({
 		var tmpl = this.templateProvider.templateByClass(clazz);
 		if (!tmpl.featurePositions) this._addTemplateInfo(tmpl);
 
-		var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {class: tmpl.className, style: tmpl.readAttribute("style")});
+		var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {class: tmpl.className, style: tmpl.readAttribute("style")},"");
 		if (where == "bottom") {
 			target.appendChild(inst);
 		}
