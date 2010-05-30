@@ -457,7 +457,8 @@ Concrete.Editor = Class.create({
 			
 	adjustMarker: function() {
 		var cur = this.selector.getCursorPosition();
-		this.marker.setStyle({left: cur.x, top: cur.y});
+    var poff = this.marker.getOffsetParent().cumulativeOffset();
+		this.marker.setStyle({left: cur.x-poff.left, top: cur.y-poff.top});
 	},
 	
 	getModel: function() {
