@@ -54,9 +54,13 @@ class Server
         @dataProvider.setJsonModel(ident, body)
       end
     elsif req.path =~ /\bmetamodel\.js/
-      res.body = @dataProvider.metamodelAsJson 
+      @mutex.synchronize do
+        res.body = @dataProvider.metamodelAsJson 
+      end
     elsif req.path =~ /\bindex_metamodel\.js/
-      res.body = @dataProvider.indexMetamodelAsJson 
+      @mutex.synchronize do
+        res.body = @dataProvider.indexMetamodelAsJson 
+      end
 		elsif req.path == "/exit"
 			@server.shutdown
     elsif req.path =~ /favicon\.ico/
