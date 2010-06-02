@@ -32,9 +32,9 @@ Concrete.UI.ModuleBrowser = Class.create({
     if ((event.type == "dblclick" || event.keyCode == 13) && this.browser.editorRoot.hasClassName("ct_focus")) {
       var selected = this.browser.selector.selected;
       if (selected) {
-        var file = selected.hasClassName("ctc_File") ? selected : selected.up(".ctc_File");
-        if (file) {
-          var module = file.down(".ctn_name").down(".ct_value").textContent;
+        var moduleElement = this._findModuleElement(selected); 
+        if (moduleElement) {
+          var module = moduleElement.down(".ctn_name").down(".ct_value").textContent;
           if (!selected.hasClassName("ct_element")) selected = selected.up(".ct_element");
           var target = this.browser.identifierProvider.getIdentifier(selected);
           // remove filename from identifier
@@ -51,6 +51,14 @@ Concrete.UI.ModuleBrowser = Class.create({
     index.each(function(m) {
       this.browser.modelInterface.createElement(this.browser.modelRoot, "bottom", this._filterChildren(m), {"collapse": true});
     }, this);
+  },
+
+  _findModuleElement: function(node) {
+    var element = node.hasClassName("ct_element") ? node : node.up(".ct_element");
+    while (!element.parentNode.hasClassName("ct_root")) {
+      element = element.up(".ct_element"); 
+    }
+    return element;
   },
 
   _createBrowser: function(browserElement, parentElement, indexMetamodel) {
