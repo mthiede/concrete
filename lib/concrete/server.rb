@@ -11,11 +11,7 @@ class Server
     @mutex = Mutex.new
 		@server = WEBrick::HTTPServer.new(:Port => (options[:port] || 1234))
 		@server.mount_proc("/") do |req, res|
-      begin
-        handleRequest(req, res)
-      rescue Exception => e
-        puts e
-      end
+      handleRequest(req, res)
 		end
 	end
 	

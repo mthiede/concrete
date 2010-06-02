@@ -19,11 +19,8 @@ class IndexBuilder
     @indexMM ||= buildIndexMetamodel
   end
 
-  # rootElement itself is not part of the index
   def buildIndex(root)
-    index = indexMetamodel.const_get(@moduleClassName).new
-    buildIndexInternal(root, index)
-    index
+    buildIndexInternal(root)
   end
 
   private
@@ -79,20 +76,18 @@ class IndexBuilder
     container.const_get(indexMMPackage.name)
   end
 
-  def buildIndexInternal(element, parent)
+  def buildIndexInternal(element)
+    return unless indexMetamodel.const_defined?(element.class.ecore.name)
+    return unless element.respond_to?(@identName)
+    ie = indexMetamodel.const_get(element.class.ecore.name).new
+    ie.name = element.getGeneric(@identName)
     element.class.ecore.eAllReferences.select{|r| r.containment}.each do |r|
-      values = element.getGeneric(r.name)
-      values = [values] unless values.is_a?(Array)
-      values.compact!
+      values = element.getGenericAsArray(r.name).compact
       values.each do |v|
-        next unless indexMetamodel.const_defined?(v.class.ecore.name)
-        next unless v.respond_to?(@identName)
-        ie = indexMetamodel.const_get(v.class.ecore.name).new
-        ie.name = v.getGeneric(@identName)
-        parent.addElements(ie)
-        buildIndexInternal(v, ie)
+        ie.addElements(buildIndexInternal(v))
       end
     end
+    ie
   end
 
   def containers(c)

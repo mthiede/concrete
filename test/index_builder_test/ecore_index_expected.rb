@@ -1,4 +1,4 @@
-module "TestModule" do
+ePackage "ECore" do
   eClass "EDataType" do
     eAttribute "serializable"
   end

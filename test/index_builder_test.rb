@@ -58,7 +58,6 @@ class IndexBuilderTest < Test::Unit::TestCase
   def test_build_index
     builder = Concrete::IndexBuilder.new(RGen::ECore)
     index = builder.buildIndex(RGen::ECore.ecore)
-    index.name = "TestModule"
     File.open(TestDir+"/ecore_index.rb","w") do |f|
       serializer = RGen::ModelBuilder::ModelSerializer.new(f, builder.indexMetamodel.ecore)
       serializer.serialize(index)
