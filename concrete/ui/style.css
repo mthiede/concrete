@@ -198,6 +198,7 @@ a.ct_toolbar_icon:hover {
   border: 1px solid grey;
   background-color: #ccf;
 	color: black;
+  margin: 5px;
 }
 
 .popup_dialog .close_button {
