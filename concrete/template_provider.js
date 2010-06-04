@@ -104,6 +104,7 @@ Concrete.TemplateProvider = Class.create({
 		
 	_completeDomBasedTemplate: function(tmpl, clazz) {
 		tmpl.mmClass = clazz;
+    var allFeatureTemplates = tmpl.select(".ct_attribute").concat(tmpl.select(".ct_reference")).concat(tmpl.select(".ct_containment"));
 		clazz.allFeatures().each(function(f) {
 			var msg = " template not found for '"+f.name+"' in class '"+clazz.name+"'";
 			var ft;
@@ -124,7 +125,11 @@ Concrete.TemplateProvider = Class.create({
 			}
 			if (!ft.down(".ct_slot")) throw new Error("no slot in template for class '"+clazz.name+"' feature '"+f.name+"'");
 			ft.mmFeature = f;
+      delete allFeatureTemplates[allFeatureTemplates.indexOf(ft)];
 		});
+    allFeatureTemplates.each(function(ft) {
+      throw new Error("Unused feature template '"+ft.className+"' in class '"+clazz.name+"'");
+    });
 	}
 		
 });

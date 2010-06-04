@@ -94,6 +94,9 @@ Concrete.UI.ModuleEditor = Class.create({
         editor.editor.setModel(transport.responseText);
         editor._selectElementByIdentifier(ident);
         editor._modelChanged = false;
+      },
+      onException: function(request, exception) {
+        throw exception;
       }
     });
   },
