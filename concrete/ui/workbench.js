@@ -93,6 +93,10 @@ Concrete.UI.Workbench = {
       searchReplaceDialog.open(moduleEditor.editor);
     });
 
+    toolbar.addCommand({buttonClass: "ct_toggle_short_references_button"}, function() {
+      moduleEditor.toggleShortReferences();
+    });
+
     toolbar.addCommand({buttonClass: "ct_stop_server_button"}, function() {
       new Ajax.Request("/exit");
     });

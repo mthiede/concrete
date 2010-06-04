@@ -192,7 +192,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
       }
     }
     else {
-      var newValue = node.textContent.replace(searchPattern, replaceText);
+      var newValue = node.value.replace(searchPattern, replaceText);
     }
     if (newValue) {
       this.editor.modelInterface.changeValue(node, newValue);

@@ -202,10 +202,10 @@ Concrete.ConstraintChecker = Class.create({
 		}
 		else if (mmf.isReference()) {
 			children.each(function(c) {				
-				var targets = this.identifierProvider.getElement(c.textContent);
+				var targets = this.identifierProvider.getElement(c.value);
         if (!(targets instanceof Array)) targets = [targets].compact();
         if (this.externalIdentifierProvider) {
-          var ei = this.externalIdentifierProvider.getElementInfo(c.textContent, {ignoreModule: this.options.externalModule});
+          var ei = this.externalIdentifierProvider.getElementInfo(c.value, {ignoreModule: this.options.externalModule});
           if (ei) {
             // here we add a type instead of an element
             targets = targets.concat(ei.type);
@@ -231,11 +231,11 @@ Concrete.ConstraintChecker = Class.create({
 		}
 		else {
 			children.each(function(c) {
-				if (!this.isValidValue(mmf, c.textContent)) {
+				if (!this.isValidValue(mmf, c.value)) {
 					problems.push("value not allowed");
 				}
 				else {
-					this._checkFeatureConstraints(featureConstraints, element, c.textContent, problems);
+					this._checkFeatureConstraints(featureConstraints, element, c.value, problems);
 				}
 			}, this);
 		}

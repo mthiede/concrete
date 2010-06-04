@@ -146,7 +146,9 @@
 
     	ip.elementAdded(e1);
 
-			e1.down(".ct_attribute").down(".ct_value").textContent = "X";
+			var value = e1.down(".ct_attribute").down(".ct_value")
+      value.textContent = "X";
+      value.value = value.textContent;
 
     	ip.elementChanged(e1, undefined);
 
@@ -254,6 +256,9 @@
   				f.mmFeature = {name: "sub"+i, kind: "containment"};
   				f.mmFeature.isContainment = function() { return true; };
   			}
+        f.slot.select(".ct_value").each(function(v) {
+          v.value = v.textContent;
+        });
   			i++;
   		});
 		});

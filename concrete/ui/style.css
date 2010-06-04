@@ -38,6 +38,11 @@ a.ct_toolbar_icon:hover {
   background-image: url(images/edit-find-replace.png);
 }
 
+.ct_toggle_short_references_button {
+  float:left;
+  background-image: url(images/emblem-symbolic-link.png);
+}
+
 .ct_stop_server_button {
   float:right;
   background-image: url(images/process-stop.png);

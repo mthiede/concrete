@@ -288,10 +288,10 @@ Concrete.Editor = Class.create({
 			this.refHighlight = undefined;
 		}
 		if (event.ctrlKey && element.hasClassName("ct_value") && !element.hasClassName("ct_empty") && element.mmFeature().isReference()) {
-			var targets = this.identifierProvider.getElement(element.textContent);
+			var targets = this.identifierProvider.getElement(element.value);
       if (!(targets instanceof Array)) targets = [targets].compact();
       if (this.externalIdentifierProvider) {
-        var ei = this.externalIdentifierProvider.getElementInfo(element.textContent);
+        var ei = this.externalIdentifierProvider.getElementInfo(element.value);
         if (ei) {
           // here we add a type instead of an element
           targets = targets.concat(ei.type);
@@ -430,7 +430,7 @@ Concrete.Editor = Class.create({
 	copyToClipboard: function(nodes, editor) {
 		if (nodes.first().hasClassName("ct_value")) {
 			// in case of a value, we expect only one node
-			this.clipboard.write(nodes.first().textContent);
+			this.clipboard.write(nodes.first().value);
 		}
 		else {
 			this.clipboard.write(nodes.collect(function(n) { return this.modelInterface.extractModel(n); }, this));
@@ -439,7 +439,7 @@ Concrete.Editor = Class.create({
 	
 	jumpReference: function(n) {
 		if (!n.hasClassName("ct_value") || !n.mmFeature().isReference()) return;
-		var target = this.identifierProvider.getElement(n.textContent);
+		var target = this.identifierProvider.getElement(n.value);
 		if (target && !(target instanceof Array)) {
       if (this.onFollowReference) this.onFollowReference(n, target);
       if (this.options.followReferenceSupport) {
@@ -448,9 +448,9 @@ Concrete.Editor = Class.create({
       }
 		}
     else {
-      var ei = this.externalIdentifierProvider && this.externalIdentifierProvider.getElementInfo(n.textContent);
+      var ei = this.externalIdentifierProvider && this.externalIdentifierProvider.getElementInfo(n.value);
       if (ei && this.onFollowExternalReference) {
-        this.onFollowExternalReference(ei.module, n.textContent);
+        this.onFollowExternalReference(ei.module, n.value);
       }
     }
 	},
@@ -544,7 +544,7 @@ Concrete.Editor.Commands = [
 		},
 		run: function(n, editor) {
 			editor.inlineEditor.edit(n, { 
-				init: n.textContent, 
+				init: n.value, 
 				options: editor.constraintChecker.attributeOptions(n.mmFeature()), 
 				onSuccess: function(v) {
 					if (n.hasClassName("ct_empty")) {
@@ -605,7 +605,7 @@ Concrete.Editor.Commands = [
 			return n.hasClassName("ct_value") && n.mmFeature().isReference();
 		},
 		run: function(n, editor) {
-			editor.inlineEditor.edit(n, { init: n.textContent, partial: true, 
+			editor.inlineEditor.edit(n, { init: n.value, partial: true, 
 				options: Concrete.Editor.CommandHelper.referenceOptions(n.mmFeature().type, editor), 
 				onSuccess: function(v) {
 					if (n.hasClassName("ct_empty")) {

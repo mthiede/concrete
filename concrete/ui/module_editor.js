@@ -5,6 +5,7 @@ Concrete.UI.ModuleEditor = Class.create({
   //   rootClasses:         array of names of classes which can be instantiated on root level, default: all
   //   duplicatableClasses: array of names of classes of which multiple instances can exist with the same qualified name, default: none 
   //   identifierAttribute: name of the identifier attribute, default: name
+  //   shortReferences:     if set to true, display only the last part of each reference, default: false
   // 
   initialize: function(parentElement, extIdentProvider, metamodelProvider, options) {
     options = options || {};
@@ -15,6 +16,7 @@ Concrete.UI.ModuleEditor = Class.create({
     this._editorElement = this._createContainerElement(parentElement);
     this._clipboard = this._createClipboard(parentElement);
     this._templateProvider = options.templateProvider || new Concrete.TemplateProvider(this._createTemplatesElement(parentElement));
+    this._shortReferences = options.shortReferences == true ? true : false;
     this.editor = this._createEditor();
     this._modelChanged = false;
     this._saveDiscardDialog = new Concrete.UI.ProceedDialog({
@@ -84,6 +86,12 @@ Concrete.UI.ModuleEditor = Class.create({
       }
     });
   },
+
+  toggleShortReferences: function() {
+    this._shortReferences = !this._shortReferences;
+    this._setDisplayValueProvider(this.editor.modelInterface);
+    this.editor.modelInterface.redrawDisplayValues();
+  },
   
   _loadModule: function(module, ident) {
     var editor = this;
@@ -127,7 +135,27 @@ Concrete.UI.ModuleEditor = Class.create({
       rootClasses: rootClasses,
       });
     ed.modelInterface.addModelChangeListener(this);
+    this._setDisplayValueProvider(ed.modelInterface);
     return ed;
+  },
+
+  _setDisplayValueProvider: function(modelInterface) {
+    if (this._shortReferences) {
+      var dvp = function(text, feature) {
+        if (feature.mmFeature.isReference()) {
+          return text.toString().split("/").last();
+        }
+        else {
+          return text;
+        }
+      };
+    }
+    else {
+      var dvp = function(text, feature) {
+        return text;
+      };
+    } 
+    modelInterface.setDisplayValueProvider(dvp);
   },
 
   _selectElementByIdentifier: function(ident) {

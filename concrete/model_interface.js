@@ -45,10 +45,10 @@ Element.addMethods({
 		else {
       if (values.size() > 1) {
         // optimization: empty placeholder values can not appear amoung other childs
-        return values.collect(function(c) {return c.textContent});
+        return values.collect(function(c) {return c.value});
       }
       else if (values.size() == 1 && !values[0].hasClassName("ct_empty")) {
-        return [values[0].textContent]; 
+        return [values[0].value]; 
       }
       else {
         return []; 
@@ -64,10 +64,17 @@ Element.addMethods({
 Concrete.ModelInterface = Class.create({
 	
 	// +modelRoot+ is the DOM element containing the model elements
-	initialize: function(modelRoot, templateProvider, metamodelProvider) {
+  // Options:
+  //   displayValueProvider: a function which returns the display value for an attribute or reference, 
+  //       the function must take two arguments, the original value text and the value node's feature parent 
+  //       default: none
+  //
+	initialize: function(modelRoot, templateProvider, metamodelProvider, options) {
 		this.modelRoot = modelRoot;
 		this.templateProvider = templateProvider;
 		this.metamodelProvider = metamodelProvider;
+    options = options || {};
+    this._displayValueProvider = options.displayValueProvider;
 		this._modelChangeListeners = [];
 	},
 	
@@ -78,6 +85,10 @@ Concrete.ModelInterface = Class.create({
 				throw new Error ("incomplete listener interface");
 		this._modelChangeListeners.push(listener);
 	},
+
+  setDisplayValueProvider: function(dvp) {
+    this._displayValueProvider = dvp;
+  },
 	
 	elements: function() {
 		return this.modelRoot.childElements().collect(function(e) {
@@ -132,16 +143,23 @@ Concrete.ModelInterface = Class.create({
 		if (!(["before", "after", "bottom"].include(where))) throw new Error ("unknown position");
 		if (where == "bottom" && !target.hasClassName("ct_slot")) throw new Error ("not a slot");
 		if (where != "bottom" && !target.hasClassName("ct_value")) throw new Error ("not a value");
-		var arg = {}; arg[where] = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, (text || ""));
+    text = (text || "").toString();
+    var feature = target.findAncestor(["ct_attribute", "ct_reference"]);
+    var valueNode = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, this._displayValue(text, feature));
+    valueNode.value = text;
+		var arg = {}; arg[where] = valueNode;
 		target.insert(arg);
-		this._notifyModelChangeListeners("changed", target.up(".ct_element"), target.findAncestor(["ct_attribute", "ct_reference"]));
+		this._notifyModelChangeListeners("changed", target.up(".ct_element"), feature);
 		this._notifyModelChangeListeners("commit");
 	},
 	
 	changeValue: function(value, text) {
 		if (!value.hasClassName("ct_value")) throw new Error("not a value");
-		value.textContent = text;
-		this._notifyModelChangeListeners("changed", value.up(".ct_element"), value.findAncestor(["ct_attribute", "ct_reference"]));
+    var feature = value.findAncestor(["ct_attribute", "ct_reference"]);
+    text = text.toString();
+		value.textContent = this._displayValue(text, feature);
+    value.value = text;
+		this._notifyModelChangeListeners("changed", value.up(".ct_element"), feature);
 		this._notifyModelChangeListeners("commit");
 	},
 
@@ -163,21 +181,21 @@ Concrete.ModelInterface = Class.create({
 					var converted = childs.collect(function(v){return this.extractModel(v); }, this);
 				}
 				else if (f.mmFeature.isReference()) {
-					var converted = childs.collect(function(v){return v.textContent; }, this);
+					var converted = childs.collect(function(v){return v.value; }, this);
 				}
 				else {
 					var converted = childs.collect(function(v){
 						if (f.mmFeature.type.isInteger()) {
-							return parseInt(v.textContent);
+							return parseInt(v.value);
 						}
 						else if (f.mmFeature.type.isFloat()) {
-							return parseFloat(v.textContent);
+							return parseFloat(v.value);
 						}
 						else if (f.mmFeature.type.isBoolean()) {
-							return v.textContent == "true";
+							return v.value == "true";
 						}
 						else {
-							return v.textContent; 
+							return v.value; 
 						}
 					});
 				}
@@ -191,6 +209,33 @@ Concrete.ModelInterface = Class.create({
 		}, this)
 		return result;
 	},
+
+  // if no +element+ is provided redrawing will start on model root
+  redrawDisplayValues: function(element) {
+    if (!this._displayValueProvider) return; 
+    if (element == undefined) {
+      this.modelRoot.childElements().each(function(c) {
+        this.redrawDisplayValues(c);
+      }, this);
+    }
+    else {
+      element.features.each(function(f) {
+        var childs = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
+        if (childs.size() > 0) {
+          if (f.mmFeature.isContainment()) {
+            childs.each(function(c) {
+              this.redrawDisplayValues(c);
+            }, this);
+          }
+          else {
+            childs.each(function(c) {
+              c.textContent = this._displayValue(c.value, f);
+            }, this);
+          }
+        }
+      }, this);
+    }
+  },
 	
 	// Private
 
@@ -282,9 +327,10 @@ Concrete.ModelInterface = Class.create({
 				}
 				else {
 					values.each(function(v) {
-						var vale = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, v);
+						var vale = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, this._displayValue(v.toString(), f));
+            vale.value = v.toString();
 						slot.appendChild(vale);
-					});
+					}, this);
 				}
 			}
 			else if (f.hasClassName("ct_auto_hide")) {
@@ -306,6 +352,15 @@ Concrete.ModelInterface = Class.create({
     }
 		return inst;
 	},
+
+  _displayValue: function(text, feature) {
+    if (this._displayValueProvider) {
+      return this._displayValueProvider(text, feature);
+    }
+    else {
+      return text;
+    }
+  },
 		
 	// add information used to make template instantiation more efficient 
 	_addTemplateInfo: function(tmpl) {
