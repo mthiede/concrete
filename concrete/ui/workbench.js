@@ -42,6 +42,8 @@ Concrete.UI.Workbench = {
       metamodelProvider: mp
       });
 
+    var preferencesDialog = new Concrete.UI.PreferencesDialog();
+
     // Event Handler
 
     Event.observe(window, 'click', function(event) {
@@ -99,6 +101,10 @@ Concrete.UI.Workbench = {
 
     toolbar.addCommand({buttonClass: "ct_stop_server_button"}, function() {
       new Ajax.Request("/exit");
+    });
+
+    toolbar.addCommand({buttonClass: "ct_preferences_button"}, function() {
+      preferencesDialog.open();
     });
 
     function jumpReference(module, ident) {

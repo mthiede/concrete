@@ -43,6 +43,11 @@ a.ct_toolbar_icon:hover {
   background-image: url(images/emblem-symbolic-link.png);
 }
 
+.ct_preferences_button {
+  float:right;
+  background-image: url(images/preferences-system.png);
+}
+
 .ct_stop_server_button {
   float:right;
   background-image: url(images/process-stop.png);
@@ -191,6 +196,14 @@ a.ct_toolbar_icon:hover {
 }
 
 .popup_dialog .text_input {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border: 1px solid grey;
+	color: black;
+}
+
+.popup_dialog .dropdown_input {
   width: 100%;
   margin-top: 5px;
   margin-bottom: 5px;

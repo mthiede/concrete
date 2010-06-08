@@ -10,6 +10,7 @@ Concrete.UI = {
         'proceed_dialog',
         'open_element_dialog',
         'search_replace_dialog',
+        'preferences_dialog',
         'layout_manager',
         'toolbar',
         'module_browser',
