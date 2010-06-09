@@ -20,6 +20,7 @@ Concrete.UI.PreferencesDialog = Class.create(Concrete.UI.AbstractDialog, {
         "<p class='label'>Concrete Syntax</p>" +
         "<select class='dropdown_input syntax_input'>" + 
         "</select>" + 
+        "<p>Save your work and press 'reload' to make changes visible.</p>" +
         "<div style='text-align: center; margin: 10px'>" +
           "<input class='button_input proceed_button' type='button' value='OK' />" +
           "<input class='button_input cancel_button' type='button' value='Cancel' />" +

@@ -6,18 +6,23 @@ class ConcreteSyntaxProvider
     attr_accessor :ident, :dir, :name, :desc, :htmlTemplates, :cssStyleFile
   end
 
-  def initialize(configDirs, logger)
+  def initialize(configDirs, logger, config=nil)
     @configDirs = configDirs
     @logger = logger
+    @config = config
     @selectedSyntax = nil 
   end
 
   def selectedSyntax
-    @selectedSyntax || syntaxes.first
+    syn = syntaxes
+    storedIdent = @config.andand.loadValue("concrete_syntax") 
+    storedSyntax = syn.find{|s| s.ident == storedIdent} if storedIdent
+    storedSyntax || @selectedSyntax || syn.first
   end
 
   def selectSyntax(ident)
     @selectedSyntax = syntaxes.find{|s| s.ident == ident}
+    @config.andand.storeValue("concrete_syntax", ident.to_s)
   end
 
   def syntaxesAsJson
@@ -41,7 +46,7 @@ class ConcreteSyntaxProvider
         s = ConcreteSyntax.new
         s.ident = syntaxDir.gsub("\\","/")
         s.dir = syntaxDir
-        s.name = sd
+        s.name = sd.split(/[_\W]/).collect{|w| w.capitalize}.join(" ")
         s.desc = ""
         s.cssStyleFile = styleFile if File.exist?(styleFile)
         s.htmlTemplates = File.read(templatesFile) if File.exist?(templatesFile)
