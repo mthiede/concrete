@@ -421,7 +421,7 @@ Concrete.Editor = Class.create({
     }
     var parentElements = n.ancestors().select(function(a) {return a.mmClass;});
     parentElements.each(function(e) {
-      if (e.foldButton.hasClassName("ct_fold_closed")) {
+      if (e.foldButton && e.foldButton.hasClassName("ct_fold_closed")) {
         this.expandElement(e);
       }
     }, this);
