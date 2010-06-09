@@ -27,7 +27,7 @@ class Server
 	def handleRequest(req, res)
 		if req.path == "/"
       editorHtml = File.read(@htmlRoot+"/editor.html")
-      editorHtml.sub!(/<!--\s+html templates\s+-->/, @syntaxProvider.selectedSyntax.htmlTemplates) if @syntaxProvider.selectedSyntax
+      editorHtml.sub!(/<!--\s+html templates\s+-->/, @syntaxProvider.selectedSyntax.htmlTemplates) if @syntaxProvider.andand.selectedSyntax.andand.htmlTemplates
 			res.body = editorHtml 
 		elsif req.path =~ /^\/html\/(.*)/
       File.open(@htmlRoot+"/"+$1, "rb") do |f|
