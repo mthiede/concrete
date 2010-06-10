@@ -68,6 +68,7 @@ Concrete.UI.ModuleBrowser = Class.create({
     var ed = new Concrete.Editor(browserElement, tp, mp, ip, {
       readOnlyMode: true, 
       followReferenceSupport: false,
+      showInfoPopups: false,
       scrolling: "vertical"});
     // HACK to disable constraint checking
     ed.constraintChecker._updateAllProblems = function() {};

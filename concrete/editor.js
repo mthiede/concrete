@@ -31,12 +31,15 @@ Concrete.Editor = Class.create({
   //   scrolling:    specifies if the current element should scroll into view
   //                 possible values: none, horizontal, vertical, both, default: both
   //   selector:     if a selector is provided, use this instead of the internal selector, default: none
+  //   showInfoPopups:
+  //                 if set to true, show information about element/values in a popup, default: true
   //
 	initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     options = options || {};
     this.options = options;
     if (options.readOnlyMode == undefined) options.readOnlyMode = false;
     if (options.followReferenceSupport == undefined) options.followReferenceSupport = true;
+    if (options.showInfoPopups == undefined) options.showInfoPopups = true;
     options.scrolling = options.scrolling || "both";
 		this.editorRoot = editorRoot;
 		this._setupRoot();
@@ -72,7 +75,7 @@ Concrete.Editor = Class.create({
 		this.modelRoot = this.editorRoot.childElements().first();
 		this.editorRoot.insert({bottom: "<div style='position: absolute; left: 0; top: 0' class='ct_cursor'></div>"});
 		this.marker = this.editorRoot.childElements().last();
-		this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_error_popup'></div>"});
+		this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
 		this.popup = this.editorRoot.childElements().last();
 	},
 	
@@ -122,8 +125,12 @@ Concrete.Editor = Class.create({
 		if (!this._hasFocus) return;
 		
 		if (event.type == "mousemove") {
-			this._handleErrorHighlight(event);
+			this._handleErrorPopups(event);
+      if (this.options.showInfoPopups) {
+        this._handleInfoPopups(event);
+      }
 			this._handleRefHighlight(event);
+      this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
 		}
 		if (this.inlineEditor.isActive) {
 			if (event.type == "click" && event.isLeftClick()) {
@@ -264,21 +271,64 @@ Concrete.Editor = Class.create({
 		}
 	},
 	
-	_handleErrorHighlight: function(event) {
+	_handleErrorPopups: function(event) {
 		var element = Event.element(event);
 		var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
 		if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
       var desc = errorElement.childElements().find(function(e) { return e.hasClassName("ct_error_description")});
       if (desc) {
-        this.popup.innerHTML = desc.innerHTML;
-        this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
-        this.popup.show();			
+        this._setPopupMessage("error_desc", "error", desc.innerHTML);
       }
 		}
 		else {
-			this.popup.hide();
+      this._resetPopupMessage("error_desc");
 		}		
 	},
+
+  _handleInfoPopups: function(event) {
+		var element = Event.element(event);
+    this._resetPopupMessage("feature_name");
+    this._resetPopupMessage("reference_value");
+    this._resetPopupMessage("reference_module");
+    if (element.hasClassName("ct_value") && element.up(".ct_editor") == this.editorRoot) {
+      this._setPopupMessage("feature_name", "info", "Feature: "+element.mmFeature().name);
+      if (element.mmFeature().isReference() && element.value) {
+        this._setPopupMessage("reference_value", "info", "Reference to: "+element.value);
+        if (this.externalIdentifierProvider) {
+          var ei = this.externalIdentifierProvider.getElementInfo(element.value);
+          if (ei && ei.module != this.options.externalModule) {
+            this._setPopupMessage("reference_module", "info", "In module: "+ei.module);
+          }
+        }
+      }
+    }
+  },
+
+  _setPopupMessage: function(ident, kind, content) {
+    this._popupMessages = this._popupMessages || {};
+    var msg = this._popupMessages[ident];
+    var clazz = kind == "error" ? "ct_error_message" : "ct_info_message";
+    if (!msg) {
+      Element.insert(this.popup, {bottom: "<div class='"+clazz+"'>"+content+"</div>"});
+      msg = this.popup.childElements().last();
+    }
+    else {
+      msg.className = clazz;
+      msg.innerHTML = content;
+    }
+    this._popupMessages[ident] = msg;
+    this.popup.show();
+  },
+
+  _resetPopupMessage: function(ident) {
+    this._popupMessages = this._popupMessages || {};
+    var msg = this._popupMessages[ident];
+    if (msg) {
+      msg.remove();
+      this._popupMessages[ident] = undefined;
+    }
+    if (this.popup.childElements().size() == 0) this.popup.hide();
+  },
 	
 	_handleRefHighlight: function(event) {
 		var element = Event.element(event);

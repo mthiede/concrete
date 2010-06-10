@@ -7,6 +7,7 @@ body {
 	color: #000;
 	font-family: "courier new";
 	font-size: 12;
+  cursor: default;
 }
  
 /* editor */
@@ -126,16 +127,33 @@ body {
 	border-left: 5px solid #F77;	
 }
 
-/* error popup shown when hovering over an element/feature with error */
-.ct_error_popup {
-	background-color: #F77;	
-	border: 1px solid #700;
-	padding: 2px;		
-}
-
 /* inline editor showing an error while editing */
 .inline_editor.ct_error {
 	background-color: #F77;	
+}
+
+/* Message Popup 
+ *****************************************************************************/
+
+/* popup shown when hovering over an element/feature */
+.ct_message_popup {
+	background-color: #FFD;	
+	border: 1px solid #777;
+  color: black;
+}
+
+.ct_error_message {
+  padding-left: 19px;
+  background: url("dialog-error.png") no-repeat;
+  min-height: 16px;
+  margin: 3px;
+}
+
+.ct_info_message {
+  padding-left: 19px;
+  background: url("dialog-information.png") no-repeat;
+  min-height: 16px;
+  margin: 3px;
 }
 
 /* References
