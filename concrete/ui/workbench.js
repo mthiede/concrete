@@ -67,6 +67,7 @@ Concrete.UI.Workbench = {
       layoutManager.handleEvent(event);
     });
     Event.observe(window, 'mousemove', function(event) {
+      toolbar.handleEvent(event);
       if (layoutManager.handleEvent(event)) {}
       else { 
         moduleEditor.handleEvent(event);
@@ -76,7 +77,7 @@ Concrete.UI.Workbench = {
 
     // Commands
 
-    toolbar.addCommand({buttonClass: "ct_save_button", hotkey: "ctrl+shift+S"}, function() {
+    toolbar.addCommand({buttonClass: "ct_save_button", hotkey: "ctrl+shift+S", tooltip: "Save Model"}, function() {
       moduleEditor.save({
         onSuccess: function() {
           loadIndex();
@@ -87,23 +88,23 @@ Concrete.UI.Workbench = {
       });
     });
 
-    toolbar.addCommand({buttonClass: "ct_open_element_button", hotkey: "ctrl+shift+E"}, function() {
+    toolbar.addCommand({buttonClass: "ct_open_element_button", hotkey: "ctrl+shift+E", tooltip: "Open Element"}, function() {
       openElementDialog.open(eip.getAllElementInfo());
     });
 
-    toolbar.addCommand({buttonClass: "ct_search_replace_button", hotkey: "ctrl+shift+F"}, function() {
+    toolbar.addCommand({buttonClass: "ct_search_replace_button", hotkey: "ctrl+shift+F", tooltip: "Search and Replace"}, function() {
       searchReplaceDialog.open(moduleEditor.editor);
     });
 
-    toolbar.addCommand({buttonClass: "ct_toggle_short_references_button"}, function() {
+    toolbar.addCommand({buttonClass: "ct_toggle_short_references_button", tooltip: "Toggle Short References"}, function() {
       moduleEditor.toggleShortReferences();
     });
 
-    toolbar.addCommand({buttonClass: "ct_stop_server_button"}, function() {
+    toolbar.addCommand({buttonClass: "ct_stop_server_button", tooltip: "Stop Server"}, function() {
       new Ajax.Request("/exit");
     });
 
-    toolbar.addCommand({buttonClass: "ct_preferences_button"}, function() {
+    toolbar.addCommand({buttonClass: "ct_preferences_button", tooltip: "Preferences"}, function() {
       preferencesDialog.open();
     });
 

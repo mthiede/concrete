@@ -2,7 +2,9 @@ Concrete.UI.Toolbar = Class.create({
 
   initialize: function(parentElement) {
     this.toolbar = this._createDomElement(parentElement);
+    this.popup = this.toolbar.down(".ct_tooltip_popup");
     this.hotkeys = new Hash();
+    this.tooltips = {};
   },
 
   handleEvent: function(event) {
@@ -23,6 +25,23 @@ Concrete.UI.Toolbar = Class.create({
         }
       }, this);
     }
+    else if (event.type == "mousemove") {
+      var element = Event.element(event);
+      this.popup.hide();
+      if (element.hasClassName("ct_toolbar_icon")) {
+        var clazz = element.className.sub("ct_toolbar_icon ","");
+        var tooltip = this.tooltips[clazz];
+        if (tooltip && tooltip.length > 0) {
+          this.popup.innerHTML = tooltip;
+          var left = event.clientX+20;
+          if (left > document.viewport.getDimensions().width - this.popup.getWidth()) {
+            left = document.viewport.getDimensions().width - this.popup.getWidth();
+          }
+          this.popup.setStyle({left: left, top: event.clientY+20});
+          this.popup.show();
+        }
+      }
+    }
   },
 
   addCommand: function(options, func) {
@@ -30,6 +49,9 @@ Concrete.UI.Toolbar = Class.create({
       this.hotkeys.set(options.hotkey, func);
     }
     var clazz = options.buttonClass || "";
+    if (options.tooltip && clazz.length > 0) {
+      this.tooltips[clazz] = options.tooltip;
+    }
     Element.insert(this.toolbar, { bottom:
       "<a class='ct_toolbar_icon "+clazz+"'></a>"
     });
@@ -39,7 +61,9 @@ Concrete.UI.Toolbar = Class.create({
 
   _createDomElement: function(parentElement) {
     Element.insert(parentElement, { bottom: 
-      "<div class='ct_toolbar'></div>"
+      "<div class='ct_toolbar'>" +
+        "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_tooltip_popup'></div>" +
+      "</div>"
     });
     return parentElement.childElements().last();
   },

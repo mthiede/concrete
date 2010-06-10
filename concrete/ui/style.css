@@ -23,6 +23,15 @@ a.ct_toolbar_icon:hover {
   margin: 3px 6px 9px 6px;
 }
 
+.ct_tooltip_popup {
+	background-color: #FFD;	
+	border: 1px solid #777;
+  color: black;
+  padding: 3px;
+  white-space: nowrap;
+  font-family: arial;
+}
+
 .ct_save_button {
   float:left; 
   background-image: url(images/document-save.png);
