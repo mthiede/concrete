@@ -20,14 +20,20 @@ Concrete.TemplateProvider = Class.create({
     this.options.alwaysHideFeatures = this.options.alwaysHideFeatures || [];
 	},
 	
-	emptyValue: function() {
+	emptyValue: function(feature) {
 		var value = new Element("span");
 		value.className = "ct_value ct_empty";
-		value.innerHTML = "&nbsp;";
+		value.innerHTML = "&lt;"+feature.mmFeature.name+"&gt;";
 		return value;
 	},
 	
-	emptyElement: function(parentNode) {
+	emptyElement: function(parentNode, feature) {
+    if (feature) {
+      var placeholderText = "&lt;"+feature.mmFeature.name+"&gt;"
+    }
+    else {
+      var placeholderText = "&lt;root&gt;"
+    }
     if (parentNode.tagName.toUpperCase() == "TBODY") {
       cols = parentNode.up("table").select("tr").max(function(r) { return r.childElements().select(function(c) {return c.tagName.toUpperCase() == "TD";}).size(); });
       var element = new Element("tr");
@@ -36,13 +42,13 @@ Concrete.TemplateProvider = Class.create({
       // adding child td node via innerHTML doesn't work in Firefox as long as the parent tr node is not child of a table
       var td = new Element("td");
       td.writeAttribute("colspan", cols);
-      td.innerHTML = "&nbsp;";
+      td.innerHTML = placeholderText;
       element.appendChild(td);
     }
     else {
       var element = new Element("span");
       element.className = "ct_element ct_empty";
-      element.innerHTML = "&nbsp;";
+      element.innerHTML = placeholderText;
       element.features = [];
     }
 		return element;

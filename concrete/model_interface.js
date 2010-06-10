@@ -8,16 +8,20 @@
 
 Element.addMethods({
 	// speed optimization in case the class is known this will be faster
-	mmFeature: function(e, clazz) {
+	feature: function(e, clazz) {
 		if (clazz) {
 			var feat = e.findAncestor(clazz);
 		}
 		else {
 			var feat = e.findAncestor(["ct_attribute", "ct_reference", "ct_containment"]);			
 		}
-		return feat.mmFeature;
+		return feat;
 	},
 	
+	mmFeature: function(e, clazz) {
+    return e.feature(clazz).mmFeature;
+  },
+
 	featureValues: function(e, feature) {
     if (Object.isString(feature)) {
       if (!e.featuresByName) {

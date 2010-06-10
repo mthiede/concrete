@@ -327,7 +327,7 @@ Concrete.Editor = Class.create({
 	// assumption all nodes have the same parent
 	removeElements: function(nodes) {
 		if (nodes.first().siblings().select(function(s){ return s.hasClassName("ct_element")}).size() == nodes.size()-1) {
-			nodes.last().insert({after: this.templateProvider.emptyElement(nodes.last().parentNode)});
+			nodes.last().insert({after: this.templateProvider.emptyElement(nodes.last().parentNode, nodes.last().feature())});
 		}
 		if (nodes.last().next()) {
 			this.selector.selectDirect(nodes.last().next());
@@ -356,10 +356,10 @@ Concrete.Editor = Class.create({
 			var slot = f.down(".ct_slot");
 			if (slot.childElements().size() == 0) {
 				if (f.mmFeature.isContainment()) {
-					slot.insert({bottom: this.templateProvider.emptyElement(slot)});
+					slot.insert({bottom: this.templateProvider.emptyElement(slot, f)});
 				}
 				else {
-					slot.insert({bottom: this.templateProvider.emptyValue()});
+					slot.insert({bottom: this.templateProvider.emptyValue(f)});
 				}
 			}
 		}, this);
@@ -508,10 +508,10 @@ Concrete.Editor.CommandHelper = {
 				var slot = f.down(".ct_slot");
 				if (slot.childElements().size() == 0) {
 					if (f.mmFeature.isContainment()) {
-						slot.insert({bottom: editor.templateProvider.emptyElement(slot)});
+						slot.insert({bottom: editor.templateProvider.emptyElement(slot, f)});
 					}
 					else {
-						slot.insert({bottom: editor.templateProvider.emptyValue()});
+						slot.insert({bottom: editor.templateProvider.emptyValue(f)});
 					}
 				}
 			}
@@ -520,7 +520,7 @@ Concrete.Editor.CommandHelper = {
 	
 	removeValue: function(n, editor) {
 		if (n.siblings().select(function(s){ return s.hasClassName("ct_value")}).size() == 0) {
-			n.insert({after: editor.templateProvider.emptyValue()});
+			n.insert({after: editor.templateProvider.emptyValue(n.feature())});
 		}
 		if (n.next()) {
 			editor.selector.selectDirect(n.next());
@@ -569,7 +569,7 @@ Concrete.Editor.Commands = [
 				(n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value")}).size()+1 < n.mmFeature().upperLimit);
 		},
 		run: function(n, editor) {
-			n.insert({after: editor.templateProvider.emptyValue()});
+			n.insert({after: editor.templateProvider.emptyValue(n.feature())});
 			var temp = n.next();
 			editor.selector.selectDirect(temp);
 			editor.inlineEditor.edit(temp, { init: "",
@@ -630,7 +630,7 @@ Concrete.Editor.Commands = [
 				(n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value")}).size()+1 < n.mmFeature().upperLimit);
 		},
 		run: function(n, editor) {
-			n.insert({after: editor.templateProvider.emptyValue()});
+			n.insert({after: editor.templateProvider.emptyValue(n.feature())});
 			var temp = n.next();
 			editor.selector.selectDirect(temp);
 			editor.inlineEditor.edit(temp, { init: "", partial: true, 
@@ -708,7 +708,7 @@ Concrete.Editor.Commands = [
 			return n.hasClassName("ct_element") && !n.hasClassName("ct_empty") && Concrete.Editor.CommandHelper.canAddElement(n.up(), editor);
 		},
 		run: function(n, editor) {
-			n.insert({after: editor.templateProvider.emptyElement(n.parentNode)})
+			n.insert({after: editor.templateProvider.emptyElement(n.parentNode, n.feature())})
 			var temp = n.next()
 			editor.selector.selectDirect(temp)
 			editor.inlineEditor.edit(temp, { init: "", 
