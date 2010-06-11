@@ -8,6 +8,7 @@ Concrete.UI.Toolbar = Class.create({
   },
 
   handleEvent: function(event) {
+    var handeled = false;
     if (event.type == "keydown") {
       this.hotkeys.keys().each(function(k) {
         var match = k.match(/^(ctrl\+)?(shift\+)?(\w)$/);
@@ -20,7 +21,8 @@ Concrete.UI.Toolbar = Class.create({
             keyCode == event.keyCode) {
             this.hotkeys.get(k)();
             event.stop();
-            return true;
+            handeled = true;
+            throw $break;
           }
         }
       }, this);
@@ -42,6 +44,7 @@ Concrete.UI.Toolbar = Class.create({
         }
       }
     }
+    return handeled;
   },
 
   addCommand: function(options, func) {
