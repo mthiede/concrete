@@ -6,7 +6,11 @@ The basic idea is to make use of the browser's document object model (DOM) to re
 
 Concrete is a Javascript widget based on Prototype and Scriptaculous. It exchanges model data in JSON format and can be integrated easily using Ajax.
 
-Note that until now, Concrete has only been tested sucessfully with Firefox.
+Besides the pure editor widget Concrete now also contains additional support for building larger editors. There is Javascript code implementing a simple "workbench" with an index view and edit view and search and replace functionality. In addition, there is Ruby code implementing the server side counterpart for loading and storing data with a local file system. As an example, check out the separate "mmedit" project on github. 
+
+Note that Concrete can also be used with non-Ruby backends.
+
+Concrete has been tested sucessfully with Firefox and Chrome.
 
 
 == Screencast
@@ -23,6 +27,20 @@ You can get the latest version from github.
 
 Concrete is not a standalone editor but needs to be integrated into a (web) application. For more information how to do this, see the developers guide and the examples included.
 
+Ruby users can install Concrete as a gem:
+
+> gem install concrete
+
+The Ruby based functionality of Concrete requires the "rgen" modelling framework which should be installed automatically. Otherwise it can be installed using: 
+
+> gem install rgen
+
+RGen is also available on github.
+
+The Ruby part of Concrete should work with any Ruby version starting with Ruby 1.8.6. The Ruby installers can be downloaded from:
+
+http://ruby-lang.org
+
 
 == Documentation
 
@@ -38,6 +56,8 @@ Currently, the examples folder contains:
 
 To use the examples, just open the HTML file in your browser (currently it should be Firefox). You can start from scratch or load a given model in JSON format. To do so just paste it into the clipboard box visible on each example page, then focus the editor and paste again using Ctrl-V. To store an example model, select it in the editor using Ctrl-A, copy it to the internal clipboard using Ctrl-C and then copy the JSON from the clipboard area to where you need it.
 	
+The metamodel editor comes in 3 flavours demonstrating text based, table based and box based layouts.
+
 In the metamodel example, there is also a little Ruby program which shows server interaction with Ajax. You can run the edit.rb with a JSON file as argument and it will fire up the browser, load the model, let you edit it and write it back to the file when you click the "Save" button. There is a folder "example_data" which contains the plain metamodels of the examples, they are basically the same as what is embedded in the respective example HTML files.
 
 To edit the statemachine example metamodel, you would do:
@@ -46,8 +66,22 @@ To edit the statemachine example metamodel, you would do:
 
 If you want to try the respective editor with the changed metamodel, you have to put it into the HTML file. It will not load the metamodel from the "example_data" folder.
 
+A much more sophisticated example metamodel editor is "mmedit" which is available as a separate gem on github.
+
 
 == License
 
 Concrete is licensed under the terms of the MIT license, see the included MIT-LICENSE file.
+
+
+== Credits
+
+Concrete is based on the great Prototype Javascript framework which makes Javascript feel much more like Ruby:
+http://www.prototypejs.org/
+
+For auto completion and some visual effects, as well as the unit test framework, thanks go to Scriptaculous:
+http://script.aculo.us/
+
+Almost all of the icons are taken from the Tango icon theme:
+http://tango.freedesktop.org/
 

@@ -487,12 +487,56 @@ Note, that only elements with an identifier can be referenced.</p></div>
 with multiples elements selected. Note however, that you can not paste an attribute or reference value where an element
 is expected and vice versa.</p></div>
 </div>
-<h2 id="_errors">Errors</h2>
+<h2 id="_hover_information">Hover Information</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>Some information is show only when moving the mouse over a model element or value. Make sure to focus the editor first,
+otherwise the hovers will not appear.</p></div>
+<h3 id="_errors">Errors</h3><div style="clear:left"></div>
 <div class="paragraph"><p>The DSL defines constraints on possible models. For example, for some attributes only a single value might be
 allowed, whereas for other attributes you may provide more than one value.
 If a constraint is violated for an element or feature, the element/feature will be marked as erroneous.
 Move the mouse over such an element in order to show the error message in a popup window.</p></div>
+<h3 id="_model_information">Model Information</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Depending on the concrete syntax, the feature names might be hidden. When moving the mouse over a model value, the name of the
+feature that value belongs to will be shown. Also for references, the full identifier will be shown.</p></div>
+</div>
+<h2 id="_workbench">Workbench</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Some editors might use the "workbench" functionality which comes with <em>Concrete</em>. The workbench features:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+a module index view
+</p>
+</li>
+<li>
+<p>
+a module editor view
+</p>
+</li>
+<li>
+<p>
+following references across modules
+</p>
+</li>
+<li>
+<p>
+finding elements based on a index ("open element")
+</p>
+</li>
+<li>
+<p>
+search/replace functionality
+</p>
+</li>
+<li>
+<p>
+switchable layouts via the preferences dialog
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Using the workbench should be pretty much self-explanatory. Some of the commands can be invoked using hotkeys which are described
+in the command reference below.</p></div>
 </div>
 <h2 id="_command_reference">Command Reference</h2>
 <div class="sectionbody">
@@ -616,10 +660,34 @@ cellspacing="0" cellpadding="4">
 </tbody>
 </table>
 </div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Workbench Commands</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Shift-S</p></td>
+<td align="left" valign="top"><p class="table">save model</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Shift-F</p></td>
+<td align="left" valign="top"><p class="table">open search/replace dialog</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ctrl-Shift-E</p></td>
+<td align="left" valign="top"><p class="table">open "open element" dialog</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-28 13:42:19 WEDT
+Last updated 2010-06-13 23:51:34 WEDT
 </div>
 </div>
 </body>

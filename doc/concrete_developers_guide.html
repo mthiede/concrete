@@ -404,7 +404,7 @@ div#toc a:visited { color: blue; }
 <div class="sectionbody">
 <div class="paragraph"><p>Models are represented by DOM nodes with special (CSS) classes. Elements, attributes, references and containments are represented by DOM nodes with classes <tt>ct_element</tt>, <tt>ct_attribute</tt>, <tt>ct_reference</tt> and <tt>ct_containment</tt> respectively. Attribute, reference and containment nodes are child nodes of element nodes. However, they do not have to be direct children, there can be other nodes around them.</p></div>
 <div class="paragraph"><p>Within each attribute, reference or containment node, there has to be a <em>slot</em> node marked by class <tt>ct_slot</tt>. Again, slots don&#8217;t have to be direct children and may have other nodes around them. The slot is the place where attribute values, reference values or child elements are inserted.</p></div>
-<div class="paragraph"><p>Attribute and reference values are DOM nodes marked with class <tt>ct_value</tt>. These nodes contain plain text which is the actual attribute value or the identifier of the referenced element. Between the slot and the contained values or elements, there must not be any other nodes.</p></div>
+<div class="paragraph"><p>Attribute and reference values are DOM nodes marked with class <tt>ct_value</tt>. These nodes contain plain text which represents the actual attribute value or the identifier of the referenced element. Note that the visible value of an attribute or reference may be different from the actual value in the model. As an example, long references by qualified names may be shortened to only the last path element. The internal model value is stored in a Javascript property "value" of the value node. Between the slot and the contained values or elements, there must not be any other nodes.</p></div>
 <div class="paragraph"><p>Note, that other custom CSS classes may be added to all the nodes as long as no predefined, reserved class is used (see CSS Class Reference).</p></div>
 <div class="paragraph"><p>For each element, the corresponding metamodel class is indicated by an additional CSS class. The CSS class name consists of the prefix <tt>ctc_</tt> followed by the name of the metamodel class. For example, an instance of the metamodel class "State" is annotated with CSS class <tt>ctc_State</tt>.</p></div>
 <div class="paragraph"><p>In order to indentify the features within each model element, they are annotated with CSS classes indicating the feature name. The CSS class name consists of the prefix <tt>ctn_</tt> followed by the name of the feature. For example an instance of the feature "name" would be annotated with CSS class <tt>ctn_name</tt>.</p></div>
@@ -542,8 +542,8 @@ Reference values are strings holding the identifier of the referenced element.
 <div class="paragraph"><p><em>Concrete</em> depends on <em>Prototype</em> and <em>Scriptaculous</em>. So you need to make sure, that these libraries are included before <em>Concrete</em> itself:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&lt;script src="../../lib/prototype.js" type="text/javascript"&gt;&lt;/script&gt;
-&lt;script src="../../lib/scriptaculous/scriptaculous.js" type="text/javascript"&gt;&lt;/script&gt;
+<pre><tt>&lt;script src="../../redist/prototype.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="../../redist/scriptaculous/scriptaculous.js" type="text/javascript"&gt;&lt;/script&gt;
 &lt;script src="../../concrete/concrete.js" type="text/javascript"&gt;&lt;/script&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Note that for the current version of <em>Concrete</em>, a slightly patched version of Scriptaculous is required which comes in the release package.</p></div>
@@ -586,7 +586,7 @@ Reference values are strings holding the identifier of the referenced element.
 <div class="content">
 <pre><tt>var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());</tt></pre>
 </div></div>
-<h3 id="_indentifier_provider">Indentifier Provider</h3><div style="clear:left"></div>
+<h3 id="_identifier_provider">Identifier Provider</h3><div style="clear:left"></div>
 <div class="paragraph"><p>In <em>Concrete</em>, identifiers are used to define reference targets. In order to create identifiers, the editor needs an identifier provider. Currently, the <tt>QualifiedNameBasedIdentifierProvider</tt> is included with <em>Concrete</em>, but other providers implementing custom identifier calculation strategies could be used instead. The <tt>QualifiedNameBasedIdentifierProvider</tt> needs to know the name of the attribute holding the local (non-qualified) name.</p></div>
 <div class="paragraph"><p>In the following example, all attributes named "name" are used for qualified name calculation.</p></div>
 <div class="listingblock">
@@ -601,7 +601,7 @@ Reference values are strings holding the identifier of the referenced element.
 <pre><tt>&lt;textarea id="clipboard1" style="background-color: white; color: black; border: 1px solid grey" cols="80" rows="10" wrap="off"&gt;
 &lt;/textarea&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>This textarea can be passed into the a new instance of <tt>Clipboard</tt>.</p></div>
+<div class="paragraph"><p>This textarea can be passed into a new instance of <tt>Clipboard</tt>.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>var cb = new Concrete.Clipboard($("clipboard1"));</tt></pre>
@@ -634,7 +634,7 @@ Event.observe(window, 'mousemove', function(event) {
 });</tt></pre>
 </div></div>
 <h3 id="_loading_and_storing_data">Loading and Storing Data</h3><div style="clear:left"></div>
-<div class="paragraph"><p>A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the <em>Concrete</em> editor provides the methods <tt>getModel</tt> and <tt>setModel</tt>. In both cases the model is a set of Javascript objects following the JSON conventions as described above.</p></div>
+<div class="paragraph"><p>A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the <em>Concrete</em> editor provides the methods <tt>getModel</tt> and <tt>setModel</tt>. In both cases the model is a JSON string following the JSON conventions as described above.</p></div>
 <div class="paragraph"><p>One possible way to use this API is to get the data from a server via AJAX and also store it back in the same way. Another option for loading is to embed the model in an HTML element in JSON text format and load it from there.</p></div>
 <div class="listingblock">
 <div class="content">
@@ -656,6 +656,163 @@ if (modelData.isJSON()) {
 <div class="content">
 <pre><tt>new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });</tt></pre>
 </div></div>
+</div>
+<h2 id="_the_workbench">The Workbench</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The "workbench" is an environment for editing larger models which are made up from <em>modules</em>. It is actually an assembly of two <em>Concrete</em> editor widgets. Thus it is both, an example of how the editor widget can be used in a larger scope and a base for more sophisticated editors. Just like the simple editor widget itself, the workbench is metamodel independant.</p></div>
+<div class="paragraph"><p>The workbench features:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+a module index view (read only)
+</p>
+</li>
+<li>
+<p>
+a module editor
+</p>
+</li>
+<li>
+<p>
+an inter module index supporting inter module references
+</p>
+</li>
+<li>
+<p>
+a dialog to jump to elements based on the index
+</p>
+</li>
+<li>
+<p>
+search/replace functionality
+</p>
+</li>
+<li>
+<p>
+support for switchable layouts via a preferences dialog
+</p>
+</li>
+<li>
+<p>
+a Ruby based server backend for reading/writing to the filesystem
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In order to use the Ruby backend, you need to have the Ruby runtime installed. Once Ruby is installed <em>Concrete</em> can be installed as a Ruby <em>gem</em>. See the Readme file for details.</p></div>
+<h3 id="_modules_and_index">Modules and Index</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The workbench is used to edit models devided into modules. It is based on the assumption that modules can be loaded and stored independantly.</p></div>
+<div class="paragraph"><p>An index is used to implement inter-module search and link functionality. The overall index is composed of the the indices of the individual modules. In case a module is modified, only this module&#8217;s index needs to be regenerated.</p></div>
+<div class="paragraph"><p>The index is a stripped down version of the original model. From the point of view of the <em>Concrete</em> editor widget, the index is just a model as any other model. Thus it needs to be an instance of a metamodel, the <em>index metamodel</em>. The index metamodel can be derived from the original metamodel: It contains a metaclass for each metaclass in the original metamodel. However the only features of an index metaclass are the name ("name") and the child elements ("elements"). The <em>Concrete::IndexBuilder</em> can be used to both create the index metamodel from the original metamodel and the index model from the original model.</p></div>
+<div class="paragraph"><p>The module index view of the workbench is actually a <em>Concret</em> editor widget which shows the index model. With the index structure as described above, class information, element names and the containment structure are available in the index. Using class information, class specific layouts (e.g. class specific icons) can be applied to the index view.</p></div>
+<h3 id="_data_provider_and_working_set">Data Provider and Working Set</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The workbench functionality is generic, you need to provide a metamodel as well as an instantiator and serializer for your models. This is done by passing a <em>data provider</em> to the generic server. The data provider is a Ruby object implementing the following methods:</p></div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Methods to be implemented by a Data Provider</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">metamodelAsJson</p></td>
+<td align="left" valign="top"><p class="table">returns the metamodel as a JSON string following the conventions described above</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">indexMetamodelAsJson</p></td>
+<td align="left" valign="top"><p class="table">returns the index metamodel as a JSON string</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">getJsonModel(fileIdent)</p></td>
+<td align="left" valign="top"><p class="table">reads the model part contained in module <em>fileIdent</em> from the filesystem or a database and returns a JSON string</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">setJsonModel(fileIdent, data)</p></td>
+<td align="left" valign="top"><p class="table">takes a JSON string representing the model in module <em>fileIdent</em> and writes it to the filesystem or a database</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">getAllJsonIndex</p></td>
+<td align="left" valign="top"><p class="table">returns a JSON string representing the overall model index (i.e. the composition of all module indices)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>The server also needs to know which modules exist. Therefor you should provide an instance of <em>Concrete::WorkingSet</em> which is basically a set of module identifiers.</p></div>
+<h3 id="_concrete_syntaxes">Concrete Syntaxes</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The workbench server supports selecting a concrete syntax from a set of available syntaxes. A concrete syntax consists of a stylesheet part and a HTML template part. Use an instance of <em>Concrete::ConcreteSyntaxProvider</em> to tell the server about the available syntaxes. The syntax provider takes a set of directories which contain concrete syntax information represented by directories and files following a naming convention:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;syntax root dir 1&gt;
+  &lt;syntax 1&gt;
+    style.css
+    templates.html
+  &lt;syntax 2&gt;
+    style.css
+    templates.html</tt></pre>
+</div></div>
+<div class="paragraph"><p>There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user&#8217;s home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" in case the syntax contains a HTML part. It should also contain a CSS file "style.css" and it may contain more resources (e.g. images) referenced from that stylesheet.</p></div>
+<div class="paragraph"><p>The server will make the files in the directory of the selected syntax available via the path prefix "/syntax". It will also insert the contents of the file "template.html" in the main HTML file by replacing the placeholder comment "html templates". See below for an example.</p></div>
+<h3 id="_setting_up_the_server">Setting up the Server</h3><div style="clear:left"></div>
+<div class="paragraph"><p>With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section.</p></div>
+<div class="paragraph"><p>The following example code sets up an instance of <em>Concrete::Server</em>. It reads the module names as file names from the command line and uses the RGen builtin ECore meta-metamodel as metamodel (in fact this is taken form the "mmedit" metamodel editor project). It uses the <em>Concrete::IndexBuilder</em> to derive the index metamodel and the index model and it uses a <em>Concrete::Config</em> to store the preferences in the user&#8217;s home directory.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>logger = Concrete::Util::Logger.new
+
+workingSet = Concrete::WorkingSet.new(".")
+ARGV.each{|a| workingSet.addFile(a)}
+
+mm = RGen::ECore
+indexBuilder = Concrete::IndexBuilder.new(mm)
+indexBuilder.indexMetamodel
+
+dataProvider = MMEdit::DataProvider.new(workingSet, mm, indexBuilder, logger)
+config = Concrete::Config.new(File.expand_path("~/.mmedit_config"))
+syntaxProvider = Concrete::ConcreteSyntaxProvider.new([File.dirname(__FILE__)+"/../syntax"], logger, config)
+Concrete::Server.new(workingSet, dataProvider, syntaxProvider, File.dirname(__FILE__)+"/../html").start</tt></pre>
+</div></div>
+<h3 id="_setting_up_the_javascript_part">Setting up the Javascript Part</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The server expects a file named "editor.html" in its HTML root directory. This is the place to setup the Javascript part of the workbench.</p></div>
+<div class="paragraph"><p>To be able to use the workbench functionality, you need to include the "concrete_ui" package as well as the workbench specific styles.</p></div>
+<div class="paragraph"><p>Note that the server will automatically redirect requests with prefix "/concrete" to the directory containing the <em>Concrete</em> Javascript code. It will redirect requests to "/html" to the HTML root directory and it will redirect requests to "/syntax" to the selected syntax directory. Requests to "metamodel.js" and "index_metamodel.js" will be served with the data returned from the data provider methodes "metamodelAsJson" and "indexMetamodelAsJson".</p></div>
+<div class="paragraph"><p>Here is an example from the "mmedit" project.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;link rel="stylesheet" href="/concrete/example/themes/white.css" type="text/css" /&gt;
+&lt;link rel="stylesheet" href="/concrete/concrete/ui/style.css" type="text/css" /&gt;
+&lt;link rel="stylesheet" href="/html/style.css" type="text/css" /&gt;
+&lt;link rel="stylesheet" href="/syntax/style.css" type="text/css" /&gt;
+&lt;script src="/concrete/redist/prototype.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/concrete/redist/scriptaculous/scriptaculous.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/concrete/concrete/concrete.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/concrete/concrete/ui/concrete_ui.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="metamodel.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="index_metamodel.js" type="text/javascript"&gt;&lt;/script&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>The "editor.html" file should also contain the placeholder which is to be replaced with the HTML templates from the syntax directory. Therefor it should contain a template container element including the placeholder:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;div id="editor_templates" style='display: none'&gt;
+  &lt;!-- html templates --&gt;
+&lt;/div&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>The workbench is created by means of a setup method which takes the metamodel and index metamodel as arguments. Note that in this example, the requests to "metamodel.js" and "index_metamodel.js" do not only return the JSON text but they return a Javascript assignment of this text to the variables "Metamodel" and "IndexMetamodel". In addition to the metamodels, the setup method takes options which are passed to the index view editor widget and the model editor widget.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Concrete.UI.Workbench.setup(Metamodel, IndexMetamodel, {
+
+  moduleEditorOptions: {
+    rootClasses: ["EPackage"],
+    templateProvider: new Concrete.TemplateProvider($("editor_templates"), {
+      identifierAttribute: "name"
+    }),
+    shortReferences: true
+  }
+});</tt></pre>
+</div></div>
+<h3 id="_going_beyond_the_workbench">Going beyond the Workbench</h3><div style="clear:left"></div>
+<div class="paragraph"><p>The "workbench" should cover a number of editing usecases without change. In case you need different functionality, just use it as an example and starting point to create your own <em>Concrete</em> based editor.</p></div>
 </div>
 <h2 id="_css_class_reference">CSS Class Reference</h2>
 <div class="sectionbody">
@@ -702,11 +859,15 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">ct_handle</p></td>
-<td align="left" valign="top"><p class="table">marks a DOM node which is used as an element&#8217;s handle</p></td>
+<td align="left" valign="top"><p class="table">marks a DOM node which is used as an element&#8217;s handle, this node will change into an editor when the element&#8217;s class is to be changed</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">ct_auto_hide</p></td>
-<td align="left" valign="top"><p class="table">marks a feature as "auto hide"</p></td>
+<td align="left" valign="top"><p class="table">marks a feature as "auto hide", it will be hidden if it is empty</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_always_hide</p></td>
+<td align="left" valign="top"><p class="table">marks a feature as "always hide", it will be hidden when the selection leaves the current element</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">ct_root</p></td>
@@ -737,7 +898,7 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">this class is present at the editor node if it is focused</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table">ct_select</p></td>
+<td align="left" valign="top"><p class="table">ct_selected</p></td>
 <td align="left" valign="top"><p class="table">this class is present at an element or value if it is selected</p></td>
 </tr>
 <tr>
@@ -763,6 +924,18 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">ct_fold_empty</p></td>
 <td align="left" valign="top"><p class="table">present at the fold button when the containing element has no contained elements</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_message_popup</p></td>
+<td align="left" valign="top"><p class="table">popup window shown when hovering over a model element</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_info_message</p></td>
+<td align="left" valign="top"><p class="table">info message within the message popup window</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_error_message</p></td>
+<td align="left" valign="top"><p class="table">error message within the message popup window</p></td>
 </tr>
 </tbody>
 </table>
@@ -808,13 +981,69 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">ct_ref_target</p></td>
 <td align="left" valign="top"><p class="table">marks the target element when a reference is highlighted</p></td>
 </tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_element_icon</p></td>
+<td align="left" valign="top"><p class="table">marks a node which can take an element&#8217;s icon with a "background" style</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="none"
+width="100%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">CSS Classes used by the Workbench</caption>
+<col width="50%" />
+<col width="50%" />
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">ct_layout_main</p></td>
+<td align="left" valign="top"><p class="table">marks the main editor pane</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_layout_sidebar</p></td>
+<td align="left" valign="top"><p class="table">marks the module index view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_layout_sidebar_drag</p></td>
+<td align="left" valign="top"><p class="table">draggable border of the index view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_layout_toolbar</p></td>
+<td align="left" valign="top"><p class="table">toolbar pane</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_toolbar</p></td>
+<td align="left" valign="top"><p class="table">the toolbar</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_toolbar_icon</p></td>
+<td align="left" valign="top"><p class="table">an icon of a toolbar button</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_tooltop_popup</p></td>
+<td align="left" valign="top"><p class="table">tooltip popup</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_&lt;&#8230;&gt;_button</p></td>
+<td align="left" valign="top"><p class="table">specific toolbar buttons</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_&lt;&#8230;&gt;_dialog</p></td>
+<td align="left" valign="top"><p class="table">marks nodes serving as dialog windows</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">ct_clipboard_area</p></td>
+<td align="left" valign="top"><p class="table">the clipboard area (textarea) in the module editor</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-28 13:41:52 WEDT
+Last updated 2010-06-14 00:05:25 WEDT
 </div>
 </div>
 </body>

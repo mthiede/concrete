@@ -24,7 +24,7 @@ Models are represented by DOM nodes with special (CSS) classes. Elements, attrib
 
 Within each attribute, reference or containment node, there has to be a _slot_ node marked by class +ct_slot+. Again, slots don't have to be direct children and may have other nodes around them. The slot is the place where attribute values, reference values or child elements are inserted. 
 
-Attribute and reference values are DOM nodes marked with class +ct_value+. These nodes contain plain text which is the actual attribute value or the identifier of the referenced element. Between the slot and the contained values or elements, there must not be any other nodes.
+Attribute and reference values are DOM nodes marked with class +ct_value+. These nodes contain plain text which represents the actual attribute value or the identifier of the referenced element. Note that the visible value of an attribute or reference may be different from the actual value in the model. As an example, long references by qualified names may be shortened to only the last path element. The internal model value is stored in a Javascript property "value" of the value node. Between the slot and the contained values or elements, there must not be any other nodes.
 
 Note, that other custom CSS classes may be added to all the nodes as long as no predefined, reserved class is used (see CSS Class Reference).
 
@@ -207,7 +207,7 @@ Here is how this metamodel can be fed into a new instance of +MetamodelProvider+
 var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());
 ----
 
-=== Indentifier Provider ===
+=== Identifier Provider ===
 
 In _Concrete_, identifiers are used to define reference targets. In order to create identifiers, the editor needs an identifier provider. Currently, the +QualifiedNameBasedIdentifierProvider+ is included with _Concrete_, but other providers implementing custom identifier calculation strategies could be used instead. The +QualifiedNameBasedIdentifierProvider+ needs to know the name of the attribute holding the local (non-qualified) name.
 
@@ -228,7 +228,7 @@ Here is an example:
 </textarea>
 ----
 
-This textarea can be passed into the a new instance of +Clipboard+.
+This textarea can be passed into a new instance of +Clipboard+.
 
 ----
 var cb = new Concrete.Clipboard($("clipboard1"));
@@ -268,7 +268,7 @@ Event.observe(window, 'mousemove', function(event) {
 
 === Loading and Storing Data ===
 
-A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the _Concrete_ editor provides the methods +getModel+ and +setModel+. In both cases the model is a set of Javascript objects following the JSON conventions as described above.
+A newly created editor is empty and the user can start building a model from scratch. However in most cases, some prebuilt model should be loaded and the final result should be stored. For this purpose, the _Concrete_ editor provides the methods +getModel+ and +setModel+. In both cases the model is a JSON string following the JSON conventions as described above.
 
 One possible way to use this API is to get the data from a server via AJAX and also store it back in the same way. Another option for loading is to embed the model in an HTML element in JSON text format and load it from there. 
 
@@ -295,6 +295,145 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 ----
 
 
+== The Workbench ==
+
+The "workbench" is an environment for editing larger models which are made up from _modules_. It is actually an assembly of two _Concrete_ editor widgets. Thus it is both, an example of how the editor widget can be used in a larger scope and a base for more sophisticated editors. Just like the simple editor widget itself, the workbench is metamodel independant.
+
+The workbench features:
+
+* a module index view (read only)
+* a module editor 
+* an inter module index supporting inter module references
+* a dialog to jump to elements based on the index
+* search/replace functionality
+* support for switchable layouts via a preferences dialog
+* a Ruby based server backend for reading/writing to the filesystem
+
+In order to use the Ruby backend, you need to have the Ruby runtime installed. Once Ruby is installed _Concrete_ can be installed as a Ruby _gem_. See the Readme file for details.
+
+
+=== Modules and Index ===
+
+The workbench is used to edit models devided into modules. It is based on the assumption that modules can be loaded and stored independantly.
+
+An index is used to implement inter-module search and link functionality. The overall index is composed of the the indices of the individual modules. In case a module is modified, only this module's index needs to be regenerated.
+
+The index is a stripped down version of the original model. From the point of view of the _Concrete_ editor widget, the index is just a model as any other model. Thus it needs to be an instance of a metamodel, the _index metamodel_. The index metamodel can be derived from the original metamodel: It contains a metaclass for each metaclass in the original metamodel. However the only features of an index metaclass are the name ("name") and the child elements ("elements"). The _Concrete::IndexBuilder_ can be used to both create the index metamodel from the original metamodel and the index model from the original model. 
+
+The module index view of the workbench is actually a _Concret_ editor widget which shows the index model. With the index structure as described above, class information, element names and the containment structure are available in the index. Using class information, class specific layouts (e.g. class specific icons) can be applied to the index view.
+
+
+=== Data Provider and Working Set ===
+
+The workbench functionality is generic, you need to provide a metamodel as well as an instantiator and serializer for your models. This is done by passing a _data provider_ to the generic server. The data provider is a Ruby object implementing the following methods:
+
+.Methods to be implemented by a Data Provider
+[frame="topbot",grid="none"]
+|=======================
+| metamodelAsJson | returns the metamodel as a JSON string following the conventions described above
+| indexMetamodelAsJson | returns the index metamodel as a JSON string
+| getJsonModel(fileIdent) | reads the model part contained in module _fileIdent_ from the filesystem or a database and returns a JSON string 
+| setJsonModel(fileIdent, data) | takes a JSON string representing the model in module _fileIdent_ and writes it to the filesystem or a database
+| getAllJsonIndex | returns a JSON string representing the overall model index (i.e. the composition of all module indices)
+|=======================
+
+The server also needs to know which modules exist. Therefor you should provide an instance of _Concrete::WorkingSet_ which is basically a set of module identifiers.
+
+
+=== Concrete Syntaxes ===
+
+The workbench server supports selecting a concrete syntax from a set of available syntaxes. A concrete syntax consists of a stylesheet part and a HTML template part. Use an instance of _Concrete::ConcreteSyntaxProvider_ to tell the server about the available syntaxes. The syntax provider takes a set of directories which contain concrete syntax information represented by directories and files following a naming convention:
+
+----
+<syntax root dir 1>
+  <syntax 1>
+    style.css
+    templates.html
+  <syntax 2>
+    style.css
+    templates.html
+----
+
+There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user's home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" in case the syntax contains a HTML part. It should also contain a CSS file "style.css" and it may contain more resources (e.g. images) referenced from that stylesheet.
+
+The server will make the files in the directory of the selected syntax available via the path prefix "/syntax". It will also insert the contents of the file "template.html" in the main HTML file by replacing the placeholder comment "html templates". See below for an example.
+
+
+=== Setting up the Server ===
+
+With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section.
+
+The following example code sets up an instance of _Concrete::Server_. It reads the module names as file names from the command line and uses the RGen builtin ECore meta-metamodel as metamodel (in fact this is taken form the "mmedit" metamodel editor project). It uses the _Concrete::IndexBuilder_ to derive the index metamodel and the index model and it uses a _Concrete::Config_ to store the preferences in the user's home directory.
+
+----
+logger = Concrete::Util::Logger.new
+
+workingSet = Concrete::WorkingSet.new(".")
+ARGV.each{|a| workingSet.addFile(a)}
+
+mm = RGen::ECore
+indexBuilder = Concrete::IndexBuilder.new(mm)
+indexBuilder.indexMetamodel
+
+dataProvider = MMEdit::DataProvider.new(workingSet, mm, indexBuilder, logger)
+config = Concrete::Config.new(File.expand_path("~/.mmedit_config"))
+syntaxProvider = Concrete::ConcreteSyntaxProvider.new([File.dirname(__FILE__)+"/../syntax"], logger, config)
+Concrete::Server.new(workingSet, dataProvider, syntaxProvider, File.dirname(__FILE__)+"/../html").start
+----
+
+
+=== Setting up the Javascript Part ===
+
+The server expects a file named "editor.html" in its HTML root directory. This is the place to setup the Javascript part of the workbench.
+
+To be able to use the workbench functionality, you need to include the "concrete_ui" package as well as the workbench specific styles. 
+
+Note that the server will automatically redirect requests with prefix "/concrete" to the directory containing the _Concrete_ Javascript code. It will redirect requests to "/html" to the HTML root directory and it will redirect requests to "/syntax" to the selected syntax directory. Requests to "metamodel.js" and "index_metamodel.js" will be served with the data returned from the data provider methodes "metamodelAsJson" and "indexMetamodelAsJson".
+
+Here is an example from the "mmedit" project.
+
+----
+<link rel="stylesheet" href="/concrete/example/themes/white.css" type="text/css" />		
+<link rel="stylesheet" href="/concrete/concrete/ui/style.css" type="text/css" />		
+<link rel="stylesheet" href="/html/style.css" type="text/css" />
+<link rel="stylesheet" href="/syntax/style.css" type="text/css" />
+<script src="/concrete/redist/prototype.js" type="text/javascript"></script>
+<script src="/concrete/redist/scriptaculous/scriptaculous.js" type="text/javascript"></script>
+<script src="/concrete/concrete/concrete.js" type="text/javascript"></script>
+<script src="/concrete/concrete/ui/concrete_ui.js" type="text/javascript"></script>
+<script src="metamodel.js" type="text/javascript"></script>
+<script src="index_metamodel.js" type="text/javascript"></script>
+----
+
+The "editor.html" file should also contain the placeholder which is to be replaced with the HTML templates from the syntax directory. Therefor it should contain a template container element including the placeholder:
+
+----
+<div id="editor_templates" style='display: none'>
+  <!-- html templates -->
+</div>
+----
+
+The workbench is created by means of a setup method which takes the metamodel and index metamodel as arguments. Note that in this example, the requests to "metamodel.js" and "index_metamodel.js" do not only return the JSON text but they return a Javascript assignment of this text to the variables "Metamodel" and "IndexMetamodel". In addition to the metamodels, the setup method takes options which are passed to the index view editor widget and the model editor widget.
+
+----
+Concrete.UI.Workbench.setup(Metamodel, IndexMetamodel, {
+
+  moduleEditorOptions: {
+    rootClasses: ["EPackage"],
+    templateProvider: new Concrete.TemplateProvider($("editor_templates"), {
+      identifierAttribute: "name"
+    }),
+    shortReferences: true
+  }
+});
+----
+
+
+=== Going beyond the Workbench ===
+
+The "workbench" should cover a number of editing usecases without change. In case you need different functionality, just use it as an example and starting point to create your own _Concrete_ based editor. 
+
+
 == CSS Class Reference ==
 
 .Model and Template Related CSS Classes
@@ -308,8 +447,9 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 | ct_value | attribute or reference value
 | ctc_<...> | class indicating an element's metamodel class
 | ctn_<...> | class indicating a feature's name
-| ct_handle | marks a DOM node which is used as an element's handle
-| ct_auto_hide | marks a feature as "auto hide"
+| ct_handle | marks a DOM node which is used as an element's handle, this node will change into an editor when the element's class is to be changed
+| ct_auto_hide | marks a feature as "auto hide", it will be hidden if it is empty
+| ct_always_hide | marks a feature as "always hide", it will be hidden when the selection leaves the current element
 | ct_root | internal. marks the model root node
 |=======================
 
@@ -319,13 +459,16 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 | ct_editor | the editor itself
 | ct_inline_editor | inline editor for editing text inside the editor
 | ct_focus | this class is present at the editor node if it is focused
-| ct_select | this class is present at an element or value if it is selected
+| ct_selected | this class is present at an element or value if it is selected
 | ct_cursor | cursor on the border of the currently selected element
 | ct_empty | empty value or element placeholder
 | ct_fold_button | marks the fold button
 | ct_fold_open | present at the fold button when the fold is open
 | ct_fold_closed | present at the fold button when the fold is closed
 | ct_fold_empty | present at the fold button when the containing element has no contained elements
+| ct_message_popup | popup window shown when hovering over a model element
+| ct_info_message | info message within the message popup window
+| ct_error_message | error message within the message popup window
 |=======================
 
 .Highlighting Related CSS Classes
@@ -339,6 +482,20 @@ new Ajax.Request("/save", { method: 'post', postBody: ed.getModel() });
 | ct_error_popup | popup window shown when the mouse is over an erroneous element
 | ct_ref_source | marks a reference when it is highlighted
 | ct_ref_target | marks the target element when a reference is highlighted
+| ct_element_icon | marks a node which can take an element's icon with a "background" style
 |=======================
 
-
+.CSS Classes used by the Workbench
+[frame="topbot",grid="none"]
+|=======================
+| ct_layout_main | marks the main editor pane
+| ct_layout_sidebar | marks the module index view
+| ct_layout_sidebar_drag | draggable border of the index view 
+| ct_layout_toolbar | toolbar pane
+| ct_toolbar | the toolbar
+| ct_toolbar_icon | an icon of a toolbar button
+| ct_tooltop_popup | tooltip popup
+| ct_<...>_button | specific toolbar buttons
+| ct_<...>_dialog | marks nodes serving as dialog windows 
+| ct_clipboard_area | the clipboard area (textarea) in the module editor
+|=======================

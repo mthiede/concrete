@@ -142,12 +142,39 @@ with multiples elements selected. Note however, that you can not paste an attrib
 is expected and vice versa.
 
 
-== Errors ==
+== Hover Information ==
+
+Some information is show only when moving the mouse over a model element or value. Make sure to focus the editor first, 
+otherwise the hovers will not appear.
+
+
+=== Errors ===
 
 The DSL defines constraints on possible models. For example, for some attributes only a single value might be
 allowed, whereas for other attributes you may provide more than one value. 
 If a constraint is violated for an element or feature, the element/feature will be marked as erroneous.
 Move the mouse over such an element in order to show the error message in a popup window.
+
+
+=== Model Information ===
+
+Depending on the concrete syntax, the feature names might be hidden. When moving the mouse over a model value, the name of the
+feature that value belongs to will be shown. Also for references, the full identifier will be shown.
+
+
+== Workbench ==
+
+Some editors might use the "workbench" functionality which comes with _Concrete_. The workbench features:
+
+* a module index view
+* a module editor view 
+* following references across modules
+* finding elements based on a index ("open element")
+* search/replace functionality
+* switchable layouts via the preferences dialog
+
+Using the workbench should be pretty much self-explanatory. Some of the commands can be invoked using hotkeys which are described
+in the command reference below.
 
 
 == Command Reference ==
@@ -185,3 +212,12 @@ Move the mouse over such an element in order to show the error message in a popu
 | Ctrl-Hover over reference | highlight reference target
 | Ctrl-Left Click | select reference target (jump to reference target)
 |=======================
+
+.Workbench Commands
+[frame="topbot",grid="none"]
+|=======================
+| Ctrl-Shift-S | save model
+| Ctrl-Shift-F | open search/replace dialog
+| Ctrl-Shift-E | open "open element" dialog
+|=======================
+
