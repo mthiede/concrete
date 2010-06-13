@@ -71,13 +71,22 @@
 		</div>
 		<script type="text/javascript" language="javascript" charset="utf-8">
 			// <![CDATA[
-		//	try {
 				var tp = new Concrete.TemplateProvider($("templates1"), {identifierAttribute: "name"});
 				var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());
 				var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
 				var cb = new Concrete.Clipboard($("clipboard1"));
 				var ed = new Concrete.Editor($("editor1"), tp, mp, ip, {clipboard: cb, 
 					rootClasses: mp.metaclasses.select(function(c) { return ["Statemachine"].include(c.name)})});
+
+        // only show the last part of reference identifiers
+        ed.modelInterface.setDisplayValueProvider(function(text, feature) {
+          if (feature.mmFeature.isReference()) {
+            return text.toString().split("/").last();
+          }
+          else {
+            return text;
+          }
+        });
 				
 				Event.observe(window, 'click', function(event) {
 					ed.handleEvent(event);
@@ -88,10 +97,6 @@
 				Event.observe(window, 'mousemove', function(event) {
 					ed.handleEvent(event);
 				});
-		//	}
-		//	catch(e) {
-		//		alert(e);
-		//	}
 			// ]]>
 		</script>
 	</body>

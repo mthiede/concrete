@@ -40,7 +40,6 @@
 		</div>
 		<script type="text/javascript" language="javascript" charset="utf-8">
 			// <![CDATA[
-		//	try {
 				var tp = new Concrete.TemplateProvider($("templates1"), {identifierAttribute: "name"});
 				var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());
 				var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
@@ -57,10 +56,6 @@
 				Event.observe(window, 'mousemove', function(event) {
 					ed.handleEvent(event);
 				});
-		//	}
-		//	catch(e) {
-		//		alert(e);
-		//	}
 			// ]]>
 		</script>
 	</body>

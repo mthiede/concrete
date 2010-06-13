@@ -14,5 +14,5 @@
 {"_class": "Class", "name": "Neg", "superTypes": "Expression", "features": 
   {"_class": "Feature", "name": "expr", "kind": "containment", "lowerLimit": 1, "upperLimit": 1, "type": "Expression"}}, 
 {"_class": "Class", "name": "Value", "superTypes": "Expression", "features": 
-  {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}}]
+  {"_class": "Feature", "name": "value", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}}]
 

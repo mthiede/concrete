@@ -3,8 +3,8 @@ require 'webrick'
 #
 # Simple ajax interaction with Concrete editor
 #
-# Adapt the path to firefox below.
-# Startup the browser before you run this script, otherwise is might hang.
+# Adapt the path to the browser (Firefox or Chrome) below.
+# Startup the browser before you run this script, otherwise it might hang.
 #
 Browser = "firefox"
 Port = 1234
@@ -34,6 +34,8 @@ class ConcreteServer
 			File.open(@file, "w") {|f| f.write(req.body)}
 		elsif req.path == "/exit"
 			@server.shutdown
+    elsif req.path == "/favicon.ico"
+      # ignore
 		else
 			res.body = File.read("../.."+req.path)
 		end
