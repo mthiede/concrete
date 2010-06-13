@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)+"/../lib")
 require 'test/unit'
 require 'fileutils'
 require 'rgen/array_extensions'
-require 'rgen/model_builder/model_serializer'
+require 'rgen/serializer/json_serializer'
 require 'concrete/index_builder'
 
 class IndexBuilderTest < Test::Unit::TestCase
@@ -58,11 +58,11 @@ class IndexBuilderTest < Test::Unit::TestCase
   def test_build_index
     builder = Concrete::IndexBuilder.new(RGen::ECore)
     index = builder.buildIndex(RGen::ECore.ecore)
-    File.open(TestDir+"/ecore_index.rb","w") do |f|
-      serializer = RGen::ModelBuilder::ModelSerializer.new(f, builder.indexMetamodel.ecore)
-      serializer.serialize(index)
+    File.open(TestDir+"/ecore_index.js", "w") do |f|
+      ser = RGen::Serializer::JsonSerializer.new(f)
+      ser.serialize(index)        
     end
-    assert_equal File.read(TestDir+"/ecore_index_expected.rb"), File.read(TestDir+"/ecore_index.rb")
+    assert_equal File.read(TestDir+"/ecore_index_expected.js").strip, File.read(TestDir+"/ecore_index.js").strip
   end
 
 end
