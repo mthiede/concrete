@@ -2,16 +2,30 @@
 
 * First public release
 
-=0.2.0
+=0.2.0 (June 14th, 2010)
 
+* Added higher level "workbench" editor support
+* Added Ruby/RGen backend support
+* Added model info hovers which share the popup window used for error descriptions
 * Added fold button support 
-* Added read only mode
+* Added read only mode of editor widget
 * Added float datatype support
-* Added support for feature sort function in TemplateProvider
-* Bugfix: show hovers only for focused editor
-* Added external identifier support
-* Scrolling to selected element also works in scroll containers
-* Added "always hide" strategy for features
-* Added selector option "cursorEdgeOnly", added editor option 'selector', fixed non-edge-only mode
 * Added support for table based element layouts 
+* Added metamodel editor examples showing box based and table based layouts
+* Added support for feature sort function and element icons in TemplateProvider
+* Added external identifier support
+* Added "always hide" strategy for features
+* Added selector option "cursorEdgeOnly", fixed non-edge-only mode
+* Added "white" theme
+* Added helper for iterating through model elements in depth first order
+* The empty element/value placeholder shows the feature name
+* Constraint checks run asynchronously in the background
+* Several performance improvements for larger models
+* Elements can be created in collapsed state
+* Concrete can be distributed as a Ruby gem
+* Fixed scrolling to selected element to also work in scroll containers
+* Fixed error hovers to be only shown for focused editor
+* Fixed Scriptaculous bugs: do not scroll page while moving in autocompletion box, do not hide autocompletion box when scrollbar is operated
+* Fixed marker (cursor) positioning for editor nodes with offset
+* Fixed exception in case fold control nodes are not present
 

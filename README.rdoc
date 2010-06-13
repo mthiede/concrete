@@ -31,9 +31,10 @@ Ruby users can install Concrete as a gem:
 
 > gem install concrete
 
-The Ruby based functionality of Concrete requires the "rgen" modelling framework which should be installed automatically. Otherwise it can be installed using: 
+The Ruby based functionality of Concrete requires the "rgen" modelling framework and the little "andand" gem which should be installed automatically. Otherwise it can be installed using: 
 
 > gem install rgen
+> gem install andand
 
 RGen is also available on github.
 
