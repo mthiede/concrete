@@ -36,7 +36,6 @@ class Server
     elsif req.path =~ /^\/syntax\/(.*)/ && @syntaxProvider.selectedSyntax
       File.open(@syntaxProvider.selectedSyntax.dir+"/"+$1, "rb") do |f|
         res.body = f.read
-        puts res.body.size
       end
 		elsif req.path =~ /^\/concrete\/(.*)/
       File.open(File.dirname(__FILE__)+"/../../"+$1, "rb") do |f|
