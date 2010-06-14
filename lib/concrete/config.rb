@@ -9,7 +9,8 @@ class Config
   end
 
   def loadValue(key)
-    loadConfig[key]
+    config = loadConfig
+    config[key] if config.is_a?(Hash)
   end
 
   def storeValue(key, value)
