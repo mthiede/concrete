@@ -34,6 +34,7 @@ class ConcreteSyntaxProvider
   def syntaxes
     result = []
     @configDirs.each do |cd|
+      next unless File.exist?(cd)
       Dir.entries(cd).sort.each do |sd|
         next if sd == "." || sd == ".."
         syntaxDir = cd+"/"+sd
