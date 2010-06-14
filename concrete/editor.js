@@ -111,6 +111,10 @@ Concrete.Editor = Class.create({
 			});
 	},
 		
+  focus: function() {
+    this._hasFocus = true;
+  },
+
 	handleEvent: function(event) {
 		if (event.type == "click" && event.isLeftClick()) {
 			if (Event.element(event).ancestors().concat(Event.element(event)).include(this.editorRoot)) {

@@ -125,14 +125,7 @@ Concrete.UI.Workbench = {
 
     function jumpReference(module, ident) {
       var href = "#"+module+((ident && ":"+ident) || "");
-      var lastm = window.location.href.match(/#.*/);
-      if (href == lastm && lastm[0]) {
-        // href doesn't change, call editor anyway to update selection in case it has changed
-        moduleEditor.select(module, ident);
-      }
-      else {
-        window.location.href = href; 
-      }
+      window.location.href = href; 
     }
 
     function loadIndex(options) {

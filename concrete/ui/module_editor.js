@@ -55,6 +55,7 @@ Concrete.UI.ModuleEditor = Class.create({
   select: function(module, ident) {
     if (module == this.currentModule) {
       if (ident) this._selectElementByIdentifier(ident);
+      this.editor.focus();
     }
     else {
       var dowork = function() {
@@ -62,6 +63,7 @@ Concrete.UI.ModuleEditor = Class.create({
         this._editorElement.innerHTML = "";
         this.editor = this._createEditor(module);
         this._loadModule(module, ident);
+        this.editor.focus();
       }.bind(this);
 
       if (this._modelChanged) {
