@@ -60,6 +60,11 @@ class Server
         body = req.body[identDelim+1..-1]
         @dataProvider.setJsonModel(ident, body)
       end
+    elsif req.path == "/createModule"
+      @mutex.synchronize do
+        @dataProvider.createModule(req.query["module"])
+        res.body = ""
+      end
     elsif req.path == "/concreteSyntaxes"
       res.body = @syntaxProvider.syntaxesAsJson 
     elsif req.path == "/setConcreteSyntax"

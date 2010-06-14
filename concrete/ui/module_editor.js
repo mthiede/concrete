@@ -24,6 +24,7 @@ Concrete.UI.ModuleEditor = Class.create({
       message: "The model has not yet been saved. If you continue, your modifications will be lost.",
       proceedButtonText: "Discard Changes"
     });
+    this._createModuleDialog = new Concrete.UI.CreateModuleDialog();
   },
 
   _createContainerElement: function(parentElement) {
@@ -72,6 +73,31 @@ Concrete.UI.ModuleEditor = Class.create({
     }
   },
 
+  createModule: function(options) {
+    var dowork = function() {
+      this._createModuleDialog.open({onCreateModule: function(module) {
+        new Ajax.Request("/createModule", {
+          method: 'get',
+          parameters: {"module": module},
+          onSuccess: function(transport) {
+            this.select(module);
+            if (options.onSuccess) options.onSuccess();
+          }.bind(this),
+          onFailure: function() {
+            if (options.onFailure) options.onFailure();
+          }
+        });
+      }.bind(this)});
+    }.bind(this);
+
+    if (this._modelChanged) {
+      this._saveDiscardDialog.open({onProceed: dowork});
+    }
+    else {
+      dowork();
+    }
+  },
+
   save: function(options) {
     if (!this.currentModule) return;
     new Ajax.Request("/storeModule", {
@@ -99,9 +125,11 @@ Concrete.UI.ModuleEditor = Class.create({
       method: "get",
       parameters: {"module": module},
       onSuccess: function(transport) {
-        editor.editor.setModel(transport.responseText);
-        editor._selectElementByIdentifier(ident);
-        editor._modelChanged = false;
+        if (transport.responseText.isJSON()) {
+          editor.editor.setModel(transport.responseText);
+          editor._selectElementByIdentifier(ident);
+          editor._modelChanged = false;
+        }
       },
       onException: function(request, exception) {
         throw exception;

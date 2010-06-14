@@ -24,6 +24,10 @@ class WorkingSet
   def getFile(fileIdent)
     @filesByIdent[fileIdent]
   end
+
+  def rootPath
+    @root.to_s
+  end
  
   private
   

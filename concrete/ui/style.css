@@ -32,6 +32,11 @@ a.ct_toolbar_icon:hover {
   font-family: arial;
 }
 
+.ct_create_module_button {
+  float:left; 
+  background-image: url(images/document-new.png);
+}
+
 .ct_save_button {
   float:left; 
   background-image: url(images/document-save.png);

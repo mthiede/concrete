@@ -334,6 +334,7 @@ The workbench functionality is generic, you need to provide a metamodel as well 
 | indexMetamodelAsJson | returns the index metamodel as a JSON string
 | getJsonModel(fileIdent) | reads the model part contained in module _fileIdent_ from the filesystem or a database and returns a JSON string 
 | setJsonModel(fileIdent, data) | takes a JSON string representing the model in module _fileIdent_ and writes it to the filesystem or a database
+| createModule(fileIdent) | creates a new empty module for the given identifier
 | getAllJsonIndex | returns a JSON string representing the overall model index (i.e. the composition of all module indices)
 |=======================
 

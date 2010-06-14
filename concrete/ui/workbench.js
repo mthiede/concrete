@@ -77,7 +77,18 @@ Concrete.UI.Workbench = {
 
     // Commands
 
-    toolbar.addCommand({buttonClass: "ct_save_button", hotkey: "ctrl+shift+S", tooltip: "Save Model"}, function() {
+    toolbar.addCommand({buttonClass: "ct_create_module_button", tooltip: "Create Module"}, function() {
+      moduleEditor.createModule({
+        onSuccess: function() {
+          loadIndex();
+        },
+        onFailure: function() {
+          alert("Create module failed");
+        }
+      });
+    });
+
+    toolbar.addCommand({buttonClass: "ct_save_button", hotkey: "ctrl+shift+S", tooltip: "Save Module"}, function() {
       moduleEditor.save({
         onSuccess: function() {
           loadIndex();
