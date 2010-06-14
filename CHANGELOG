@@ -18,6 +18,7 @@
 * Added selector option "cursorEdgeOnly", fixed non-edge-only mode
 * Added "white" theme
 * Added helper for iterating through model elements in depth first order
+* Added button to open Concrete Users Guide
 * The empty element/value placeholder shows the feature name
 * Constraint checks run asynchronously in the background
 * Several performance improvements for larger models

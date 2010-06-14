@@ -104,6 +104,10 @@ Concrete.UI.Workbench = {
       new Ajax.Request("/exit");
     });
 
+    toolbar.addCommand({buttonClass: "ct_browse_help_button", tooltip: "Browse Help"}, function() {
+      window.open("/doc/concrete_users_guide.html", "Concrete Users Guide");
+    });
+
     toolbar.addCommand({buttonClass: "ct_preferences_button", tooltip: "Preferences"}, function() {
       preferencesDialog.open();
     });

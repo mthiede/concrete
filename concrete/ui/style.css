@@ -57,6 +57,11 @@ a.ct_toolbar_icon:hover {
   background-image: url(images/preferences-system.png);
 }
 
+.ct_browse_help_button {
+  float:right;
+  background-image: url(images/help-browser.png);
+}
+
 .ct_stop_server_button {
   float:right;
   background-image: url(images/process-stop.png);

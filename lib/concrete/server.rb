@@ -41,6 +41,10 @@ class Server
       File.open(File.dirname(__FILE__)+"/../../"+$1, "rb") do |f|
         res.body = f.read
       end
+		elsif req.path =~ /^\/doc\/(.*)/
+      File.open(File.dirname(__FILE__)+"/../../doc/"+$1, "rb") do |f|
+        res.body = f.read
+      end
 		elsif req.path == "/loadIndex"
       @mutex.synchronize do
         res.body = @dataProvider.getAllJsonIndex
