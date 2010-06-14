@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Concrete
 
 class Config
