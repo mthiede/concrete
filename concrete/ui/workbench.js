@@ -55,6 +55,7 @@ Concrete.UI.Workbench = {
     });
     Event.observe(window, 'keydown', function(event) {
       if (toolbar.handleEvent(event)) {}
+      else if ($$(".popup_dialog").any(function(d) {return d.visible();})) {}
       else {
         moduleEditor.handleEvent(event);
         moduleBrowser.handleEvent(event);
