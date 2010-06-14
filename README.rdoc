@@ -33,8 +33,7 @@ Ruby users can install Concrete as a gem:
 
 The Ruby based functionality of Concrete requires the "rgen" modelling framework and the little "andand" gem which should be installed automatically. Otherwise it can be installed using: 
 
-> gem install rgen
-> gem install andand
+> gem install andand rgen
 
 RGen is also available on github.
 
@@ -78,11 +77,11 @@ Concrete is licensed under the terms of the MIT license, see the included MIT-LI
 == Credits
 
 Concrete is based on the great Prototype Javascript framework which makes Javascript feel much more like Ruby:
-http://www.prototypejs.org/
+http://www.prototypejs.org
 
 For auto completion and some visual effects, as well as the unit test framework, thanks go to Scriptaculous:
-http://script.aculo.us/
+http://script.aculo.us
 
 Almost all of the icons are taken from the Tango icon theme:
-http://tango.freedesktop.org/
+http://tango.freedesktop.org
 
