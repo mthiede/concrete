@@ -159,7 +159,8 @@ Move the mouse over such an element in order to show the error message in a popu
 === Model Information ===
 
 Depending on the concrete syntax, the feature names might be hidden. When moving the mouse over a model value, the name of the
-feature that value belongs to will be shown. Also for references, the full identifier will be shown.
+feature that value belongs to will be shown. Also for references, the full identifier, and in case of external references to other models, 
+the module identifier will be shown.
 
 
 == Workbench ==
