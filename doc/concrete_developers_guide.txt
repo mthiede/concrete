@@ -353,18 +353,20 @@ The workbench server supports selecting a concrete syntax from a set of availabl
   <syntax 2>
     style.css
     templates.html
+...
+<syntax root dir n>
 ----
 
-There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user's home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" or "templates.haml" in case the syntax contains a HTML part. It should also contain a CSS file "style.css" and it may contain more resources (e.g. images) referenced from that stylesheet.
+There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user's home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" or "templates.haml" in case the syntax contains a HTML part. It should also contain a CSS, SASS or SCSS file and it may contain more resources (e.g. images) referenced from that stylesheet.
 
-HTML templates may be specified in HAML format to make them more concise and readable. For this to work, _haml_ needs to be installed as a gem (use "gem install haml") and the HTML templates file must be named "templates.haml".
+HTML templates and stylesheets may be specified in HAML and SASS or SCSS format to make them more concise and readable. For this to work, _haml_ needs to be installed as a gem (use "gem install haml"), the HTML templates file must be named "templates.haml" and the SASS and SCSS filenames must end with .sass and .scss. If the server is given a _haml eval contect_ object (see below) the HAML templates will evaluate in this context.
 
 The server will make the files in the directory of the selected syntax available via the path prefix "/syntax". It will also insert the contents of the file "template.html" in the main HTML file by replacing the placeholder comment "html templates". See below for an example.
 
 
 === Setting up the Server ===
 
-With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section.
+With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section. A further option to the server is the HAML eval context which can be provided using the named argument _:hamlEvalContext_.
 
 The following example code sets up an instance of _Concrete::Server_. It reads the module names as file names from the command line and uses the RGen builtin ECore meta-metamodel as metamodel (in fact this is taken form the "mmedit" metamodel editor project). It uses the _Concrete::IndexBuilder_ to derive the index metamodel and the index model and it uses a _Concrete::Config_ to store the preferences in the user's home directory.
 

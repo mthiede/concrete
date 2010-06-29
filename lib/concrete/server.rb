@@ -1,4 +1,9 @@
 require 'webrick'
+begin
+  require 'haml'
+  require 'sass'
+rescue LoadError
+end
 
 module Concrete
 
@@ -9,6 +14,8 @@ class Server
     @dataProvider = dataProvider
     @syntaxProvider = syntaxProvider 
     @htmlRoot = htmlRoot
+    @logger = options[:logger]
+    @hamlEvalContext = options[:hamlEvalContext]
     @mutex = Mutex.new
 		@server = WEBrick::HTTPServer.new(:Port => (options[:port] || 1234))
 		@server.mount_proc("/") do |req, res|
@@ -27,16 +34,15 @@ class Server
 	def handleRequest(req, res)
 		if req.path == "/"
       editorHtml = File.read(@htmlRoot+"/editor.html")
-      editorHtml.sub!(/<!--\s+html templates\s+-->/, @syntaxProvider.selectedSyntax.htmlTemplates) if @syntaxProvider.andand.selectedSyntax.andand.htmlTemplates
+      templatesData = htmlTemplatesData(@syntaxProvider.selectedSyntax.dir) if @syntaxProvider.selectedSyntax
+      editorHtml.sub!(/<!--\s+html templates\s+-->/, templatesData) if templatesData 
 			res.body = editorHtml 
 		elsif req.path =~ /^\/html\/(.*)/
       File.open(@htmlRoot+"/"+$1, "rb") do |f|
         res.body = f.read
       end
     elsif req.path =~ /^\/syntax\/(.*)/ && @syntaxProvider.selectedSyntax
-      File.open(@syntaxProvider.selectedSyntax.dir+"/"+$1, "rb") do |f|
-        res.body = f.read
-      end
+      res.body = syntaxFileData(@syntaxProvider.selectedSyntax.dir+"/"+$1)
 		elsif req.path =~ /^\/concrete\/(.*)/
       File.open(File.dirname(__FILE__)+"/../../"+$1, "rb") do |f|
         res.body = f.read
@@ -85,7 +91,36 @@ class Server
       # error
 		end
 	end	
-		
+	
+  def syntaxFileData(fileName)
+    if haveHaml? && fileName =~ /(\.sass|\.scss)$/
+      Sass::Engine.new(File.read(fileName)).render
+    else
+      File.open(fileName, "rb") do |f|
+        f.read
+      end
+    end
+  end
+  	
+  def htmlTemplatesData(syntaxDir)
+    if haveHaml? && File.exist?(syntaxDir + "/templates.haml")
+      templatesFile = syntaxDir + "/templates.haml"
+      @logger.info("Using HAML templates file #{templatesFile}") if @logger
+      engine = Haml::Engine.new(File.read(templatesFile))
+      engine.render(@hamlEvalContext || Object.new)
+    elsif File.exist?(syntaxDir + "/templates.html")
+      templatesFile = syntaxDir + "/templates.html"
+      @logger.info("Using HTML templates file #{templatesFile}") if @logger
+      File.read(templatesFile)
+    end
+  end
+
+  def haveHaml?
+    begin
+      Haml
+    rescue NameError
+    end
+  end
 end
 
 end

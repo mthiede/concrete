@@ -65,10 +65,12 @@ class ConcreteSyntaxProviderTest < Test::Unit::TestCase
   def test_syntaxes_empty_syntax
     logger = LoggerMock.new
     sp = Concrete::ConcreteSyntaxProvider.new([TestDir+"/syntaxDir1"], logger)
-    assert_equal [], sp.syntaxes
-    assert_equal 1, logger.messages.size
-    assert_match /WARN: Concrete syntax dir without a templates/, logger.messages.first
-    assert_equal '{ "syntaxes": [], "selected": "" }', sp.syntaxesAsJson
+    assert_equal 1, sp.syntaxes.size
+    assert_equal "Empty Syntax", sp.syntaxes.first.name
+    assert_equal [], logger.messages
+    assert_equal '{ "syntaxes": [' + 
+      '{ "ident": "'+TestDir+'/syntaxDir1/empty_syntax", "name": "Empty Syntax" }' + 
+      '], "selected": "" }', sp.syntaxesAsJson
   end
 
   def test_syntaxes_common
@@ -77,28 +79,11 @@ class ConcreteSyntaxProviderTest < Test::Unit::TestCase
     syntaxes = sp.syntaxes
     assert_equal 1, syntaxes.size
     assert_equal "First Syntax", syntaxes.first.name
-    assert_equal "./concrete_syntax_provider_test/syntaxDir2/first_syntax/style.css", syntaxes.first.cssStyleFile
-    assert_equal "./concrete_syntax_provider_test/syntaxDir2/first_syntax", syntaxes.first.ident
-    assert_nil syntaxes.first.htmlTemplates
+    assert_equal TestDir+"/syntaxDir2/first_syntax", syntaxes.first.ident
     assert_equal '{ "syntaxes": [' + 
-      '{ "ident": "./concrete_syntax_provider_test/syntaxDir2/first_syntax", "name": "First Syntax" }' + 
+      '{ "ident": "'+TestDir+'/syntaxDir2/first_syntax", "name": "First Syntax" }' + 
       '], "selected": "" }', sp.syntaxesAsJson
     assert_equal [], logger.messages
-  end
-
-  def test_syntaxes_templates
-    logger = LoggerMock.new
-    sp = Concrete::ConcreteSyntaxProvider.new([TestDir+"/syntaxDir3"], logger)
-    syntaxes = sp.syntaxes
-    if haveHaml?
-      assert_equal 2, syntaxes.size
-      assert_equal "<p>Haml code!</p>", syntaxes.find{|s| s.name == "Haml Syntax"}.htmlTemplates.strip
-      assert_equal "<div>Template Content</div>", syntaxes.find{|s| s.name == "Html Syntax"}.htmlTemplates.strip
-    else
-      assert_equal 1, syntaxes.size
-      assert_equal "<div>Template Content</div>", syntaxes.first.htmlTemplates.strip
-      assert logger.messages.any?{|m| m =~ /Concrete syntax dir without.*and HAML installed/}
-    end
   end
 
   def test_selectSyntax_no_syntax
@@ -117,14 +102,14 @@ class ConcreteSyntaxProviderTest < Test::Unit::TestCase
       sp.selectSyntax("dummy")
     end
     assert_equal "First Syntax", sp.selectedSyntax.name
-    sp.selectSyntax("./concrete_syntax_provider_test/syntaxDir3/haml_syntax")
+    sp.selectSyntax(TestDir+"/syntaxDir3/haml_syntax")
     assert_equal "Haml Syntax", sp.selectedSyntax.name
   end
 
   def test_selectSyntax_load_config
     logger = LoggerMock.new
     config = ConfigMock.new
-    config.values["concrete_syntax"] = "./concrete_syntax_provider_test/syntaxDir3/haml_syntax" 
+    config.values["concrete_syntax"] = TestDir+"/syntaxDir3/haml_syntax" 
     sp = Concrete::ConcreteSyntaxProvider.new([TestDir+"/syntaxDir2", TestDir+"/syntaxDir3"], logger, config)
     assert_equal "Haml Syntax", sp.selectedSyntax.name
   end
@@ -135,15 +120,8 @@ class ConcreteSyntaxProviderTest < Test::Unit::TestCase
     sp = Concrete::ConcreteSyntaxProvider.new([TestDir+"/syntaxDir2", TestDir+"/syntaxDir3"], logger, config)
     sp.selectSyntax("dummy")
     assert_equal({}, config.values)
-    sp.selectSyntax("./concrete_syntax_provider_test/syntaxDir3/haml_syntax" )
-    assert_equal({"concrete_syntax" => "./concrete_syntax_provider_test/syntaxDir3/haml_syntax" }, config.values)
-  end
-
-  def haveHaml?
-    begin
-      Haml
-    rescue NameError
-    end
+    sp.selectSyntax(TestDir+"/syntaxDir3/haml_syntax" )
+    assert_equal({"concrete_syntax" => TestDir+"/syntaxDir3/haml_syntax" }, config.values)
   end
 
 end

@@ -753,13 +753,15 @@ cellspacing="0" cellpadding="4">
     templates.html
   &lt;syntax 2&gt;
     style.css
-    templates.html</tt></pre>
+    templates.html
+...
+&lt;syntax root dir n&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user&#8217;s home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" or "templates.haml" in case the syntax contains a HTML part. It should also contain a CSS file "style.css" and it may contain more resources (e.g. images) referenced from that stylesheet.</p></div>
-<div class="paragraph"><p>HTML templates may be specified in HAML format to make them more concise and readable. For this to work, <em>haml</em> needs to be installed as a gem (use "gem install haml") and the HTML templates file must be named "templates.haml".</p></div>
+<div class="paragraph"><p>There can be several syntax root directories (e.g. one which is deployed with your editor and one in the user&#8217;s home directory). The display name of a specific syntax is derived from the syntax directory within a root directory. The syntax directory should contain a file "templates.html" or "templates.haml" in case the syntax contains a HTML part. It should also contain a CSS, SASS or SCSS file and it may contain more resources (e.g. images) referenced from that stylesheet.</p></div>
+<div class="paragraph"><p>HTML templates and stylesheets may be specified in HAML and SASS or SCSS format to make them more concise and readable. For this to work, <em>haml</em> needs to be installed as a gem (use "gem install haml"), the HTML templates file must be named "templates.haml" and the SASS and SCSS filenames must end with .sass and .scss. If the server is given a <em>haml eval contect</em> object (see below) the HAML templates will evaluate in this context.</p></div>
 <div class="paragraph"><p>The server will make the files in the directory of the selected syntax available via the path prefix "/syntax". It will also insert the contents of the file "template.html" in the main HTML file by replacing the placeholder comment "html templates". See below for an example.</p></div>
 <h3 id="_setting_up_the_server">Setting up the Server</h3><div style="clear:left"></div>
-<div class="paragraph"><p>With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section.</p></div>
+<div class="paragraph"><p>With a working set, data provider and syntax provider in place the server can be instantiated. As an additional argument, it needs the location of its HTML root directory. The root directory should contain a file named "editor.html" which is the main HTML file as described in the next section. A further option to the server is the HAML eval context which can be provided using the named argument <em>:hamlEvalContext</em>.</p></div>
 <div class="paragraph"><p>The following example code sets up an instance of <em>Concrete::Server</em>. It reads the module names as file names from the command line and uses the RGen builtin ECore meta-metamodel as metamodel (in fact this is taken form the "mmedit" metamodel editor project). It uses the <em>Concrete::IndexBuilder</em> to derive the index metamodel and the index model and it uses a <em>Concrete::Config</em> to store the preferences in the user&#8217;s home directory.</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1048,7 +1050,7 @@ cellspacing="0" cellpadding="4">
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-06-25 11:36:59 WEDT
+Last updated 2010-06-30 08:10:12 WEDT
 </div>
 </div>
 </body>
