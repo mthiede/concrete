@@ -30,7 +30,7 @@
 * Fixed marker (cursor) positioning for editor nodes with offset
 * Fixed exception in case fold control nodes are not present
 
-=0.2.1
+=0.2.1 
 
 * Added support for HAML style HTML templates and stylesheets based on SASS
 
