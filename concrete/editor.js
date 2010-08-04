@@ -134,7 +134,7 @@ Concrete.Editor = Class.create({
         this._handleInfoPopups(event);
       }
 			this._handleRefHighlight(event);
-      this.popup.setStyle({left: event.clientX+20, top: event.clientY+20});
+      this.popup.setStyle({left: event.clientX+20+'px', top: event.clientY+20+'px'});
 		}
 		if (this.inlineEditor.isActive) {
 			if (event.type == "click" && event.isLeftClick()) {
@@ -512,7 +512,7 @@ Concrete.Editor = Class.create({
 	adjustMarker: function() {
 		var cur = this.selector.getCursorPosition();
     var poff = this.marker.getOffsetParent().cumulativeOffset();
-		this.marker.setStyle({left: cur.x-poff.left, top: cur.y-poff.top});
+		this.marker.setStyle({left: cur.x-poff.left+'px', top: cur.y-poff.top+'px'});
 	},
 	
 	getModel: function() {

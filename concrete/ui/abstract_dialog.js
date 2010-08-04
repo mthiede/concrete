@@ -20,7 +20,7 @@ Concrete.UI.AbstractDialog = Class.create({
     }.bind(this));
     Event.observe(window, 'mousemove', function(event) {
       if (this.moving) {
-        this.dialogElement.setStyle({left: event.clientX-this.moveOffset.left, top: event.clientY-this.moveOffset.top});
+        this.dialogElement.setStyle({left: event.clientX-this.moveOffset.left+'px', top: event.clientY-this.moveOffset.top+'px'});
       }
     }.bind(this));
     Event.observe(window, 'click', function(event) {
@@ -62,8 +62,8 @@ Concrete.UI.AbstractDialog = Class.create({
   },
 
   open: function() {
-    this.dialogElement.setStyle({left: (window.innerWidth-this.dialogElement.getWidth())/2, top: (window.innerHeight-this.dialogElement.getHeight())/2});
-    this.dialogElement.down(".shadow").setStyle({width: this.dialogElement.getWidth()+10, height: this.dialogElement.getHeight()+10});
+    this.dialogElement.setStyle({left: (window.innerWidth-this.dialogElement.getWidth())/2+'px', top: (window.innerHeight-this.dialogElement.getHeight())/2+'px'});
+    this.dialogElement.down(".shadow").setStyle({width: this.dialogElement.getWidth()+10+'px', height: this.dialogElement.getHeight()+10+'px'});
     this.dialogElement.show();
     this.dialogElement.down("input").select();
     this.active = true;

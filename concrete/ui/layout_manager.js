@@ -45,10 +45,10 @@ Concrete.UI.LayoutManager = Class.create({
     var sb = this.sidebar;
     var sbd = this._sidebarDrag; 
     var main = this.main; 
-    tb.setStyle({left: 0, top: 0, width: window.innerWidth});
-    sb.setStyle({left: 0, top: tb.getHeight(), width: this._sidebarWidth, height: window.innerHeight-tb.getHeight()});
-    sbd.setStyle({left: sb.getWidth(), top: tb.getHeight(), height: window.innerHeight-tb.getHeight()});
-    main.setStyle({left: sb.getWidth()+sbd.getWidth(), top: tb.getHeight(), width: window.innerWidth-sb.getWidth()-sbd.getWidth(), height: window.innerHeight-tb.getHeight()});
+    tb.setStyle({left: 0, top: 0, width: window.innerWidth+'px'});
+    sb.setStyle({left: 0, top: tb.getHeight()+'px', width: this._sidebarWidth+'px', height: window.innerHeight-tb.getHeight()+'px'});
+    sbd.setStyle({left: sb.getWidth()+'px', top: tb.getHeight()+'px', height: window.innerHeight-tb.getHeight()+'px'});
+    main.setStyle({left: sb.getWidth()+sbd.getWidth()+'px', top: tb.getHeight()+'px', width: window.innerWidth-sb.getWidth()-sbd.getWidth()+'px', height: window.innerHeight-tb.getHeight()+'px'});
   }
 
 });

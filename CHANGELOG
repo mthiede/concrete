@@ -33,4 +33,5 @@
 =0.2.1 
 
 * Added support for HAML style HTML templates and stylesheets based on SASS
+* Fixed layout/positioning problems when a doctype is provided (added missing 'px' unit)
 

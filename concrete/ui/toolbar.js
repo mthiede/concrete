@@ -39,7 +39,7 @@ Concrete.UI.Toolbar = Class.create({
           if (left > document.viewport.getDimensions().width - this.popup.getWidth()) {
             left = document.viewport.getDimensions().width - this.popup.getWidth();
           }
-          this.popup.setStyle({left: left, top: event.clientY+20});
+          this.popup.setStyle({left: left+'px', top: event.clientY+20+'px'});
           this.popup.show();
         }
       }
