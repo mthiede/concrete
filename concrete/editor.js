@@ -138,8 +138,10 @@ Concrete.Editor = Class.create({
 		}
 		if (this.inlineEditor.isActive) {
 			if (event.type == "click" && event.isLeftClick()) {
-				this.inlineEditor.cancel()
-				this.selector.selectDirect(Event.element(event));	
+        if (!Event.element(event).up().hasClassName("ct_inline_editor")) {
+          this.inlineEditor.cancel();
+          this.selector.selectDirect(Event.element(event));	
+        }
 			}
 			else if (event.keyCode == 9) { 	// tab
 				this.inlineEditor.finish();
