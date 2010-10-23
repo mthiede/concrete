@@ -37,3 +37,7 @@
 * Fixed bug not allowing to finish editing of a text attribute if an integer attribute has been edited before
 * Fixed bug not allowing to position the cursor with the mouse in a text field in edit mode
 
+=0.2.2
+
+* Added support for cursor styles depeding its relative position (left/right/top/bottom)
+

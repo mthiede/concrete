@@ -466,6 +466,7 @@ The "workbench" should cover a number of editing usecases without change. In cas
 | ct_focus | this class is present at the editor node if it is focused
 | ct_selected | this class is present at an element or value if it is selected
 | ct_cursor | cursor on the border of the currently selected element
+| ct_cursor_(left\|top\|right\|bottom) | additional classes set on the cursor to indicate its relative position
 | ct_empty | empty value or element placeholder
 | ct_fold_button | marks the fold button
 | ct_fold_open | present at the fold button when the fold is open

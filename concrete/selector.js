@@ -118,10 +118,12 @@ Concrete.Selector = Class.create({
 		if (this.cursor.element) {
 			return {
 				x: this.cursor.element.left()+this.cursor.x*Element.getWidth(this.cursor.element),
-				y: this.cursor.element.top()+this.cursor.y*Element.getHeight(this.cursor.element) };
+				y: this.cursor.element.top()+this.cursor.y*Element.getHeight(this.cursor.element),
+        xratio: this.cursor.x,
+        yratio: this.cursor.y }; 
 		}
 		else {
-			return {x: 0, y: 0};
+			return {x: 0, y: 0, xratio: 0, yratio: 0};
 		}
 	},
 	

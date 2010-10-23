@@ -515,6 +515,22 @@ Concrete.Editor = Class.create({
 		var cur = this.selector.getCursorPosition();
     var poff = this.marker.getOffsetParent().cumulativeOffset();
 		this.marker.setStyle({left: cur.x-poff.left+'px', top: cur.y-poff.top+'px'});
+    if (cur.yratio < 0.5) {
+      this.marker.addClassName("ct_cursor_top");
+      this.marker.removeClassName("ct_cursor_bottom");
+    }
+    else {
+      this.marker.addClassName("ct_cursor_bottom");
+      this.marker.removeClassName("ct_cursor_top");
+    }
+    if (cur.xratio < 0.5) {
+      this.marker.addClassName("ct_cursor_left");
+      this.marker.removeClassName("ct_cursor_right");
+    }
+    else {
+      this.marker.addClassName("ct_cursor_right");
+      this.marker.removeClassName("ct_cursor_left");
+    }
 	},
 	
 	getModel: function() {
