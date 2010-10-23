@@ -40,4 +40,5 @@
 =0.2.2
 
 * Added support for cursor styles depeding its relative position (left/right/top/bottom)
+* Added editor method to show a hidden feature
 

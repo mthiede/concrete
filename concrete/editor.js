@@ -408,20 +408,24 @@ Concrete.Editor = Class.create({
     // expand to make fold button state consistent (code below will show all features)
     this.expandElement(n);
 		n.findFirstDescendants(["ct_attribute", "ct_reference", "ct_containment"], ["ct_element"]).each(function(f) {
-			f.show();
-			var slot = f.down(".ct_slot");
-			if (slot.childElements().size() == 0) {
-				if (f.mmFeature.isContainment()) {
-					slot.insert({bottom: this.templateProvider.emptyElement(slot, f)});
-				}
-				else {
-					slot.insert({bottom: this.templateProvider.emptyValue(f)});
-				}
-			}
+      this.showHiddenFeature(f);
 		}, this);
 		this.adjustMarker();
 	},
 
+  showHiddenFeature: function(f) {
+    f.show();
+    var slot = f.down(".ct_slot");
+    if (slot.childElements().size() == 0) {
+      if (f.mmFeature.isContainment()) {
+        slot.insert({bottom: this.templateProvider.emptyElement(slot, f)});
+      }
+      else {
+        slot.insert({bottom: this.templateProvider.emptyValue(f)});
+      }
+    }
+  },
+	
   toggleFoldButton: function(fb) {
     if (fb.hasClassName("ct_fold_open")) {
       this.collapseElement(fb.up(".ct_element"));
@@ -576,20 +580,11 @@ Concrete.Editor.CommandHelper = {
 	showAllNonAutoHideFeatures: function(n, editor) {
 		n.select(".ct_attribute, .ct_reference, .ct_containment").each(function(f) {
 			if (!f.hasClassName("ct_auto_hide") && !f.hasClassName("ct_always_hide")) {
-				f.show();
-				var slot = f.down(".ct_slot");
-				if (slot.childElements().size() == 0) {
-					if (f.mmFeature.isContainment()) {
-						slot.insert({bottom: editor.templateProvider.emptyElement(slot, f)});
-					}
-					else {
-						slot.insert({bottom: editor.templateProvider.emptyValue(f)});
-					}
-				}
+        editor.showHiddenFeature(f);
 			}
 		});		
 	},
-	
+
 	removeValue: function(n, editor) {
 		if (n.siblings().select(function(s){ return s.hasClassName("ct_value")}).size() == 0) {
 			n.insert({after: editor.templateProvider.emptyValue(n.feature())});
