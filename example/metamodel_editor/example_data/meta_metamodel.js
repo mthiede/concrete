@@ -1,3 +1,4 @@
+ExampleData = Object.toJSON( 
 [
   {"_class": "Datatype", "name": "String"},
   {"_class": "Datatype", "name": "Integer"},
@@ -19,4 +20,5 @@
     {"_class": "Feature", "name": "type", "kind": "reference", "lowerLimit": 1, "upperLimit": 1, "type": "Classifier"}
   ]}
 ]
+);
 

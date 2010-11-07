@@ -1,3 +1,4 @@
+ExampleData = Object.toJSON( 
 [{"_class": "Statemachine", "name": "AC", "triggers": [
   {"_class": "Trigger", "name": "OnButton"}, 
   {"_class": "Trigger", "name": "ModeButton"}], "states": [
@@ -9,3 +10,4 @@
     {"_class": "SimpleState", "name": "Cooling", "transitions": 
       {"_class": "Transition", "targetState": "/AC/On/Heating", "trigger": "/AC/ModeButton"}}], "transitions": 
     {"_class": "Transition", "targetState": "/AC/Off", "trigger": "/AC/OnButton"}}]}]
+);

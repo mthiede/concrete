@@ -1,3 +1,4 @@
+ExampleData = Object.toJSON( 
 [{"_class": "Datatype", "name": "String"}, 
 {"_class": "Class", "name": "Statemachine", "features": [
   {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}, 
@@ -29,4 +30,5 @@
   {"_class": "Feature", "name": "expr", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}}, 
 {"_class": "Class", "name": "VarRef", "superTypes": "Expression", "features": 
   {"_class": "Feature", "name": "variable", "kind": "reference", "lowerLimit": 1, "upperLimit": 1, "type": "Variable"}}]
+);
 

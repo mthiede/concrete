@@ -42,4 +42,5 @@
 * Added support for cursor styles depeding its relative position (left/right/top/bottom)
 * Added editor method to show a hidden feature
 * Don't accept invalid JSON in setModel()
+* Added buttons to example editors for loading example models
  

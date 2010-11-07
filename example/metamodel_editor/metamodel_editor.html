@@ -6,6 +6,7 @@
 		<script src="../../redist/prototype.js" type="text/javascript"></script>
 		<script src="../../redist/scriptaculous/scriptaculous.js" type="text/javascript"></script>
 		<script src="../../concrete/concrete.js" type="text/javascript"></script>
+		<script src="example_data/statemachine_metamodel.js" type="text/javascript"></script>
 	</head>
 	<body>
 		<div id="templates1" style="display: none">	
@@ -48,7 +49,8 @@
 		  <input type="button" style="margin: 10px" value="Exit" onclick="exitEditor();"/>
     </div>
 
-		<br/>
+    <p><input type="button" onclick="ed.setModel(ExampleData);" value="Load example" /> Discards existing model!</p>
+
 		<textarea id="clipboard1" style="background-color: white; color: black; border: 1px solid grey" cols="80" rows="10" wrap="off"></textarea>
 
 		<script type="text/javascript" language="javascript" charset="utf-8">
