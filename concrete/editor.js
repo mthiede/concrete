@@ -543,9 +543,11 @@ Concrete.Editor = Class.create({
 	},
 	
 	setModel: function(json) {
-		this.modelInterface.removeElement(this.modelRoot.childElements());
-		this.modelInterface.createElement(this.modelRoot, "bottom", json.evalJSON());
-		this.selector.selectDirect(this.modelRoot.down());
+    if (json.isJSON()) {
+      this.modelInterface.removeElement(this.modelRoot.childElements());
+      this.modelInterface.createElement(this.modelRoot, "bottom", json.evalJSON());
+      this.selector.selectDirect(this.modelRoot.down());
+    }
 	}
 })
 
