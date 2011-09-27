@@ -1,0 +1,21 @@
+/* Folding
+ *****************************************************************************/
+
+.ct_fold_open {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background-image: url("minus_9px.png");
+}
+
+.ct_fold_closed {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background-image: url("plus_9px.png");
+}
+
+.ct_fold_empty {
+  display: none;
+}
+

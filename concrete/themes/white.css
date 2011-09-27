@@ -1,0 +1,169 @@
+
+/* General Editor
+ *****************************************************************************/
+
+/* editor */
+.ct_editor {
+	cursor: default;
+}
+
+/* editor when focused */
+.ct_editor.ct_focus {
+	border: 1px solid #888;
+}
+
+/* Inline Editor 
+ *****************************************************************************/
+
+/* text input element */
+.ct_inline_editor input {
+	font-family: "courier new";
+	font-size: 12;
+	color: #000;
+	background-color: transparent;
+	border: 0;
+}
+
+/* dropdown list */
+.ct_inline_editor ul {
+	padding: 0;
+	margin: 0;
+}
+
+/* dropdown list item */
+.ct_inline_editor ul li {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	color: black;
+	text-align: left;	
+}
+
+/* dropdown list element when selected */
+.ct_inline_editor ul li.selected {
+	background-color: #ccf;		
+}
+
+/* General Syntax Highlighting
+ *****************************************************************************/
+
+/* these styles are mainly intended for textual representations of the model */
+
+/* Class name */
+.ct_class_name {
+	color: #0000aa;
+}
+
+/* Feature name */
+.ct_feature_name {
+	color: #008800;
+}
+
+/* Element name */
+.ct_identifier_attribute .ct_value {
+	color: #aa0000;
+}
+
+/* don't show feature name for identifier attributes */
+.ct_identifier_attribute .ct_feature_name {
+	display: none;
+}
+
+/* indentation of containment features */
+.ct_containment {
+	padding-left: 10px;	
+}
+
+/* indentation of contained elements */
+.ct_containment .ct_element {
+	margin-left: 10px;
+}
+
+/* indentation of inline editor when editing a contained element */
+/* won't work in case a template is putting something around the slot */
+.ct_containment > .ct_slot > .ct_inline_editor {
+	margin-left: 10px;	
+}
+
+/* space between references and attributes */
+.ct_value {
+	margin-right: 5px;
+}
+
+/* empty element/value used to insert new elements/values */
+.ct_empty {
+	background-color: #777;	
+}
+
+/* Selection
+ *****************************************************************************/
+
+/* element/value selected */
+.ct_selected {
+	background-color: #ccf;
+}
+
+/* cursor	<-- disabled "annoying" cursor [MB 2011-09-19]
+.ct_cursor {
+	width: 4px;
+	height: 4px;
+	background-color: #f0f;
+}
+ */
+
+/* Errors
+ *****************************************************************************/
+
+/* element/feature with an error */
+.ct_error {
+	border-left: 5px solid #F77;	
+}
+
+/* inline editor showing an error while editing */
+.inline_editor.ct_error {
+	background-color: #F77;	
+}
+
+/* Message Popup 
+ *****************************************************************************/
+
+/* popup shown when hovering over an element/feature */
+.ct_message_popup {
+	background-color: #FFD;	
+	border: 1px solid #777;
+  color: black;
+}
+
+.ct_error_message {
+  padding-left: 19px;
+  background: url("dialog-error.png") no-repeat;
+  min-height: 16px;
+  margin: 3px;
+}
+
+.ct_info_message {
+  padding-left: 19px;
+  background: url("dialog-information.png") no-repeat;
+  min-height: 16px;
+  margin: 3px;
+}
+
+/* References
+ *****************************************************************************/
+
+/* target of a reference when hovering over the source */
+.ct_ref_target {
+	background: #77F;	
+}
+
+/* source of a reference when hovering over it */
+.ct_ref_source {
+	text-decoration: underline;
+	color: #77F;	
+}
+
+/* source when within target */
+.ct_ref_target .ct_ref_source {
+	color: #FFF;
+}
+
