@@ -46,7 +46,7 @@ var Droppables = {
   findDeepestChild: function(drops) {
     deepest = drops[0];
 
-    for (i = 1; i < drops.length; ++i)
+    for (var i = 1; i < drops.length; ++i)
       if (Element.isParent(drops[i].element, deepest.element))
         deepest = drops[i];
 
