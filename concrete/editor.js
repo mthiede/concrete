@@ -10,12 +10,13 @@ Concrete.Editor = Class.create({
   //   readOnlyMode: if set, the model can not be modified via user events, default: false
   //   clipboard:    if a DOM node is provided it is used as clipboard, default: internal clipboard
   //   rootClasses:  set of classes which can be instantiated on root level, default: all 
-  //   externalIdentifierProvider: 
+  //   externalIdentifierProvider:
   //                 an object providing access to identifiers of objects which are not
   //                 part of the model being edited in this instance of the editor, default: none
   //   constraintChecker:
-  //                 a custom constraint checker, default: none (built in constraint checker)
-  //   externalModule: name of the external module which represents the module being edited
+  //                 a custom constraint checker, default: none (built-in constraint checker)
+  //   externalModule:
+  //                 name of the external module which represents the module being edited
   //                 by this instance of the editor (see externalIdentifierProvider)
   //                 if set, external identifiers from the named module will be ignored, default: none
   //   followReferenceSupport:
@@ -23,7 +24,7 @@ Concrete.Editor = Class.create({
   //                 and to step back and forward in the jump history, default: true
   //   onFollowReference:
   //                 a function which will be called when a reference is invoked
-  //                 it gets two argments, the source reference element and the target element, default: none
+  //                 it gets two arguments, the source reference element and the target element, default: none
   //   onFollowExternalReference:
   //                 a function which will be called when an external reference is invoked, 
   //                 it gets two arguments, the module (provided by the identifier provider) and the identifier,
@@ -560,9 +561,9 @@ Concrete.Editor = Class.create({
 Concrete.Editor.CommandHelper = {
   
   referenceOptions: function(type, editor) {
-    var idents = editor.modelInterface.elements().
-      select(function(e) { return editor.constraintChecker.isValidInstance(type, e);}).
-      collect(function(e) { return editor.identifierProvider.getIdentifier(e); });
+    var idents = editor.modelInterface.elements()
+      .select(function(e) { return editor.constraintChecker.isValidInstance(type, e);})
+      .collect(function(e) { return editor.identifierProvider.getIdentifier(e); });
     if (editor.externalIdentifierProvider) {
       idents = idents.concat(editor.externalIdentifierProvider.getIdentifiers(type));
     }
@@ -587,7 +588,7 @@ Concrete.Editor.CommandHelper = {
   
   showAllNonAutoHideFeatures: function(n, editor) {
     n.select(".ct_attribute, .ct_reference, .ct_containment").each(function(f) {
-      if (!f.hasClassName("ct_auto_hide") && !f.hasClassName("ct_always_hide")) {
+      if( !this.canAutoHide(f) ) {
         editor.showHiddenFeature(f);
       }
     });
