@@ -69,6 +69,7 @@ Concrete.Editor = Class.create({
     this.onFollowReference = options.onFollowReference;
     this.onFollowExternalReference = options.onFollowExternalReference;
     this._hasFocus = false;
+    this.showDocumentationPopups = true;
   },
   
   _setupRoot: function() {
@@ -297,17 +298,32 @@ Concrete.Editor = Class.create({
     this._resetPopupMessage("feature_name");
     this._resetPopupMessage("reference_value");
     this._resetPopupMessage("reference_module");
-    if (element.hasClassName("ct_value") && element.up(".ct_editor") == this.editorRoot) {
-      this._setPopupMessage("feature_name", "info", "Feature: "+element.mmFeature().name);
-      if (element.mmFeature().isReference() && element.value) {
-        this._setPopupMessage("reference_value", "info", "Reference to: "+element.value);
+    this._resetPopupMessage("documentation");
+    if( element.up(".ct_editor") != this.editorRoot ) {
+    	return;
+    }
+    if( element.hasClassName("ct_value") ) {
+      var feature = element.mmFeature();
+      this._setPopupMessage("feature_name", "info", "Feature: " + feature.name);
+      if( feature.isReference() && element.value ) {
+        this._setPopupMessage("reference_value", "info", "Reference to: " + element.value);
         if (this.externalIdentifierProvider) {
           var ei = this.externalIdentifierProvider.getElementInfo(element.value);
-          if (ei && ei.module != this.options.externalModule) {
-            this._setPopupMessage("reference_module", "info", "In module: "+ei.module);
+          if( ei && ei.module != this.options.externalModule ) {
+            this._setPopupMessage("reference_module", "info", "In module: " + ei.module);
           }
         }
       }
+      if( this.showDocumentationPopups && feature.documentation ) {
+    	  this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
+      }
+    } else {
+    	if( this.showDocumentationPopups && element.hasClassName("ct_class_name") ) {
+	    	var clazzElt = element.up(".ct_element");
+	    	if( clazzElt && clazzElt.mmClass.documentation ) {
+	      	  this._setPopupMessage("documentation", "info", "Documentation: " + clazzElt.mmClass.documentation);
+	    	}
+    	}
     }
   },
 
