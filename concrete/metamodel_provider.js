@@ -103,7 +103,7 @@ Concrete.MetamodelProvider = Class.create({
 	
 	_extendedDatatypeChecks: function(type) {
 		for (p in type) {
-			if (!["_class", "name", "literals"].include(p)) throw new Error("Unknown property '"+p+"' in type '"+type.name+"'");
+			if (!["_class", "name", "documentation", "literals"].include(p)) throw new Error("Unknown property '"+p+"' in type '"+type.name+"'");
 		}
 		if (type._class != "Enum" && type.literals != undefined) {
 			throw new Error("Literals can only be specified for Enums");
@@ -115,19 +115,20 @@ Concrete.MetamodelProvider = Class.create({
 			if (!(["String", "Integer", "Float", "Boolean"].include(type.name))) throw new Error("Plain Datatypes (excluding Enums) must be named one of [String, Integer, Float, Boolean]");
 		}
 	},
-	
+
 	_extendedClassChecks: function(clazz) {
 		for (p in clazz) {
-			if (!["_class", "features", "name", "superTypes", "abstract"].include(p)) throw new Error("Unknown property '"+p+"' in class '"+clazz.name+"'");
+			if (!["_class", "features", "name", "documentation", "superTypes", "abstract"].include(p)) throw new Error("Unknown property '"+p+"' in class '"+clazz.name+"'");
 		}
 		if (clazz.abstract != undefined) {
 			if (clazz.abstract != true && clazz.abstract != false) throw new Error("Abstract property must be true or false in class '"+clazz.name+"'");
 		}
 	},	
+
 	_extendedFeatureChecks: function(feat, clazz) {
 		var loc = " in class '"+clazz.name+"', feature '"+feat.name+"'";
 		for (p in feat) {
-			if (!["_class", "name", "kind", "type", "lowerLimit", "upperLimit"].include(p)) throw new Error("Unknown property '"+p+"'" + loc );
+			if (!["_class", "name", "documentation", "kind", "type", "lowerLimit", "upperLimit"].include(p)) throw new Error("Unknown property '"+p+"'" + loc );
 			if (p == "kind") {
 				if (!["attribute", "reference", "containment"].include(feat.kind)) throw new Error("Feature kind must be one of 'attribute', 'reference', 'containment'" + loc);
 			}
