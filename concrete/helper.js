@@ -8,7 +8,7 @@ Concrete.Helper = {
 	
 	createDOMNode: function(tag, attrs, inner) {
 		var node = new Element(tag);
-		if (attrs.class) node.className = attrs.class;
+		if (attrs['class']) node.className = attrs['class'];
 		if (attrs.style) node.writeAttribute("style", attrs.style);
 		node.innerHTML = inner;
 		return node;

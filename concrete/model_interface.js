@@ -149,7 +149,7 @@ Concrete.ModelInterface = Class.create({
     if (where != "bottom" && !target.hasClassName("ct_value")) throw new Error ("not a value");
     text = (text || "").toString();
     var feature = target.findAncestor(["ct_attribute", "ct_reference"]);
-    var valueNode = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, this._displayValue(text, feature));
+    var valueNode = Concrete.Helper.createDOMNode('span', {'class': 'ct_value'}, this._displayValue(text, feature));
     valueNode.value = text;
     var arg = {}; arg[where] = valueNode;
     target.insert(arg);
@@ -292,7 +292,7 @@ Concrete.ModelInterface = Class.create({
     var tmpl = this.templateProvider.templateByClass(clazz);
     if (!tmpl.featurePositions) this._addTemplateInfo(tmpl);
 
-    var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {class: tmpl.className, style: tmpl.readAttribute("style")},"");
+    var inst = Concrete.Helper.createDOMNode(tmpl.tagName, {'class': tmpl.className, style: tmpl.readAttribute("style")},"");
     if (where == "bottom") {
       target.appendChild(inst);
     }
@@ -334,7 +334,7 @@ Concrete.ModelInterface = Class.create({
         }
         else {
           values.each(function(v) {
-            var vale = Concrete.Helper.createDOMNode('span', {class: 'ct_value'}, this._displayValue(v.toString(), f));
+            var vale = Concrete.Helper.createDOMNode('span', {'class': 'ct_value'}, this._displayValue(v.toString(), f));
             vale.value = v.toString();
             slot.appendChild(vale);
           }, this);

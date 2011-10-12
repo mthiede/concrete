@@ -29,9 +29,9 @@ Concrete.ConstraintChecker = Class.create({
 
 	addConstraint: function(constraint) {
 		if (constraint instanceof Concrete.ConstraintChecker.FeatureValueConstraint) {
-			this.featureConstraints[constraint.class()] = this.featureConstraints[constraint.class()] || {}
-			this.featureConstraints[constraint.class()][constraint.feature()] = this.featureConstraints[constraint.class()][constraint.feature()] || [];
-			this.featureConstraints[constraint.class()][constraint.feature()].push(constraint);
+			this.featureConstraints[constraint.klass()] = this.featureConstraints[constraint.klass()] || {}
+			this.featureConstraints[constraint.klass()][constraint.feature()] = this.featureConstraints[constraint.klass()][constraint.feature()] || [];
+			this.featureConstraints[constraint.klass()][constraint.feature()].push(constraint);
 		}
 	},
 	
@@ -260,7 +260,7 @@ Concrete.ConstraintChecker = Class.create({
       node._errorDescriptions = [];
       node.addClassName("ct_error");
     }
-    var desc = Concrete.Helper.createDOMNode("div", {class: "ct_error_description", style: "display: none"}, text);
+    var desc = Concrete.Helper.createDOMNode("div", {'class': "ct_error_description", style: "display: none"}, text);
 		node.appendChild(desc);	
     node._errorDescriptions.push(desc);
 	},
@@ -281,8 +281,8 @@ Concrete.ConstraintChecker.FeatureValueConstraint = Class.create({
 	initialize: function(options) {
 		this.options = options;		
 	},
-	class: function() {
-		return this.options.class;
+	klass: function() {
+		return this.options.klass;
 	},
 	feature: function() {
 		return this.options.feature;
