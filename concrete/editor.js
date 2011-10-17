@@ -118,116 +118,133 @@ Concrete.Editor = Class.create({
   },
 
   handleEvent: function(event) {
-    if (event.type == "click" && event.isLeftClick()) {
-      if (Event.element(event).ancestors().concat(Event.element(event)).include(this.editorRoot)) {
+    if( event.type == "click" && event.isLeftClick() ) {
+      // check whether the event occurred on an element that is contained by the editor:
+      if( event.element().ancestors().concat(event.element()).include(this.editorRoot) ) {
         this._hasFocus = true;
         this.editorRoot.addClassName("ct_focus");
-      }
-      else {
+      } else {
         this._hasFocus = false;
         this.editorRoot.removeClassName("ct_focus");
       }
     }
-    if (!this._hasFocus) return;
-    
-    if (event.type == "mousemove") {
+    if( !this._hasFocus ) return;
+
+    if( event.type == "mousemove" ) {
       this._handleErrorPopups(event);
-      if (this.options.showInfoPopups) {
+      if( this.options.showInfoPopups ) {
         this._handleInfoPopups(event);
       }
       this._handleRefHighlight(event);
-      this.popup.setStyle({left: event.clientX+20+'px', top: event.clientY+20+'px'});
+      this.popup.setStyle({left: event.clientX + 20 + 'px', top: event.clientY + 20 + 'px'});
     }
-    if (this.inlineEditor.isActive) {
-      if (event.type == "click" && event.isLeftClick()) {
-        if (!Event.element(event).up().hasClassName("ct_inline_editor")) {
+
+    if( this.inlineEditor.isActive ) {
+      // left mouse click?:
+      if( event.type == "click" && event.isLeftClick() ) {
+        if( !Event.element(event).up().hasClassName("ct_inline_editor") ) {
           this.inlineEditor.cancel();
           this.selector.selectDirect(Event.element(event));
         }
       }
-      else if (event.keyCode == 9) {   // tab
+      // Tab?:
+      else if( event.keyCode == 9 ) {
         this.inlineEditor.finish();
-        if (event.shiftKey) {
+        if( event.shiftKey ) {
           this.selector.selectTab("prev");
-        }
-        else {
+        } else {
           this.selector.selectTab("next");
         }
         event.stop();
       }
-      else if (event.keyCode == 13) { // return
+      // Return?:
+      else if( event.keyCode == 13 ) {
         this.inlineEditor.finish();
         event.stop();
       }
-      else if (event.keyCode == 27) { // esc
+      // Escape?:
+      else if( event.keyCode == 27 ) {
         this.inlineEditor.cancel();
         event.stop();
       }
     }
+    // inline editor not active:
     else {
-      if (event.type == "click" && event.isLeftClick()) {
-        if (Event.element(event).hasClassName("ct_fold_button")) {
+      var ctrlKey = this._ctrlKey(event);
+   	  // left mouse click?:
+      if( event.type == "click" && event.isLeftClick() ) {
+        // clicked fold button?:
+        if( Event.element(event).hasClassName("ct_fold_button") ) {
           this.toggleFoldButton(Event.element(event));
         }
-        else if (event.ctrlKey) {
+        // follow reference?:
+        else if( ctrlKey ) {
           this.jumpReference(Event.element(event));
         }
-        else if (this.selector.selected == this.selector.surroundingSelectable(Event.element(event))) {
+        // ??
+        else if( this.selector.selected == this.selector.surroundingSelectable(Event.element(event)) ) {
           this.runCommand("edit_event");
         }
+        // ??
         else {
           this.selector.selectDirect(Event.element(event), event.shiftKey);
           event.stop();
         }
       }
-      else if (event.keyCode == Event.KEY_LEFT && event.ctrlKey) {
-        if (event.shiftKey) {
+      else if( event.keyCode == Event.KEY_LEFT && ctrlKey ) {
+        // Ctrl-Shift-Left?:
+        if( event.shiftKey ) {
           this.runCommand("collapse_recursive_event");
         }
+        // Ctrl-Left?:
         else {
           this.runCommand("collapse_event");
         }
         event.stop();
       }
-      else if (event.keyCode == Event.KEY_RIGHT && event.ctrlKey) {
-        if (event.shiftKey) {
+      // Ctrl-Shift-Right?:
+      else if( event.keyCode == Event.KEY_RIGHT && ctrlKey ) {
+        // Ctrl-Right?:
+        if( event.shiftKey ) {
           this.runCommand("expand_recursive_event");
         }
+        // Ctrl-Right?:
         else {
           this.runCommand("expand_event");
         }
         event.stop();
       }
-      else if (event.keyCode == Event.KEY_LEFT && event.altKey) {
-        if (this.options.followReferenceSupport) {
+      else if( event.keyCode == Event.KEY_LEFT && event.altKey ) {
+        if( this.options.followReferenceSupport ) {
           this.runCommand("jump_backward_event");
           event.stop();
         }
       }
-      else if (event.keyCode == Event.KEY_RIGHT && event.altKey) {
+      else if( event.keyCode == Event.KEY_RIGHT && event.altKey)  {
         if (this.options.followReferenceSupport) {
           this.runCommand("jump_forward_event");
           event.stop();
         }
       }
-      else if (event.keyCode == Event.KEY_UP) {
+      else if( event.keyCode == Event.KEY_UP ) {
         this.selector.selectCursor("up", event.shiftKey);
         event.stop();
       }
-      else if (event.keyCode == Event.KEY_DOWN) {
+      else if( event.keyCode == Event.KEY_DOWN ) {
         this.selector.selectCursor("down", event.shiftKey);
         event.stop();
       }
-      else if (event.keyCode == Event.KEY_LEFT) {
+      else if( event.keyCode == Event.KEY_LEFT ) {
         this.selector.selectCursor("left", event.shiftKey);
         event.stop();
       }
-      else if (event.keyCode == Event.KEY_RIGHT) {
+      else if( event.keyCode == Event.KEY_RIGHT ) {
         this.selector.selectCursor("right", event.shiftKey);
         event.stop();
       }
-      else if (event.keyCode == 9) {   // tab 
-        if (event.shiftKey) {
+      // Tab?:
+      else if( event.keyCode == 9 ) {
+        if( event.shiftKey ) {
           this.selector.selectTab("prev");
         }
         else {
@@ -235,50 +252,64 @@ Concrete.Editor = Class.create({
         }
         event.stop();
       }
-      else if (event.keyCode == 32 && event.ctrlKey) { // ctrl space
+      // Ctrl-Space?:
+      else if( event.keyCode == 32 && ctrlKey ) {
         this.runCommand("edit_event");
         event.stop();
       }
-      else if (event.keyCode == 113) {   // F2
+      // F2?:
+      else if( event.keyCode == 113 ) {
         this.runCommand("edit_event");
         event.stop();
-      }  
-      else if (event.keyCode == 46) {    // Del
+      }
+      // Delete?:
+      else if( event.keyCode == 46 ) {
         this.runCommand("delete_event");
         event.stop();
       }
-      else if (event.shiftKey && event.keyCode == 13) {    // shift return
+      // Shift-Return?:
+      else if( event.shiftKey && event.keyCode == 13 ) {
         this.runCommand("show_hidden_event");
         event.stop();
       }
-      else if (event.keyCode == 13) {    // return
+      // Return?:
+      else if( event.keyCode == 13 ) {
         this.runCommand("insert_event");
         event.stop();
       }
-      else if (event.keyCode == 65 && event.ctrlKey) { // ctrl a
+      // Ctrl-A?:
+      else if( event.keyCode == 65 && ctrlKey ) {
         this.selector.selectDirect(this.modelRoot.childElements().first(), false);
         this.selector.selectDirect(this.modelRoot.childElements().last(), true);
         event.stop();
       }
-      else if (event.keyCode == 67 && event.ctrlKey) { // ctrl c
+      // Ctrl-C?:
+      else if( event.keyCode == 67 && ctrlKey ) {
         this.runCommand("copy_event");
         event.stop();
       }
-      else if (event.keyCode == 86 && event.ctrlKey) { // ctrl v
+      // Ctrl-V?:
+      else if( event.keyCode == 86 && ctrlKey ) {
         this.runCommand("paste_event");
         event.stop();
       }
-      else if (event.keyCode == 88 && event.ctrlKey) { // ctrl x
+      // Ctrl-X?:
+      else if( event.keyCode == 88 && ctrlKey ) {
         this.runCommand("cut_event");
         event.stop();
       }
-      else if ((event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
-        (event.keyCode >= 48 && event.keyCode <= 57)) {          // 0 - 9
+      else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
+               (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
         this.runCommand("edit_event");
       }
     }
   },
-  
+
+  _ctrlKey: function(event) {
+    var onMac = ( navigator.userAgent.indexOf('Mac') > -1 );
+    return( onMac ? event.metaKey : event.ctrlKey );
+  },
+
   _handleErrorPopups: function(event) {
     var element = Event.element(event);
     var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
@@ -360,7 +391,11 @@ Concrete.Editor = Class.create({
       if (this.refHighlight.target) this.refHighlight.target.removeClassName("ct_ref_target");
       this.refHighlight = undefined;
     }
-    if (event.ctrlKey && element.hasClassName("ct_value") && !element.hasClassName("ct_empty") && element.mmFeature().isReference()) {
+    if(    this._ctrlKey(event)
+    	&& element.hasClassName("ct_value")
+    	&& !element.hasClassName("ct_empty")
+    	&& element.mmFeature().isReference() )
+    {
       var targets = this.identifierProvider.getElement(element.value);
       if (!(targets instanceof Array)) targets = [targets].compact();
       if (this.externalIdentifierProvider) {
