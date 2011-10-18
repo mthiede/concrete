@@ -135,7 +135,7 @@ Concrete.UI.Workbench = {
         onSuccess: function(transport) {
           index.clear();
           var indexJson = transport.responseText.evalJSON(); 
-          indexJson.sortBy(function(m) {return m.name}).each(function(m) {
+          indexJson.sortBy(function(m) {return m.name;}).each(function(m) {
             index.push(m);
           });
           moduleBrowser.loadIndex(index);
@@ -149,7 +149,7 @@ Concrete.UI.Workbench = {
     };
 
     window.onhashchange = function() {
-      var match = window.location.href.match(/#([^:]+):?(.*)/)
+      var match = window.location.href.match(/#([^:]+):?(.*)/);
       var module = match && match[1];
       var ident = match && match[2];
       moduleEditor.select(module, ident);

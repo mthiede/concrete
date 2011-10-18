@@ -36,8 +36,7 @@ Concrete.UI.OpenElementDialog = Class.create(Concrete.UI.AbstractDialog, {
   },
 
   _createAutoCompleter: function() {
-    var eip = this.extIdentProvider;
-		var completer = new Autocompleter.Local(
+    var completer = new Autocompleter.Local(
       this.input, 
       this.dialogElement.down(".search_box_list"),
       [],

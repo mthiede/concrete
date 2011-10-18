@@ -22,7 +22,7 @@ Concrete.UI = {
     	});
 		});
 	}
-}
+};
 
 Concrete.UI.load();
 

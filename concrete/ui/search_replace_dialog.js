@@ -5,12 +5,12 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     $super(dialogElement, options);
 
     this.propertyInput = dialogElement.down(".property_input");
-		Element.insert(this.propertyInput, { after: 
+    Element.insert(this.propertyInput, { after: 
       "<div style='position: relative; margin: 1px'><div class='auto_complete_dropdown' style='display: none; width: 100%; max-height: 100px; overflow-y: auto'></div></div>"
-		});
+    });
     this.propertyOptions = [];
-		new Autocompleter.Local(this.propertyInput, this.propertyInput.next().down(), this.propertyOptions, {
-      partialSearch: true, fullSearch: true, minChars: 0, partialChars: 0, choices: 100 })
+    new Autocompleter.Local(this.propertyInput, this.propertyInput.next().down(), this.propertyOptions, {
+      partialSearch: true, fullSearch: true, minChars: 0, partialChars: 0, choices: 100 });
 
     this.searchInput = dialogElement.down(".search_input");
     this.replaceInput = dialogElement.down(".replace_input");
@@ -56,13 +56,15 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
 
   _buttonPressed: function(element) {
     var featureDesc = this.propertyInput.value.strip();
+    var className = null;
+    var featureName = null;
     if (/^(\w*|\*|\w+#\*|\w+#\w+)$/.match(featureDesc)) {
       if (featureDesc.include("#")) {
-        var className = featureDesc.split("#")[0];
-        var featureName = featureDesc.split("#")[1];
+        className = featureDesc.split("#")[0];
+        featureName = featureDesc.split("#")[1];
       }
       else {
-        var featureName = featureDesc;
+        featureName = featureDesc;
       }
     }
     else {
@@ -183,16 +185,17 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
   },
 
   _replaceMatch: function(node, searchPattern, replaceText) {
+    var newValue = null;
     if (Object.isString(searchPattern) && (searchPattern.empty() || searchPattern.strip() == "*")) {
       if (replaceText.empty()) {
         //this.editor.modelInterface.removeValue(node);
       }
       else {
-        var newValue = replaceText;
+        newValue = replaceText;
       }
     }
     else {
-      var newValue = node.value.replace(searchPattern, replaceText);
+      newValue = node.value.replace(searchPattern, replaceText);
     }
     if (newValue) {
       this.editor.modelInterface.changeValue(node, newValue);

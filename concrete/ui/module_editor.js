@@ -143,10 +143,11 @@ Concrete.UI.ModuleEditor = Class.create({
     var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: this.options.identifierAttribute});
     var _this = this;
     var rootClasses = this.options.rootClasses ? 
-      this.options.rootClasses.collect(function(c) {return this._metamodelProvider.metaclassesByName[c]}, this) :
+      this.options.rootClasses.collect(function(c) { return this._metamodelProvider.metaclassesByName[c]; }, this) :
       this._metamodelProvider.metaclasses;
-    var duplicatableClasses = this.options.duplicatableClasses.collect(function(c) {return this._metamodelProvider.metaclassesByName[c]}, this);
-    var ed = new Concrete.Editor(this._editorElement, this._templateProvider, this._metamodelProvider, ip, {
+    var duplicatableClasses = this.options.duplicatableClasses.collect(function(c) { return this._metamodelProvider.metaclassesByName[c]; }, this);
+    var ed = null;	// (to placate uninitialized warning on self-reference on line 160)
+    ed = new Concrete.Editor(this._editorElement, this._templateProvider, this._metamodelProvider, ip, {
       clipboard: this._clipboard, 
       externalIdentifierProvider: this._extIdentProvider, 
       externalModule: module,
@@ -156,7 +157,7 @@ Concrete.UI.ModuleEditor = Class.create({
          allowDuplicates: duplicatableClasses}),
       followReferenceSupport: false,
       onFollowReference: function(ref, target) {
-        var ident = ed.identifierProvider.getIdentifier(target)
+        var ident = ed.identifierProvider.getIdentifier(target);
         _this.options.onFollowReference(_this.currentModule, ident);
       },
       onFollowExternalReference: function(module, ident) {
@@ -170,8 +171,9 @@ Concrete.UI.ModuleEditor = Class.create({
   },
 
   _setDisplayValueProvider: function(modelInterface) {
+    var dvp = null;
     if (this._shortReferences) {
-      var dvp = function(text, feature) {
+      dvp = function(text, feature) {
         if (feature.mmFeature.isReference()) {
           return text.toString().split("/").last();
         }
@@ -181,7 +183,7 @@ Concrete.UI.ModuleEditor = Class.create({
       };
     }
     else {
-      var dvp = function(text, feature) {
+      dvp = function(text, feature) {
         return text;
       };
     } 
@@ -195,22 +197,22 @@ Concrete.UI.ModuleEditor = Class.create({
     }
   },
 
-	// ModelChangeListener Interface
-	elementAdded: function(element) {
-	},
+  // ModelChangeListener Interface
+  elementAdded: function(element) {
+  },
 
-	elementChanged: function(element, feature) {
-	},
+  elementChanged: function(element, feature) {
+  },
 
-	elementRemoved: function(element) {
-	},
-	
-	rootChanged: function(root) {
-	},
+  elementRemoved: function(element) {
+  },
 
-	commitChanges: function() {
+  rootChanged: function(root) {
+  },
+
+  commitChanges: function() {
     this._modelChanged = true;
-	}
+  }
 
 });
 

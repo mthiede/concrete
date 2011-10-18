@@ -85,4 +85,4 @@ Concrete.UI.ModuleBrowser = Class.create({
     return result;
   }
 
-})
+});
