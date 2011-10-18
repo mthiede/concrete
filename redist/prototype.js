@@ -4019,19 +4019,20 @@ Object.extend(Event, (function() {
       return element;
     },
 
+    // FIXED: https://prototype.lighthouseapp.com/projects/8886/tickets/622-eventstopobserving-on-window-object-crashes-when-removing-multiple-handlers-in-one-call
     stopObserving: function(element, eventName, handler) {
       element = $(element);
       var id = getEventID(element), name = getDOMEventName(eventName);
 
       if (!handler && eventName) {
         getWrappersForEventName(id, eventName).each(function(wrapper) {
-          element.stopObserving(eventName, wrapper.handler);
+          Event.stopObserving(element, eventName, wrapper.handler);	// FIXED
         });
         return element;
 
       } else if (!eventName) {
         Object.keys(getCacheForID(id)).each(function(eventName) {
-          element.stopObserving(eventName);
+          Event.stopObserving(element, eventName);	// FIXED
         });
         return element;
       }
