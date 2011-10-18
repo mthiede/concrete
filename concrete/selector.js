@@ -126,20 +126,21 @@ Concrete.Selector = Class.create({
   
   _findTabSelectables: function(root) {
     return this._reallyVisibles(
-      root.findFirstDescendants(Concrete.Selector.TabSelectableClasses, Concrete.Selector.SelectableClasses)
-    );
+        root.findFirstDescendants(Concrete.Selector.TabSelectableClasses, Concrete.Selector.SelectableClasses)
+      );
   },
-  
+
   _findCursorSelectables: function(root) {
     return this._reallyVisibles(
-      root.findFirstDescendants(Concrete.Selector.CursorSelectableClasses, [])
-    );
+        root.findFirstDescendants(Concrete.Selector.CursorSelectableClasses, [])
+      );
   },
 
   _reallyVisibles: function(elements) {
-    elements.select(function(n) {
-      return n.visible() && n.ancestors().all(function(a){ return a.visible(); });
-    });
+    return elements.select(function(n) {
+          return n.visible() && n.ancestors().all(function(a){ return a.visible(); });
+        }
+      );
   },
 
   /**
