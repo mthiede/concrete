@@ -62,7 +62,7 @@ class IndexBuilderTest < Test::Unit::TestCase
       ser = RGen::Serializer::JsonSerializer.new(f)
       ser.serialize(index)        
     end
-    assert_equal File.read(TestDir+"/ecore_index_expected.js").strip, File.read(TestDir+"/ecore_index.js").strip
+    assert_equal File.read(TestDir+"/ecore_index_expected.json").strip, File.read(TestDir+"/ecore_index.js").strip
   end
 
 end

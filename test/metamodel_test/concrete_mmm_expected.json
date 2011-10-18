@@ -16,4 +16,4 @@
   { "_class": "Feature", "name": "type", "kind": "reference", "lowerLimit": 0, "upperLimit": 1, "type": "/Classifier" }], "name": "Feature" },
 { "_class": "Enum", "literals": [ "attribute", "reference", "containment" ], "name": "FeatureKind" },
 { "_class": "Datatype", "name": "Integer" },
-{ "_class": "Datatype", "name": "String" }]
+{ "_class": "Datatype", "name": "String" }];

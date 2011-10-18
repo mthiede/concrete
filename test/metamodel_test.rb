@@ -19,13 +19,13 @@ class MetamodelTest < Test::Unit::TestCase
       ser = RGen::Serializer::JsonSerializer.new(f)
       ser.serialize(env.find(:class => ConcreteMMM::Classifier).sort{|a,b| a.name <=> b.name})
     end
-    assert_equal File.read(TestDir+"/concrete_mmm_expected.js").strip, File.read(outfile).strip
+    assert_equal File.read(TestDir+"/concrete_mmm_expected.json").strip, File.read(outfile).strip
   end
 
   def test_json_roundtrip
     env = RGen::Environment.new
     inst = RGen::Instantiator::JsonInstantiator.new(env, ConcreteMMM)
-    infile = TestDir + "/concrete_mmm_expected.js"
+    infile = TestDir + "/concrete_mmm_expected.json"
     inst.instantiate(File.read(infile))
     outfile = TestDir + "/concrete_mmm_regenerated.js"
     File.open(outfile, "w") do |f|
