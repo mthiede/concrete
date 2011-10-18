@@ -5,7 +5,7 @@
 // Concrete is freely distributable under the terms of an MIT-style license.
 
 Concrete.MetamodelProvider = Class.create({
-	
+
 	initialize: function(metamodelJson, opts) {
 		this.metamodel = metamodelJson;
 		this.metaclassesByName = {};

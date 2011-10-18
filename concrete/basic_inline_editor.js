@@ -5,13 +5,13 @@
 // Concrete is freely distributable under the terms of an MIT-style license.
 
 Concrete.BasicInlineEditor = Class.create({
-	
-	show: function(element, initialText, partial, completionOptions) {
-		if (this.element) {
-			// edit still in progress, cancel
-			this.hide();
-		}
-		this.element = element;
+
+  show: function(element, initialText, partial, completionOptions) {
+    if (this.element) {
+      // edit still in progress, cancel
+      this.hide();
+    }
+    this.element = element;
     if (element.parentNode.tagName.toUpperCase() == "TBODY") {
       cols = element.up("table").select("tr").max(function(r) { return r.childElements().select(function(c) {return c.tagName.toUpperCase() == "TD";}).size(); });
       Element.insert(element, { after: 
@@ -33,14 +33,14 @@ Concrete.BasicInlineEditor = Class.create({
       });
       input = element.next().down();
     }
-		element.hide();
-		this.input = input
-		input.select();
+    element.hide();
+    this.input = input;
+    input.select();
     this._interval = window.setInterval(function() { 
       // set size one larger than the text, otherwise the first char is shifted out left when new chars are added at the right
       input.size = input.value.length + 1;
     }, 50);
-		new Autocompleter.Local(input, input.next(), completionOptions, {partialSearch: partial, fullSearch: partial, minChars: 0, partialChars: 0, onShow:
+    new Autocompleter.Local(input, input.next(), completionOptions, {partialSearch: partial, fullSearch: partial, minChars: 0, partialChars: 0, onShow:
       function(element, update){
         if(!update.style.position || update.style.position=='absolute') {
           update.style.position = 'absolute';
@@ -52,22 +52,22 @@ Concrete.BasicInlineEditor = Class.create({
         }
         Effect.Appear(update,{duration:0.15});
       }
-    })
-	},
-	
-	getText: function() {
-		return this.input.value;
-	},
-	
-	setError: function() {
-		this.element.next().addClassName("ct_error");		
-	},
-	
-	hide: function() {
+    });
+  },
+
+  getText: function() {
+    return this.input.value;
+  },
+
+  setError: function() {
+    this.element.next().addClassName("ct_error");
+  },
+
+  hide: function() {
     if (this._interval) window.clearInterval(this._interval);
-		this.element.show();
-		this.element.next().remove();
-		this.element = undefined;
-	}
-	
-})
+    this.element.show();
+    this.element.next().remove();
+    this.element = undefined;
+  }
+
+});

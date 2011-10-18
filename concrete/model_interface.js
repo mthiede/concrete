@@ -7,17 +7,17 @@
 // The ModelInterface manages the model represented by DOM elements
 
 Element.addMethods({
+
   // speed optimization in case the class is known this will be faster
   feature: function(e, clazz) {
     if (clazz) {
-      var feat = e.findAncestor(clazz);
+      return e.findAncestor(clazz);
     }
     else {
-      var feat = e.findAncestor(["ct_attribute", "ct_reference", "ct_containment"]);
+      return e.findAncestor(["ct_attribute", "ct_reference", "ct_containment"]);
     }
-    return feat;
   },
-  
+
   mmFeature: function(e, clazz) {
     return e.feature(clazz).mmFeature;
   },
@@ -36,8 +36,8 @@ Element.addMethods({
     var values = feature.slot.childElements();
     if (feature.mmFeature.isContainment()) {
       if (values.size() > 1) {
-        // optimization: empty placeholder values can not appear amoung other childs
-        return values; 
+        // optimization: empty place holder values can not appear among other children
+        return values;
       }
       else if (values.size() == 1 && !values[0].hasClassName("ct_empty")) {
         return [values[0]];
@@ -48,8 +48,8 @@ Element.addMethods({
     }
     else {
       if (values.size() > 1) {
-        // optimization: empty placeholder values can not appear amoung other childs
-        return values.collect(function(c) {return c.value});
+        // optimization: empty place holder values can not appear among other children
+        return values.collect(function(c) {return c.value; });
       }
       else if (values.size() == 1 && !values[0].hasClassName("ct_empty")) {
         return [values[0].value]; 
@@ -63,7 +63,7 @@ Element.addMethods({
   isElement: function(e) {
     return e.mmClass != undefined;
   }
-})
+});
 
 Concrete.ModelInterface = Class.create({
   
@@ -182,16 +182,17 @@ Concrete.ModelInterface = Class.create({
       result["_view"] = {"collapsed": element.foldButton.hasClassName("ct_fold_closed")};
     }
     element.features.each(function(f) {
-      var childs = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
-      if (childs.size() > 0) {
+      var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
+      if (children.size() > 0) {
+        var converted = [];
         if (f.mmFeature.isContainment()) {
-          var converted = childs.collect(function(v){return this.extractModel(v); }, this);
+          converted = children.collect(function(v){return this.extractModel(v); }, this);
         }
         else if (f.mmFeature.isReference()) {
-          var converted = childs.collect(function(v){return v.value; }, this);
+          converted = children.collect(function(v){return v.value; }, this);
         }
         else {
-          var converted = childs.collect(function(v){
+          converted = children.collect(function(v){
             if (f.mmFeature.type.isInteger()) {
               return parseInt(v.value);
             }
@@ -206,14 +207,14 @@ Concrete.ModelInterface = Class.create({
             }
           });
         }
-        if (childs.size() == 1) {
+        if (children.size() == 1) {
           result[f.mmFeature.name] = converted.first();
         }
         else {
           result[f.mmFeature.name] = converted;
         }
       }
-    }, this)
+    }, this);
     return result;
   },
 
@@ -227,15 +228,15 @@ Concrete.ModelInterface = Class.create({
     }
     else {
       element.features.each(function(f) {
-        var childs = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
-        if (childs.size() > 0) {
+        var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
+        if (children.size() > 0) {
           if (f.mmFeature.isContainment()) {
-            childs.each(function(c) {
+            children.each(function(c) {
               this.redrawDisplayValues(c);
             }, this);
           }
           else {
-            childs.each(function(c) {
+            children.each(function(c) {
               c.textContent = this._displayValue(c.value, f);
             }, this);
           }
@@ -313,16 +314,16 @@ Concrete.ModelInterface = Class.create({
     inst.mmClass = tmpl.mmClass;
 
     inst.features = [];
-    var childs = inst.allChildren();
+    var children = inst.allChildren();
     var hasChildElements = false;
     for (var i=0; i<tmpl.featurePositions.length; i++) {
       var mmf = tmpl.mmFeatures[i];
-      var f = childs[tmpl.featurePositions[i]];
+      var f = children[tmpl.featurePositions[i]];
       inst.features.push(f);
       var values = element[mmf.name];
       if (!(values instanceof Array)) values = [ values ].compact();
       f.mmFeature = mmf;
-      var slot = childs[tmpl.slotPositions[i]];
+      var slot = children[tmpl.slotPositions[i]];
       f.slot = slot;
       if (values.size() > 0) {
         if (mmf.isContainment()) {
@@ -348,7 +349,7 @@ Concrete.ModelInterface = Class.create({
       }
     }
     if( tmpl.foldButtonPosition != undefined ) {
-      inst.foldButton = childs[tmpl.foldButtonPosition];
+      inst.foldButton = children[tmpl.foldButtonPosition];
       if( options.collapse ) {
         inst.foldButton.addClassName("ct_fold_closed");
       }
@@ -432,9 +433,7 @@ Concrete.ModelInterface.Helper = {
         var parentFeature = (stack && stack.pop()) || element.up(".ct_containment");
         if (parentFeature) {
           // go up to parent
-          var parentElement = (stack && stack.pop()) || parentFeature.up(".ct_element");
-          var fIndex = parentElement.features.indexOf(parentFeature) + 1;
-          element = parentElement;
+          element = (stack && stack.pop()) || parentFeature.up(".ct_element");
         }
         else {
           return false;

@@ -53,6 +53,6 @@ var Concrete = {
       });
     });
   }
-}
+};
 
 Concrete.load();

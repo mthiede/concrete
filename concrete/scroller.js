@@ -16,7 +16,7 @@ Concrete.Scroller.scrollTo = function(e, direction) {
     return (f.getDimensions().width > f.up().getDimensions().width ||
     f.getDimensions().height > f.up().getDimensions().height);
   };
-  
+
   var findScrollable = function(f) {
     if (f.tagName.toUpperCase() == "BODY") return undefined;
     if (isScrollable(f)) {
@@ -27,14 +27,14 @@ Concrete.Scroller.scrollTo = function(e, direction) {
     }
   };
 
-	var maxScroll = function(negOffset, posOffset) {
-		if ((negOffset*-1) < posOffset) {
-			return negOffset*-1;
-		}
-		else {
-			return posOffset;
-		}
-	}
+  var maxScroll = function(negOffset, posOffset) {
+    if ((negOffset*-1) < posOffset) {
+      return negOffset*-1;
+    }
+    else {
+      return posOffset;
+    }
+  };
 
   var scrollable = findScrollable(e);
 
@@ -103,4 +103,4 @@ Concrete.Scroller.scrollTo = function(e, direction) {
 
     window.scrollTo(scrollPosX, scrollPosY);
   }
-}
+};

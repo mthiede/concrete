@@ -314,7 +314,7 @@ Concrete.Editor = Class.create({
     var element = Event.element(event);
     var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
     if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
-      var desc = errorElement.childElements().find(function(e) { return e.hasClassName("ct_error_description")});
+      var desc = errorElement.childElements().find(function(e) { return e.hasClassName("ct_error_description"); });
       if (desc) {
         this._setPopupMessage("error_desc", "error", desc.innerHTML);
       }
@@ -408,9 +408,10 @@ Concrete.Editor = Class.create({
       if (targets.size() > 0) {
         // highlight the first reference
         element.addClassName("ct_ref_source");
+        var target = null;
         if (targets[0].mmClass) {
           // if target is an element in this editor
-          var target = targets[0]; 
+          target = targets[0]; 
           target.addClassName("ct_ref_target");
         }
         this.refHighlight = {source: element, target: target};
@@ -419,9 +420,9 @@ Concrete.Editor = Class.create({
   },
   
   runCommand: function(eventId) {
-    var se = this.selector.selected
+    var se = this.selector.selected;
     var cmd = Concrete.Editor.Commands.select(function(c) { 
-      return (!this.options.readOnlyMode || c.readOnly) && c.enable && c.enable(se, this) && c.trigger == eventId 
+      return (!this.options.readOnlyMode || c.readOnly) && c.enable && c.enable(se, this) && c.trigger == eventId;
     }, this).first();
     if (cmd) {
       cmd.run(se, this);
@@ -434,7 +435,7 @@ Concrete.Editor = Class.create({
 
   // assumption all nodes have the same parent
   removeElements: function(nodes) {
-    if (nodes.first().siblings().select(function(s){ return s.hasClassName("ct_element")}).size() == nodes.size()-1) {
+    if (nodes.first().siblings().select(function(s){ return s.hasClassName("ct_element"); }).size() == nodes.size()-1) {
       nodes.last().insert({after: this.templateProvider.emptyElement(nodes.last().parentNode, nodes.last().feature())});
     }
     if (nodes.last().next()) {
@@ -596,7 +597,7 @@ Concrete.Editor = Class.create({
   
   getModel: function() {
     return Concrete.Helper.prettyPrintJSON(
-      Object.toJSON(this.modelRoot.childElements().collect(function(n) { return this.modelInterface.extractModel(n)}, this)));
+      Object.toJSON(this.modelRoot.childElements().collect(function(n) { return this.modelInterface.extractModel(n); }, this)));
   },
   
   setModel: function(json) {
@@ -607,7 +608,7 @@ Concrete.Editor = Class.create({
       this.selector.selectDirect(this.modelRoot.down());
 //    }
   }
-})
+});
 
 Concrete.Editor.CommandHelper = {
   
@@ -618,7 +619,7 @@ Concrete.Editor.CommandHelper = {
     if (editor.externalIdentifierProvider) {
       idents = idents.concat(editor.externalIdentifierProvider.getIdentifiers(type));
     }
-    return idents.select(function(i) {return i && i.length > 0});
+    return idents.select(function(i) { return( i && i.length > 0 ); });
   },
     
   canAutoHide: function(feature) {
@@ -628,7 +629,7 @@ Concrete.Editor.CommandHelper = {
     },
     
   canAddElement: function(slot, editor) {
-    var numElements = slot.childElements().select(function(c){ return c.hasClassName("ct_element")}).size();
+    var numElements = slot.childElements().select(function(c){ return c.hasClassName("ct_element"); }).size();
     if (slot.hasClassName("ct_root")) {
       return editor.maxRootElements == -1 || numElements < editor.maxRootElements;
     }
@@ -646,7 +647,7 @@ Concrete.Editor.CommandHelper = {
   },
 
   removeValue: function(n, editor) {
-    if (n.siblings().select(function(s){ return s.hasClassName("ct_value")}).size() == 0) {
+    if (n.siblings().select(function(s){ return s.hasClassName("ct_value"); }).size() == 0) {
       n.insert({after: editor.templateProvider.emptyValue(n.feature())});
     }
     if (n.next()) {
@@ -659,7 +660,7 @@ Concrete.Editor.CommandHelper = {
     editor.adjustMarker();
   }
   
-}
+};
 
 Concrete.Editor.Commands = [
 
@@ -693,7 +694,7 @@ Concrete.Editor.Commands = [
     trigger: "insert_event",
     enable: function(n, editor) {
       return n.hasClassName("ct_value") && !n.hasClassName("ct_empty") && n.mmFeature().isAttribute() &&
-        (n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value")}).size()+1 < n.mmFeature().upperLimit);
+        (n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value"); }).size()+1 < n.mmFeature().upperLimit);
     },
     run: function(n, editor) {
       n.insert({after: editor.templateProvider.emptyValue(n.feature())});
@@ -754,7 +755,7 @@ Concrete.Editor.Commands = [
     trigger: "insert_event",
     enable: function(n, editor) {
       return n.hasClassName("ct_value") && !n.hasClassName("ct_empty") && n.mmFeature().isReference() &&
-        (n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value")}).size()+1 < n.mmFeature().upperLimit);
+        (n.mmFeature().upperLimit == -1 || n.siblings().select(function(s){ return s.hasClassName(".ct_value"); }).size()+1 < n.mmFeature().upperLimit);
     },
     run: function(n, editor) {
       n.insert({after: editor.templateProvider.emptyValue(n.feature())});
@@ -835,9 +836,9 @@ Concrete.Editor.Commands = [
       return n.hasClassName("ct_element") && !n.hasClassName("ct_empty") && Concrete.Editor.CommandHelper.canAddElement(n.up(), editor);
     },
     run: function(n, editor) {
-      n.insert({after: editor.templateProvider.emptyElement(n.parentNode, n.feature())})
-      var temp = n.next()
-      editor.selector.selectDirect(temp)
+      n.insert({after: editor.templateProvider.emptyElement(n.parentNode, n.feature())});
+      var temp = n.next();
+      editor.selector.selectDirect(temp);
       editor.inlineEditor.edit(temp, { init: "",
         options: editor.constraintChecker.elementOptions(n.up()),
         onSuccess: function(v) {
@@ -848,8 +849,8 @@ Concrete.Editor.Commands = [
           editor.adjustMarker();
         },
         onFailure: function(v) {
-          temp.remove()
-          editor.selector.selectDirect(n)
+          temp.remove();
+          editor.selector.selectDirect(n);
         }
       });
     }
@@ -1034,4 +1035,4 @@ Concrete.Editor.Commands = [
     }
   }
   
-]
+];
