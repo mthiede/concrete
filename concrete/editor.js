@@ -34,7 +34,9 @@ Concrete.Editor = Class.create({
   //   selector:     if a selector is provided, use this instead of the internal selector, default: none
   //   showInfoPopups:
   //                 if set to true, show information about element/values in a popup, default: true
-  //
+  //   dirtyListeners:
+  //                 an array of listeners whose update() method is called whenever the dirty state
+  //                 of the model that's edited changes to 'dirty'/true
   initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     options = options || {};
     this.options = options;
@@ -42,6 +44,7 @@ Concrete.Editor = Class.create({
     if (options.followReferenceSupport == undefined) options.followReferenceSupport = true;
     if (options.showInfoPopups == undefined) options.showInfoPopups = true;
     options.scrolling = options.scrolling || "both";
+    if (options.dirtyListeners == undefined) options.dirtyListeners = [];
     this.editorRoot = editorRoot;
     this._setupRoot();
     this.templateProvider = templateProvider;
@@ -70,8 +73,19 @@ Concrete.Editor = Class.create({
     this.onFollowExternalReference = options.onFollowExternalReference;
     this._hasFocus = false;
     this.showDocumentationPopups = true;
+    this.dirtyState = false;
   },
-  
+
+  /**
+   * Sets the dirty state to the given value or to 'dirty'/true if no value is
+   * given.
+   */
+  _setDirtyState: function(state) {
+    this.dirtyState = ( typeof(state) == 'undefined' ) ? true : !!state;
+    var dirtyState = this.dirtyState;
+    this.options.dirtyListeners.forEach(function(l) { l.update(dirtyState); });
+  },
+
   _setupRoot: function() {
     this.editorRoot.insert({top: "<div class='ct_root'></div>"});
     this.modelRoot = this.editorRoot.childElements().first();
@@ -80,7 +94,7 @@ Concrete.Editor = Class.create({
     this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
     this.popup = this.editorRoot.childElements().last();
   },
-  
+
   _createInlineEditor: function() {
     var marker = this.marker;
     this.inlineEditor = new Concrete.InlineEditor(function(isActive) {
@@ -92,7 +106,7 @@ Concrete.Editor = Class.create({
       }
     });
   },
-  
+
   _setupSelector: function(selector) {
     var editor = this;
     selector.setOnChangeFunction(
@@ -112,15 +126,16 @@ Concrete.Editor = Class.create({
         editor.adjustMarker();
       });
   },
-    
+
   focus: function() {
     this._hasFocus = true;
   },
 
   handleEvent: function(event) {
+    var element = event.element();
     if( event.type == "click" && event.isLeftClick() ) {
       // check whether the event occurred on an element that is contained by the editor:
-      if( event.element().ancestors().concat(event.element()).include(this.editorRoot) ) {
+      if( element.ancestors().concat(element).include(this.editorRoot) ) {
         this._hasFocus = true;
         this.editorRoot.addClassName("ct_focus");
       } else {
@@ -142,9 +157,9 @@ Concrete.Editor = Class.create({
     if( this.inlineEditor.isActive ) {
       // left mouse click?:
       if( event.type == "click" && event.isLeftClick() ) {
-        if( !Event.element(event).up().hasClassName("ct_inline_editor") ) {
+        if( !element.up().hasClassName("ct_inline_editor") ) {
           this.inlineEditor.cancel();
-          this.selector.selectDirect(Event.element(event));
+          this.selector.selectDirect(element);
         }
       }
       // Tab?:
@@ -171,23 +186,23 @@ Concrete.Editor = Class.create({
     // inline editor not active:
     else {
       var ctrlKey = this._ctrlKey(event);
-   	  // left mouse click?:
+      // left mouse click?:
       if( event.type == "click" && event.isLeftClick() ) {
         // clicked fold button?:
-        if( Event.element(event).hasClassName("ct_fold_button") ) {
-          this.toggleFoldButton(Event.element(event));
+        if( element.hasClassName("ct_fold_button") ) {
+          this.toggleFoldButton(element);
         }
         // follow reference?:
         else if( ctrlKey ) {
-          this.jumpReference(Event.element(event));
+          this.jumpReference(element);
         }
         // ??
-        else if( this.selector.selected == this.selector.surroundingSelectable(Event.element(event)) ) {
+        else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
           this.runCommand("edit_event");
         }
         // ??
         else {
-          this.selector.selectDirect(Event.element(event), event.shiftKey);
+          this.selector.selectDirect(element, event.shiftKey);
           event.stop();
         }
       }
@@ -311,7 +326,7 @@ Concrete.Editor = Class.create({
   },
 
   _handleErrorPopups: function(event) {
-    var element = Event.element(event);
+    var element = event.element();
     var errorElement = (element.hasClassName("ct_error")) ? element : element.up(".ct_error");
     if (errorElement && (errorElement.up(".ct_editor") == this.editorRoot)) {
       var desc = errorElement.childElements().find(function(e) { return e.hasClassName("ct_error_description"); });
@@ -325,13 +340,13 @@ Concrete.Editor = Class.create({
   },
 
   _handleInfoPopups: function(event) {
-    var element = Event.element(event);
+    var element = event.element();
     this._resetPopupMessage("feature_name");
     this._resetPopupMessage("reference_value");
     this._resetPopupMessage("reference_module");
     this._resetPopupMessage("documentation");
     if( element.up(".ct_editor") != this.editorRoot ) {
-    	return;
+      return;
     }
     if( element.hasClassName("ct_value") ) {
       var feature = element.mmFeature();
@@ -346,15 +361,15 @@ Concrete.Editor = Class.create({
         }
       }
       if( this.showDocumentationPopups && feature.documentation ) {
-    	  this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
+        this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
       }
     } else {
-    	if( this.showDocumentationPopups && element.hasClassName("ct_class_name") ) {
-	    	var clazzElt = element.up(".ct_element");
-	    	if( clazzElt && clazzElt.mmClass.documentation ) {
-	      	  this._setPopupMessage("documentation", "info", "Documentation: " + clazzElt.mmClass.documentation);
-	    	}
-    	}
+      if( this.showDocumentationPopups && element.hasClassName("ct_class_name") ) {
+        var clazzElt = element.up(".ct_element");
+        if( clazzElt && clazzElt.mmClass.documentation ) {
+          this._setPopupMessage("documentation", "info", "Documentation: " + clazzElt.mmClass.documentation);
+        }
+      }
     }
   },
 
@@ -383,18 +398,18 @@ Concrete.Editor = Class.create({
     }
     if (this.popup.childElements().size() == 0) this.popup.hide();
   },
-  
+
   _handleRefHighlight: function(event) {
-    var element = Event.element(event);
+    var element = event.element();
     if (this.refHighlight) {
       this.refHighlight.source.removeClassName("ct_ref_source");
       if (this.refHighlight.target) this.refHighlight.target.removeClassName("ct_ref_target");
       this.refHighlight = undefined;
     }
     if(    this._ctrlKey(event)
-    	&& element.hasClassName("ct_value")
-    	&& !element.hasClassName("ct_empty")
-    	&& element.mmFeature().isReference() )
+        && element.hasClassName("ct_value")
+        && !element.hasClassName("ct_empty")
+        && element.mmFeature().isReference() )
     {
       var targets = this.identifierProvider.getElement(element.value);
       if (!(targets instanceof Array)) targets = [targets].compact();
@@ -418,7 +433,7 @@ Concrete.Editor = Class.create({
       }
     }    
   },
-  
+
   runCommand: function(eventId) {
     var se = this.selector.selected;
     var cmd = Concrete.Editor.Commands.select(function(c) { 
@@ -428,7 +443,7 @@ Concrete.Editor = Class.create({
       cmd.run(se, this);
     }
   },
-  
+
   allSelected: function() {
     return this.selector.multiSelected.concat(this.selector.selected).uniq();
   },
@@ -456,7 +471,7 @@ Concrete.Editor = Class.create({
     });
     this.adjustMarker();
   },
-    
+
   showHiddenFeatures: function(n) {
     // expand to make fold button state consistent (code below will show all features)
     this.expandElement(n);
@@ -478,7 +493,7 @@ Concrete.Editor = Class.create({
       }
     }
   },
-  
+
   toggleFoldButton: function(fb) {
     if (fb.hasClassName("ct_fold_open")) {
       this.collapseElement(fb.up(".ct_element"));
@@ -497,6 +512,7 @@ Concrete.Editor = Class.create({
       n.foldButton.addClassName("ct_fold_closed");
     }
     this.adjustMarker();
+    // TODO  check whether view info changes and set dirty status if so
   },
 
   expandElement: function(n) {
@@ -510,20 +526,23 @@ Concrete.Editor = Class.create({
       n.foldButton.addClassName("ct_fold_open");
     }
     this.adjustMarker();
-  },  
-  
+    // TODO  check whether view info changes and set dirty status if so
+  },
+
   collapseElementRecursive: function(n) {
     n.select(".ct_element").each(function(e) {
       this.collapseElement(e);
     }, this);
     this.collapseElement(n);
+    // TODO  check whether view info changes and set dirty status if so
   },
-  
+
   expandElementRecursive: function(n) {
     n.select(".ct_element").each(function(e) {
       this.expandElement(e);
     }, this);
     this.expandElement(n);
+    // TODO  check whether view info changes and set dirty status if so
   },
 
   // expands the parent elements of an element or attribute/reference value
@@ -549,7 +568,7 @@ Concrete.Editor = Class.create({
       this.clipboard.write(nodes.collect(function(n) { return this.modelInterface.extractModel(n); }, this));
     }
   },
-  
+
   jumpReference: function(n) {
     if (!n.hasClassName("ct_value") || !n.mmFeature().isReference()) return;
     var target = this.identifierProvider.getElement(n.value);
@@ -567,7 +586,7 @@ Concrete.Editor = Class.create({
       }
     }
   },
-      
+
   adjustMarker: function() {
     var cur = this.selector.getCursorPosition();
     var poff = this.marker.getOffsetParent().cumulativeOffset();
@@ -594,24 +613,24 @@ Concrete.Editor = Class.create({
         this.marker.removeClassName("ct_cursor_left");
       }
   },
-  
+
   getModel: function() {
     return Concrete.Helper.prettyPrintJSON(
       Object.toJSON(this.modelRoot.childElements().collect(function(n) { return this.modelInterface.extractModel(n); }, this)));
   },
-  
-  setModel: function(json) {
-  // $Meinte Boersma$: assuming now that the transported model is already proper JavaScript
-//    if (json.isJSON()) {
-      this.modelInterface.removeElement(this.modelRoot.childElements());
-      this.modelInterface.createElement(this.modelRoot, "bottom", json);
-      this.selector.selectDirect(this.modelRoot.down());
-//    }
+
+  setModel: function(model) {
+    if( typeof(model) == 'String' && model.isJSON()) {
+      model = json.evalJSON();
+    } // else: assume nothing has to be done
+    this.modelInterface.removeElement(this.modelRoot.childElements());
+    this.modelInterface.createElement(this.modelRoot, "bottom", model);
+    this.selector.selectDirect(this.modelRoot.down());
   }
 });
 
 Concrete.Editor.CommandHelper = {
-  
+
   referenceOptions: function(type, editor) {
     var idents = editor.modelInterface.elements()
       .select(function(e) { return editor.constraintChecker.isValidInstance(type, e);})
@@ -621,13 +640,13 @@ Concrete.Editor.CommandHelper = {
     }
     return idents.select(function(i) { return( i && i.length > 0 ); });
   },
-    
+
   canAutoHide: function(feature) {
     return (!feature.hasClassName("ct_error") &&
       (feature.hasClassName("ct_always_hide") || 
       (feature.hasClassName("ct_auto_hide") && (feature.down(".ct_slot").childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).size() == 0))));
     },
-    
+
   canAddElement: function(slot, editor) {
     var numElements = slot.childElements().select(function(c){ return c.hasClassName("ct_element"); }).size();
     if (slot.hasClassName("ct_root")) {
@@ -637,7 +656,7 @@ Concrete.Editor.CommandHelper = {
       return slot.mmFeature().upperLimit == -1 || numElements < slot.mmFeature().upperLimit;
     }
   },
-  
+
   showAllNonAutoHideFeatures: function(n, editor) {
     n.select(".ct_attribute, .ct_reference, .ct_containment").each(function(f) {
       if( !this.canAutoHide(f) ) {
@@ -659,7 +678,7 @@ Concrete.Editor.CommandHelper = {
     editor.modelInterface.removeValue(n);
     editor.adjustMarker();
   }
-  
+
 };
 
 Concrete.Editor.Commands = [
@@ -684,11 +703,14 @@ Concrete.Editor.Commands = [
             editor.modelInterface.changeValue(n, v);
           }
           editor.adjustMarker();
+          if( n.value != v ) {
+        	  editor._setDirtyState();
+          }
         }
       });
     }
   },
-  
+
   {
     name: "Add Attribute",
     trigger: "insert_event",
@@ -706,6 +728,7 @@ Concrete.Editor.Commands = [
           temp.remove();
           editor.modelInterface.createValue(n, "after", v);
           editor.selector.selectDirect(n.next());
+          editor._setDirtyState();
         }, 
         onFailure: function() {
           temp.remove();
@@ -714,7 +737,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-  
+
   {
     name: "Remove Attribute",
     trigger: "delete_event",
@@ -723,9 +746,10 @@ Concrete.Editor.Commands = [
     },
     run: function(n, editor) {
       Concrete.Editor.CommandHelper.removeValue(n, editor);
+      editor._setDirtyState();
     }
   },
-    
+
   {
     name: "Edit Reference",
     trigger: "edit_event",
@@ -745,11 +769,14 @@ Concrete.Editor.Commands = [
             editor.modelInterface.changeValue(n, v);
           }
           editor.adjustMarker();
+          if( n.value != v ) {
+            editor._setDirtyState();
+          }
         }
       });
     }
   },
-  
+
   {
     name: "Add Reference",
     trigger: "insert_event",
@@ -767,6 +794,7 @@ Concrete.Editor.Commands = [
           temp.remove();
           editor.modelInterface.createValue(n, "after", v);
           editor.selector.selectDirect(n.next());
+          editor._setDirtyState();
         }, 
         onFailure: function() {
           temp.remove();
@@ -775,7 +803,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-  
+
   {
     name: "Remove Reference",
     trigger: "delete_event",
@@ -784,9 +812,10 @@ Concrete.Editor.Commands = [
     },
     run: function(n, editor) {
       Concrete.Editor.CommandHelper.removeValue(n, editor);
+      editor._setDirtyState();
     }
   },
-  
+
   {
     name: "Create Element",
     trigger: "edit_event",
@@ -802,11 +831,12 @@ Concrete.Editor.Commands = [
           editor.selector.selectDirect(n.next());
           n.remove();
           editor.adjustMarker();
+          editor._setDirtyState();
         }
       });
     }
   },
-  
+
   {
     name: "Replace Element",
     trigger: "edit_event",
@@ -824,11 +854,12 @@ Concrete.Editor.Commands = [
           editor.selector.selectDirect(n.next());
           editor.modelInterface.removeElement(n);
           editor.adjustMarker();
+          editor._setDirtyState();
         }
       });
     }
   },
-  
+
   {
     name: "Add Element",
     trigger: "insert_event",
@@ -847,6 +878,7 @@ Concrete.Editor.Commands = [
           editor.showHiddenFeatures(n.next());
           temp.remove();
           editor.adjustMarker();
+          editor._setDirtyState();
         },
         onFailure: function(v) {
           temp.remove();
@@ -855,7 +887,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-  
+
   {
     name: "Remove Element",
     trigger: "delete_event",
@@ -864,9 +896,10 @@ Concrete.Editor.Commands = [
     },
     run: function(n, editor) {
       editor.removeElements(editor.allSelected());
+      editor._setDirtyState();
     }
   },
-  
+
   {
     name: "Hide Empty Features",
     trigger: "hide_empty_event",
@@ -894,7 +927,7 @@ Concrete.Editor.Commands = [
       });
     }
   },  
-  
+
   {
     name: "Collapse Element",
     trigger: "collapse_event",
@@ -908,7 +941,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-  
+
   {
     name: "Expand Element",
     trigger: "expand_event",
@@ -922,7 +955,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-    
+
   {
     name: "Collapse Element Recursive",
     trigger: "collapse_recursive_event",
@@ -936,7 +969,7 @@ Concrete.Editor.Commands = [
       });
     }
   },
-  
+
   {
     name: "Expand Element Recursive",
     trigger: "expand_recursive_event",
@@ -977,6 +1010,7 @@ Concrete.Editor.Commands = [
       else {
         editor.removeElements(editor.allSelected());
       }
+      editor._setDirtyState();
     }
   },
 
@@ -1006,9 +1040,10 @@ Concrete.Editor.Commands = [
         if (n.hasClassName("ct_empty")) n.remove();
       }
       editor.adjustMarker();
+      editor._setDirtyState();
     }
   },
-          
+
   {
     name: "Jump Reference",
     trigger: "jump_forward_event",
@@ -1034,5 +1069,5 @@ Concrete.Editor.Commands = [
       }
     }
   }
-  
+
 ];
