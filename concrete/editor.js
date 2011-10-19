@@ -165,11 +165,7 @@ Concrete.Editor = Class.create({
       // Tab?:
       else if( event.keyCode == 9 ) {
         this.inlineEditor.finish();
-        if( event.shiftKey ) {
-          this.selector.selectTab("prev");
-        } else {
-          this.selector.selectTab("next");
-        }
+        this.selector.selectTab( event.shiftKey ? "prev" : "next" );
         event.stop();
       }
       // Return?:
@@ -259,12 +255,7 @@ Concrete.Editor = Class.create({
       }
       // Tab?:
       else if( event.keyCode == 9 ) {
-        if( event.shiftKey ) {
-          this.selector.selectTab("prev");
-        }
-        else {
-          this.selector.selectTab("next");
-        }
+        this.selector.selectTab( event.shiftKey ? "prev" : "next" );
         event.stop();
       }
       // Ctrl-Space?:
