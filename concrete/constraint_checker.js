@@ -90,7 +90,7 @@ Concrete.ConstraintChecker = Class.create({
 
   elementOptions: function(slot) {
     var namesNonAbstracts = function(collection) {
-    	return collection.reject(function(t){return t.abstract;}).collect(function(c){ return c.name; });
+      return collection.reject(function(t) { return t.abstract; }).collect(function(c) { return c.name; });
     };
     if (slot.hasClassName("ct_root")) {
       return namesNonAbstracts(this.rootClasses);
@@ -101,14 +101,17 @@ Concrete.ConstraintChecker = Class.create({
     }
   },
 
-  // enable and disable automatic checking
+  /**
+   * Enable and disable automatic checking.
+   */
   setAutomaticChecking: function(checking) {
     this._automaticChecking = checking;
   },
 
-  // run all constraint checks and update the error annotations
-  // this method must be called explicitly if automatic checking is disabled
-  //
+  /**
+   * Run all constraint checks and update the error annotations. This method
+   * must be called explicitly if automatic checking is disabled.
+   */
   updateAllProblems: function() {
     var element = this.modelRoot.childElements().first();
     // in case the first element is an empty element, skip to next
@@ -117,8 +120,7 @@ Concrete.ConstraintChecker = Class.create({
     var stack = [];
     if (this._intervalTimer) window.clearInterval(this._intervalTimer);
     this._intervalTimer = window.setInterval(function() {
-      var i;
-      for (i=0; i<100; i++) {
+      for( var i = 0; i < 100; i++ ) {
         this._updateElementProblems(element);
         element = Concrete.ModelInterface.Helper.nextElement(element, stack);
         if (!element) {
@@ -127,7 +129,7 @@ Concrete.ConstraintChecker = Class.create({
           break;
         }
       }
-    }.bind(this), 0.01);
+    }.bind(this), 40);	// check 25x per second
   },
 
   // private
