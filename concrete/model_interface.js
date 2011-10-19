@@ -433,7 +433,9 @@ Concrete.ModelInterface.Helper = {
         var parentFeature = (stack && stack.pop()) || element.up(".ct_containment");
         if (parentFeature) {
           // go up to parent
-          element = (stack && stack.pop()) || parentFeature.up(".ct_element");
+          var parentElement = (stack && stack.pop()) || parentFeature.up(".ct_element");
+          fIndex = parentElement.features.indexOf(parentFeature) + 1;	// (don't var fIndex as it already exists...)
+          element = parentElement;
         }
         else {
           return false;
