@@ -33,7 +33,7 @@ Concrete.TemplateProvider = Class.create({
       placeholderText = "&lt;"+feature.mmFeature.name+"&gt;";
     }
     else {
-      placeholderText = "&lt;root&gt;";
+      placeholderText = "click here to start editing";
     }
     var element = new Element("span");	// normal case
     if (parentNode.tagName.toUpperCase() == "TBODY") {
