@@ -304,6 +304,11 @@ Concrete.Editor = Class.create({
         this.runCommand("cut_event");
         event.stop();
       }
+      // Ctrl-B?:
+      else if( ctrlKey && event.keyCode == 66 ) {
+        WorkbenchController.showNavigator();
+        event.stop();
+      }
       else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
                (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
         this.runCommand("edit_event");
