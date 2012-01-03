@@ -611,8 +611,8 @@ Concrete.Editor = Class.create({
   },
 
   setModel: function(model) {
-    if( typeof(model) == 'String' && model.isJSON()) {
-      model = json.evalJSON();
+    if( Object.isString(model) && model.isJSON()) {
+      model = model.evalJSON();
     } // else: assume nothing has to be done
     this.modelInterface.removeElement(this.modelRoot.childElements());
     this.modelInterface.createElement(this.modelRoot, "bottom", model);
