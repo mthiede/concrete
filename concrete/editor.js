@@ -93,6 +93,8 @@ Concrete.Editor = Class.create({
     this.marker = this.editorRoot.childElements().last();
     this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
     this.popup = this.editorRoot.childElements().last();
+    this.editorRoot.insert({bottom: "<canvas style='position: absolute; display: none;'></canvas>"});
+    this.canvas = this.editorRoot.childElements().last();
   },
 
   _createInlineEditor: function() {
@@ -396,6 +398,7 @@ Concrete.Editor = Class.create({
       this.refHighlight.source.removeClassName("ct_ref_source");
       if (this.refHighlight.target) this.refHighlight.target.removeClassName("ct_ref_target");
       this.refHighlight = undefined;
+      this.canvas.hide();
     }
     if(    this._ctrlKey(event)
         && element.hasClassName("ct_value")
@@ -419,10 +422,62 @@ Concrete.Editor = Class.create({
           // if target is an element in this editor
           target = targets[0]; 
           target.addClassName("ct_ref_target");
+          this._drawReference(element, target);
         }
         this.refHighlight = {source: element, target: target};
       }
     }    
+  },
+
+  _drawReference: function(source, target) {
+    var fromX, fromY, toX, toY;
+    if (source.left() < target.left()) {
+      fromX = source.right();
+      toX = target.left();
+    }
+    else {
+      fromX = source.left();
+      toX = target.right();
+    }
+    // if (source.top() < target.top()) {
+    //   fromY = source.bottom();
+    //   toY = target.top();
+    // }
+    // else {
+    //   fromY = source.top();
+    //   toY = target.bottom();
+    // }
+    fromY = source.top();
+    toY = target.top();
+    this._drawSpline(fromX, fromY, toX, toY);
+  },
+
+  _drawSpline: function(fromX, fromY, toX, toY) {
+    this.canvas.width = Math.abs(fromX - toX) + 40;
+    this.canvas.height = Math.abs(fromY - toY) + 40;
+    var offsetX = (fromX < toX ? fromX : toX) - 20;
+    this.canvas.style.left = offsetX;
+    var offsetY = (fromY < toY ? fromY : toY) - 20;
+    this.canvas.style.top = offsetY;
+    var context = this.canvas.getContext("2d");  
+    context.clearRect(0, 0, this.canvas.width-1, this.canvas.height-1);
+    // context.strokeRect(0, 0, this.canvas.width-1, this.canvas.height-1);
+    context.translate(-offsetX, -offsetY);
+    context.beginPath();  
+    context.moveTo(fromX, fromY);  
+    // context.bezierCurveTo(fromX, fromY, toX-((toX-fromX)/4), toY, toX, toY);
+    context.lineTo(toX, toY);
+    context.save();
+    context.translate(toX, toY);
+    context.rotate(Math.atan2((toY-fromY), toX-fromX));
+    context.moveTo(-10, -7);
+    context.lineTo(0, 0);
+    context.lineTo(-10, 7);
+    context.restore();
+    context.strokeStyle = "#00f";
+    context.lineWidth = 2;
+    context.stroke();  
+    this.canvas.show();
   },
 
   runCommand: function(eventId) {
