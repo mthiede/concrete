@@ -650,7 +650,7 @@ Concrete.Editor.CommandHelper = {
 
   showAllNonAutoHideFeatures: function(n, editor) {
     n.select(".ct_attribute, .ct_reference, .ct_containment").each(function(f) {
-      if( !this.canAutoHide(f) ) {
+      if( !Concrete.Editor.CommandHelper.canAutoHide(f) ) {
         editor.showHiddenFeature(f);
       }
     });
