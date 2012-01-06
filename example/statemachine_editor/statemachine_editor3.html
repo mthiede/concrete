@@ -1,0 +1,116 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="../themes/light_blue.css" type="text/css" />
+		<link rel="stylesheet" href="../themes/fold_button_dots_when_hidden.css" type="text/css" />
+    <link rel="stylesheet" href="style3.css" type="text/css" />
+		<script src="../../redist/prototype.js" type="text/javascript"></script>
+		<script src="../../redist/scriptaculous/scriptaculous.js" type="text/javascript"></script>
+		<script src="../../concrete/concrete.js" type="text/javascript"></script>
+		<script src="example_data/example3.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<div id="templates1" style="display: none" >
+			<div class="ct_element ctc_Statemachine">
+        <div><span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+				<div class="ct_containment ctn_triggers"><span class="ct_feature_name">triggers:</span> <div class="ct_slot"></div></div>
+				<div class="ct_containment ctn_variables"><span class="ct_feature_name">variables:</span> <div class="ct_slot"></div></div>
+				<div class="ct_containment ctn_states"><span class="ct_feature_name">states:</span> <div class="ct_slot ct_resizable" style="position: relative; padding: 10px"></div></div>
+			</div>	
+			<div class="ct_element ctc_SimpleState" style="display: inline-block; position: absolute;">
+				<div class="ct_move_handle" style="text-align: center; padding: 5px"><span class="ct_fold_button"></span> <span class="ct_handle">SimpleState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+				<div class="ct_containment ctn_transitions" style="padding: 5px; border-top: 1px solid black"><span class="ct_feature_name">transitions:</span> <div class="ct_slot"></div></div>
+			</div>	
+			<div class="ct_element ctc_CompositeState" style="display: inline-block; position: absolute;">
+				<div class="ct_move_handle" style="text-align: center; padding: 5px"><span class="ct_fold_button"></span> <span class="ct_handle">CompositeState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+				<div class="ct_containment ctn_subStates" style="border-top: 1px solid black; padding: 5px"><span class="ct_feature_name">substates:</span> <div class="ct_slot ct_resizable" style="position: relative; padding: 10px"></div></div>
+				<div class="ct_containment ctn_transitions" style="padding: 5px; border-top: 1px solid black"><span class="ct_feature_name">transitions</span>: <div class="ct_slot"></div></div>
+			</div>	
+			<span class="ct_element ctc_AndExpression" style="">
+				(<span class="ct_containment ctn_expr1" style="padding: 0px"><span class="ct_slot" style="padding: 0px"></span></span><span class="ct_handle">&&</span><span class="ct_containment ctn_expr2" style="padding: 0px"><span class="ct_slot"></span></span>)
+			</span>	
+			<span class="ct_element ctc_OrExpression" style="">
+				(<span class="ct_containment ctn_expr1" style="padding: 0px"><span class="ct_slot"></span></span><span class="ct_handle">||</span><span class="ct_containment ctn_expr2" style="padding: 0px"><span class="ct_slot"></span></span>)
+			</span>	
+			<span class="ct_element ctc_NotExpression" style="">
+				<span class="ct_handle">!</span><span class="ct_containment ctn_expr" style="padding: 0px"><span class="ct_slot"></span></span>
+			</span>	
+			<span class="ct_element ctc_VarRef" style="">
+				<span class="ct_handle">var</span>(<span class="ct_reference ctn_variable" style="padding: 0px"><span class="ct_slot"></span></span>)
+			</span>	
+		</div>
+		<div id="metamodel1" style="display: none" >
+[{"_class": "Datatype", "name": "String"}, 
+{"_class": "Class", "name": "Statemachine", "features": [
+  {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}, 
+  {"_class": "Feature", "name": "variables", "kind": "containment", "type": "Variable"}, 
+  {"_class": "Feature", "name": "triggers", "kind": "containment", "type": "Trigger"}, 
+  {"_class": "Feature", "name": "states", "kind": "containment", "type": "State"}]}, 
+{"_class": "Class", "name": "Variable", "features": 
+  {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}}, 
+{"_class": "Class", "name": "Trigger", "features": 
+  {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}}, 
+{"_class": "Class", "name": "State", "abstract": true, "features": [
+  {"_class": "Feature", "name": "name", "kind": "attribute", "lowerLimit": 1, "upperLimit": 1, "type": "String"}, 
+  {"_class": "Feature", "name": "transitions", "kind": "containment", "upperLimit": -1, "type": "Transition"}]}, 
+{"_class": "Class", "name": "SimpleState", "superTypes": "State"}, 
+{"_class": "Class", "name": "CompositeState", "superTypes": "State", "features": 
+  {"_class": "Feature", "name": "subStates", "kind": "containment", "upperLimit": -1, "type": "State"}}, 
+{"_class": "Class", "name": "Transition", "features": [
+  {"_class": "Feature", "name": "targetState", "kind": "reference", "lowerLimit": 1, "upperLimit": 1, "type": "State"}, 
+  {"_class": "Feature", "name": "trigger", "kind": "reference", "upperLimit": -1, "type": "Trigger"}, 
+  {"_class": "Feature", "name": "condition", "kind": "containment", "upperLimit": 1, "type": "Expression"}]}, 
+{"_class": "Class", "name": "Expression"}, 
+{"_class": "Class", "name": "AndExpression", "superTypes": "Expression", "features": [
+  {"_class": "Feature", "name": "expr1", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}, 
+  {"_class": "Feature", "name": "expr2", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}]}, 
+{"_class": "Class", "name": "OrExpression", "superTypes": "Expression", "features": [
+  {"_class": "Feature", "name": "expr1", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}, 
+  {"_class": "Feature", "name": "expr2", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}]}, 
+{"_class": "Class", "name": "NotExpression", "superTypes": "Expression", "features": 
+  {"_class": "Feature", "name": "expr", "kind": "containment", "lowerLimit": 1, "upperLimit": -1, "type": "Expression"}}, 
+{"_class": "Class", "name": "VarRef", "superTypes": "Expression", "features": 
+  {"_class": "Feature", "name": "variable", "kind": "reference", "lowerLimit": 1, "upperLimit": 1, "type": "Variable"}}]
+		</div>
+		<div class="ct_editor" id="editor1">
+		</div>
+    <p><input type="button" onclick="ed.setModel(ExampleData);" value="Load example" /> Discards existing model!</p>
+		<textarea id="clipboard1" style="background-color: white; color: black; border: 1px solid grey" cols="80" rows="10" wrap="off"></textarea>
+		</div>
+		<script type="text/javascript" language="javascript" charset="utf-8">
+			// <![CDATA[
+				var tp = new Concrete.TemplateProvider($("templates1"), {identifierAttribute: "name"});
+				var mp = new Concrete.MetamodelProvider($("metamodel1").textContent.evalJSON());
+				var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
+				var cb = new Concrete.Clipboard($("clipboard1"));
+				var ed = new Concrete.Editor($("editor1"), tp, mp, ip, {clipboard: cb, 
+					rootClasses: mp.metaclasses.select(function(c) { return ["Statemachine"].include(c.name)})});
+
+        // only show the last part of reference identifiers
+        ed.modelInterface.setDisplayValueProvider(function(text, feature) {
+          if (feature.mmFeature.isReference()) {
+            return text.toString().split("/").last();
+          }
+          else {
+            return text;
+          }
+        });
+				
+				Event.observe(window, 'click', function(event) {
+					ed.handleEvent(event);
+				});
+				Event.observe(window, 'keydown', function(event) {
+					ed.handleEvent(event);
+				});
+				Event.observe(window, 'mousemove', function(event) {
+					ed.handleEvent(event);
+				});
+				Event.observe(window, 'mouseup', function(event) {
+					ed.handleEvent(event);
+				});
+				Event.observe(window, 'mousedown', function(event) {
+					ed.handleEvent(event);
+				});
+			// ]]>
+		</script>
+	</body>
+</html>

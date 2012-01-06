@@ -147,6 +147,12 @@ Concrete.Editor = Class.create({
     }
     if( !this._hasFocus ) return;
 
+    if (event.type == "mousedown") {
+      this._handleDragStart(event);
+    }
+    if (event.type == "mouseup") {
+      this._handleDragStop(event);
+    }
     if( event.type == "mousemove" ) {
       this._handleErrorPopups(event);
       if( this.options.showInfoPopups ) {
@@ -154,6 +160,8 @@ Concrete.Editor = Class.create({
       }
       this._handleRefHighlight(event);
       this.popup.setStyle({left: event.clientX + 20 + 'px', top: event.clientY + 20 + 'px'});
+      this._handleCursorStyle(event);
+      this._handleDragging(event);
     }
 
     if( this.inlineEditor.isActive ) {
@@ -390,6 +398,75 @@ Concrete.Editor = Class.create({
       this._popupMessages[ident] = undefined;
     }
     if (this.popup.childElements().size() == 0) this.popup.hide();
+  },
+
+  _handleCursorStyle: function(event) {
+    var element = event.element();
+    if (this.cursorStyledElement) {
+      this.cursorStyledElement.style.cursor = "";
+      this.cursorStyledElement = undefined;
+    }
+    if (element.hasClassName("ct_move_handle")) {
+      element.style.cursor = "move";
+      this.cursorStyledElement = element;
+    }
+    else if (this._isAtResizeHandle(event)) {
+      element.style.cursor = "se-resize";
+      this.cursorStyledElement = element;
+    }
+  },
+
+  _handleDragStart: function(event) {
+    var element = event.element();
+    var movee;
+    if (element.hasClassName("ct_move_handle")) {
+      movee = element.hasClassName("ct_element") ? element : element.up(".ct_element");
+      this.dragContext = {
+        type: "move",
+        element: movee,
+        mouseStartX: event.clientX,
+        mouseStartY: event.clientY,
+        elementStartLeft: movee.positionedOffset().left,
+        elementStartTop: movee.positionedOffset().top
+      };
+    }
+    else if (this._isAtResizeHandle(event)) {
+      this.dragContext = {
+        type: "resize",
+        element: element,
+        mouseStartX: event.clientX,
+        mouseStartY: event.clientY,
+        elementStartWidth: parseInt(element.getStyle("width"), 10),
+        elementStartHeight: parseInt(element.getStyle("height"), 10)
+      };
+    }
+  },
+
+  _handleDragStop: function(event) {
+    this.dragContext = undefined;
+  },
+
+  _handleDragging: function(event) {
+    var element = event.element();
+    var mouseDiffX, mouseDiffY;
+    var dc = this.dragContext;
+    if (dc) {
+      mouseDiffX = event.clientX - dc.mouseStartX;
+      mouseDiffY = event.clientY - dc.mouseStartY;
+      if (dc.type === "move") {
+        dc.element.style.left = dc.elementStartLeft + mouseDiffX + "px";
+        dc.element.style.top = dc.elementStartTop + mouseDiffY + "px";
+      }
+      else if (dc.type === "resize") {
+        dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
+        dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
+      }
+    }
+  },
+
+  _isAtResizeHandle: function(event) {
+    var element = event.element();
+    return element.hasClassName("ct_resizable") && (event.clientX > element.right() - 10) && (event.clientY > element.bottom() - 10);
   },
 
   _handleRefHighlight: function(event) {

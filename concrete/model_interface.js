@@ -179,10 +179,20 @@ Concrete.ModelInterface = Class.create({
   extractModel: function(element) {
     var result = {_class: element.mmClass.name};
     if( element.foldButton ) {
-      result["_view"] = {"collapsed": element.foldButton.hasClassName("ct_fold_closed")};
+      result["_view"] = result["_view"] || {};
+      result["_view"]["collapsed"] = element.foldButton.hasClassName("ct_fold_closed");
+    }
+    if( element.style.position === "absolute" ) {
+      result["_view"] = result["_view"] || {};
+      result["_view"]["position"] = { left: element.style.left, top: element.style.top};
     }
     element.features.each(function(f) {
       var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
+      if (f.slot.hasClassName("ct_resizable")) {
+        result["_view"] = result["_view"] || {};
+        result["_view"]["container-size"] = result["_view"]["container-size"] || {};
+        result["_view"]["container-size"][f.mmFeature.name] = { width: f.slot.style.width, height: f.slot.style.height };
+      }
       if (children.size() > 0) {
         var converted = [];
         if (f.mmFeature.isContainment()) {
@@ -328,6 +338,10 @@ Concrete.ModelInterface = Class.create({
       if (values.size() > 0) {
         if (mmf.isContainment()) {
           if (options.collapse) f.hide();
+          if (f.slot.hasClassName("ct_resizable") && element._view && element._view["container-size"] && element._view["container-size"][mmf.name]) {
+            f.slot.style.width = element._view["container-size"][mmf.name].width;
+            f.slot.style.height = element._view["container-size"][mmf.name].height;
+          }
           values.each(function(v) {
             this._instantiateTemplateRecursive(v, slot, "bottom", options);
             hasChildElements = true;
@@ -361,6 +375,10 @@ Concrete.ModelInterface = Class.create({
       if( element._view && element._view.collapsed ) {
     	  this.collapseElement(inst);
       }
+    }
+    if (element._view && element._view.position && inst.style.position === "absolute") {
+      inst.style.left = element._view.position.left;
+      inst.style.top = element._view.position.top;
     }
     return inst;
   },

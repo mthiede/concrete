@@ -175,3 +175,10 @@ body {
 .ct_ref_target .ct_ref_source {
 	color: #FFF;
 }
+
+/* Resize Handle
+ *****************************************************************************/
+
+.ct_resizable {
+  background: url("resize.png") bottom right no-repeat;
+}
