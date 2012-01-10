@@ -5,28 +5,32 @@ ExampleData = Object.toJSON(
   {"_class": "Trigger", "_view": 
     {"collapsed": false}, "name": "ModeButton"}], "_view": 
   {"container-size": 
-    {"states": 
-      {"width": "1553px", "height": "211px"}}}, "states": [
+    {"chartElements": 
+      {"width": "1553px", "height": "211px"}}}, "chartElements": [
   {"_class": "SimpleState", "_view": 
     {"collapsed": false, "position": 
-      {"left": "", "top": ""}}, "name": "Off", "transitions": 
-    {"_class": "Transition", "_view": 
-      {"collapsed": false}, "targetState": "/AC/On", "trigger": "/AC/OnButton"}}, 
+      {"left": "15px", "top": "46px"}}, "name": "Off"}, 
   {"_class": "CompositeState", "_view": 
     {"collapsed": false, "position": 
-      {"left": "377px", "top": "-51px"}, "container-size": 
-      {"subStates": 
-        {"width": "704px", "height": "158px"}}}, "name": "On", "subStates": [
+      {"left": "397px", "top": "-30px"}, "container-size": 
+      {"chartElements": 
+        {"width": "596px", "height": "144px"}}}, "name": "On", "chartElements": [
     {"_class": "SimpleState", "_view": 
       {"collapsed": false, "position": 
-        {"left": "12px", "top": "93px"}}, "name": "Heating", "transitions": 
-      {"_class": "Transition", "_view": 
-        {"collapsed": false}, "targetState": "/AC/On/Cooling", "trigger": "/AC/ModeButton"}}, 
+        {"left": "45px", "top": "54px"}}, "name": "Heating"}, 
     {"_class": "SimpleState", "_view": 
       {"collapsed": false, "position": 
-        {"left": "315px", "top": "10px"}}, "name": "Cooling", "transitions": 
-      {"_class": "Transition", "_view": 
-        {"collapsed": false}, "targetState": "/AC/On/Heating", "trigger": "/AC/ModeButton"}}], "transitions": 
+        {"left": "442px", "top": "66px"}}, "name": "Cooling"}, 
     {"_class": "Transition", "_view": 
-      {"collapsed": false}, "targetState": "/AC/Off", "trigger": "/AC/OnButton"}}]}]
+      {"position": 
+        {"left": "236px", "top": "4px"}}, "sourceState": "/AC/On/Heating", "targetState": "/AC/On/Cooling", "trigger": "/AC/ModeButton"}, 
+    {"_class": "Transition", "_view": 
+      {"position": 
+        {"left": "235px", "top": "82px"}}, "sourceState": "/AC/On/Cooling", "targetState": "/AC/On/Heating", "trigger": "/AC/ModeButton"}]}, 
+  {"_class": "Transition", "_view": 
+    {"position": 
+      {"left": "214px", "top": "93px"}}, "sourceState": "/AC/Off", "targetState": "/AC/On", "trigger": "/AC/OnButton"}, 
+  {"_class": "Transition", "_view": 
+    {"position": 
+      {"left": "212px", "top": "-19px"}}, "sourceState": "/AC/On", "targetState": "/AC/Off", "trigger": "/AC/OnButton"}]}]
 );

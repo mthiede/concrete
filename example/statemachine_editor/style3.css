@@ -30,6 +30,39 @@
 	background: #aaf;
 }
 
+.ctc_Transition.ct_element {
+  padding-top: 20px;
+  background: url(arrow_right.png) 5px 5px no-repeat;
+  min-width: 50px;
+  margin: 0;
+}
+
+.ctc_Transition .ctn_sourceState .ct_ref_handle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  left: 55px;
+  top: 9px;
+  border: 1px solid black;
+}
+
+.ctc_Transition .ctn_targetState .ct_ref_handle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  left: 0px;
+  top: 9px;
+  border: 1px solid black;
+}
+
+.ctc_Transition .ct_error .ct_ref_handle {
+  top: 8px;
+  border: 2px solid red;
+}
+
+.ctc_Transition.ct_selected {
+	background-color: #aaf;
+}
 .ctc_AndExpression .ct_containment { padding: 0; }
 .ctc_AndExpression .ct_containment .ct_element { margin: 0; }
 .ctc_AndExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
