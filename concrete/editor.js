@@ -198,6 +198,9 @@ Concrete.Editor = Class.create({
         if( element.hasClassName("ct_fold_button") ) {
           this.toggleFoldButton(element);
         }
+        if( element.hasClassName("ct_var_handle") ) {
+          this._handleVariantToggle(event);
+        }
         // follow reference?:
         else if( ctrlKey ) {
           this.jumpReference(element);
@@ -413,6 +416,19 @@ Concrete.Editor = Class.create({
     else if (this._isAtResizeHandle(event)) {
       element.style.cursor = "se-resize";
       this.cursorStyledElement = element;
+    }
+  },
+
+  _handleVariantToggle: function(event) {
+    var element = event.element().up(".ct_element");
+    var next;
+    var vi = element.variantInfo();
+    if (vi) {
+      next = vi.current + 1;
+      if (next > vi.max) {
+        next = 1;
+      }
+      element.setVariantIndex(next);
     }
   },
 

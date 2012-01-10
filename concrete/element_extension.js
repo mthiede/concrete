@@ -23,6 +23,26 @@ Element.addMethods({
     }
     return false;
   },
+  variantInfo: function(e) {
+    var result = null;
+    var match;
+    e.classNames()._each(function(n) {
+      match = n.match(/^ct_var(\d+)_(\d+)$/);
+      if (match) {
+        max = parseInt(match[1], 10);
+        cur = parseInt(match[2], 10);
+        result = { current: cur, max: max };
+      }
+    });
+    return result;
+  },
+  setVariantIndex: function(e, index) {
+    var vi = e.variantInfo();
+    if (vi) {
+      e.removeClassName("ct_var"+vi.max+"_"+vi.current);
+      e.addClassName("ct_var"+vi.max+"_"+index);
+    }
+  },
   /**
    * This method is necessary because Prototype's up() doesn't support
    * searching for multiple classes. Optionally, a single class may be

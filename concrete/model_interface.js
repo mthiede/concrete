@@ -186,6 +186,10 @@ Concrete.ModelInterface = Class.create({
       result["_view"] = result["_view"] || {};
       result["_view"]["position"] = { left: element.style.left, top: element.style.top};
     }
+    if( element.variantInfo() ) {
+      result["_view"] = result["_view"] || {};
+      result["_view"]["variant"] = element.variantInfo().current;
+    }
     element.features.each(function(f) {
       var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
       if (f.slot.hasClassName("ct_resizable")) {
@@ -379,6 +383,9 @@ Concrete.ModelInterface = Class.create({
     if (element._view && element._view.position && inst.style.position === "absolute") {
       inst.style.left = element._view.position.left;
       inst.style.top = element._view.position.top;
+    }
+    if (element._view && element._view.variant && inst.variantInfo()) {
+      inst.setVariantIndex(element._view.variant);
     }
     return inst;
   },

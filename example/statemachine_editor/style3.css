@@ -11,6 +11,7 @@
 .ctc_SimpleState.ct_element {
 	border: 1px solid black; 
 	-moz-border-radius: 0.5em; 
+	border-radius: 0.5em; 
 	margin: 0;
 	background: url(state_background.png) no-repeat top right #fcf2e3;
 }
@@ -22,6 +23,7 @@
 .ctc_CompositeState.ct_element {
 	border: 1px solid black; 
 	-moz-border-radius: 0.5em; 
+	border-radius: 0.5em; 
 	margin: 0;	
 	background: url(state_background.png) no-repeat top right #fcf2e3;
 }
@@ -37,6 +39,10 @@
   margin: 0;
 }
 
+.ctc_Transition.ct_element.ct_var2_2 {
+  background: url(arrow_left.png) 5px 5px no-repeat;
+}
+
 .ctc_Transition .ctn_sourceState .ct_ref_handle {
   position: absolute;
   width: 3px;
@@ -44,6 +50,10 @@
   left: 55px;
   top: 9px;
   border: 1px solid black;
+}
+
+.ctc_Transition.ct_var2_2 .ctn_sourceState .ct_ref_handle {
+  left: 0px;
 }
 
 .ctc_Transition .ctn_targetState .ct_ref_handle {
@@ -55,14 +65,34 @@
   border: 1px solid black;
 }
 
+.ctc_Transition.ct_var2_2 .ctn_targetState .ct_ref_handle {
+  left: 55px;
+}
+
 .ctc_Transition .ct_error .ct_ref_handle {
   top: 8px;
   border: 2px solid red;
 }
 
-.ctc_Transition.ct_selected {
+.ctc_Transition.ct_selected, .ctc_Transition.ct_selected.ct_var2_2 {
 	background-color: #aaf;
 }
+
+.ctc_Transition .ct_var_handle {
+  position: absolute;
+  display: none;
+  width: 13px;
+  height: 13px;
+  left: 22px;
+  top: -10px;
+  border: 1px solid black;
+  background: url(flip.png) no-repeat;
+}
+
+.ctc_Transition:hover .ct_var_handle {
+  display: block;
+}
+
 .ctc_AndExpression .ct_containment { padding: 0; }
 .ctc_AndExpression .ct_containment .ct_element { margin: 0; }
 .ctc_AndExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
