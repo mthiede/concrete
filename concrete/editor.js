@@ -93,6 +93,8 @@ Concrete.Editor = Class.create({
     this.marker = this.editorRoot.childElements().last();
     this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
     this.popup = this.editorRoot.childElements().last();
+    this.editorRoot.insert({bottom: "<canvas style='position: absolute; display: none;'></canvas>"});
+    this.canvas = this.editorRoot.childElements().last();
   },
 
   _createInlineEditor: function() {
@@ -145,6 +147,12 @@ Concrete.Editor = Class.create({
     }
     if( !this._hasFocus ) return;
 
+    if (event.type == "mousedown") {
+      this._handleDragStart(event);
+    }
+    if (event.type == "mouseup") {
+      this._handleDragStop(event);
+    }
     if( event.type == "mousemove" ) {
       this._handleErrorPopups(event);
       if( this.options.showInfoPopups ) {
@@ -152,6 +160,8 @@ Concrete.Editor = Class.create({
       }
       this._handleRefHighlight(event);
       this.popup.setStyle({left: event.clientX + 20 + 'px', top: event.clientY + 20 + 'px'});
+      this._handleCursorStyle(event);
+      this._handleDragging(event);
     }
 
     if( this.inlineEditor.isActive ) {
@@ -187,6 +197,9 @@ Concrete.Editor = Class.create({
         // clicked fold button?:
         if( element.hasClassName("ct_fold_button") ) {
           this.toggleFoldButton(element);
+        }
+        if( element.hasClassName("ct_var_handle") ) {
+          this._handleVariantToggle(event);
         }
         // follow reference?:
         else if( ctrlKey ) {
@@ -395,12 +408,95 @@ Concrete.Editor = Class.create({
     if (this.popup.childElements().size() == 0) this.popup.hide();
   },
 
+  _handleCursorStyle: function(event) {
+    var element = event.element();
+    if (this.cursorStyledElement) {
+      this.cursorStyledElement.style.cursor = "";
+      this.cursorStyledElement = undefined;
+    }
+    if (element.hasClassName("ct_move_handle")) {
+      element.style.cursor = "move";
+      this.cursorStyledElement = element;
+    }
+    else if (this._isAtResizeHandle(event)) {
+      element.style.cursor = "se-resize";
+      this.cursorStyledElement = element;
+    }
+  },
+
+  _handleVariantToggle: function(event) {
+    var element = event.element().up(".ct_element");
+    var next;
+    var vi = element.variantInfo();
+    if (vi) {
+      next = vi.current + 1;
+      if (next > vi.max) {
+        next = 1;
+      }
+      element.setVariantIndex(next);
+    }
+  },
+
+  _handleDragStart: function(event) {
+    var element = event.element();
+    var movee;
+    if (element.hasClassName("ct_move_handle")) {
+      movee = element.hasClassName("ct_element") ? element : element.up(".ct_element");
+      this.dragContext = {
+        type: "move",
+        element: movee,
+        mouseStartX: event.clientX,
+        mouseStartY: event.clientY,
+        elementStartLeft: movee.positionedOffset().left,
+        elementStartTop: movee.positionedOffset().top
+      };
+    }
+    else if (this._isAtResizeHandle(event)) {
+      this.dragContext = {
+        type: "resize",
+        element: element,
+        mouseStartX: event.clientX,
+        mouseStartY: event.clientY,
+        elementStartWidth: parseInt(element.getStyle("width"), 10),
+        elementStartHeight: parseInt(element.getStyle("height"), 10)
+      };
+    }
+  },
+
+  _handleDragStop: function(event) {
+    this.dragContext = undefined;
+  },
+
+  _handleDragging: function(event) {
+    var element = event.element();
+    var mouseDiffX, mouseDiffY;
+    var dc = this.dragContext;
+    if (dc) {
+      mouseDiffX = event.clientX - dc.mouseStartX;
+      mouseDiffY = event.clientY - dc.mouseStartY;
+      if (dc.type === "move") {
+        dc.element.style.left = dc.elementStartLeft + mouseDiffX + "px";
+        dc.element.style.top = dc.elementStartTop + mouseDiffY + "px";
+      }
+      else if (dc.type === "resize") {
+        dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
+        dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
+      }
+    }
+  },
+
+  _isAtResizeHandle: function(event) {
+    var element = event.element();
+    return element.hasClassName("ct_resizable") && (event.clientX > element.right() - 10) && (event.clientY > element.bottom() - 10);
+  },
+
   _handleRefHighlight: function(event) {
     var element = event.element();
     if (this.refHighlight) {
       this.refHighlight.source.removeClassName("ct_ref_source");
       if (this.refHighlight.target) this.refHighlight.target.removeClassName("ct_ref_target");
       this.refHighlight = undefined;
+      this.canvas.hide();
     }
     if(    this._ctrlKey(event)
         && element.hasClassName("ct_value")
@@ -424,10 +520,62 @@ Concrete.Editor = Class.create({
           // if target is an element in this editor
           target = targets[0]; 
           target.addClassName("ct_ref_target");
+          this._drawReference(element, target);
         }
         this.refHighlight = {source: element, target: target};
       }
     }    
+  },
+
+  _drawReference: function(source, target) {
+    var fromX, fromY, toX, toY;
+    if (source.left() < target.left()) {
+      fromX = source.right();
+      toX = target.left();
+    }
+    else {
+      fromX = source.left();
+      toX = target.right();
+    }
+    // if (source.top() < target.top()) {
+    //   fromY = source.bottom();
+    //   toY = target.top();
+    // }
+    // else {
+    //   fromY = source.top();
+    //   toY = target.bottom();
+    // }
+    fromY = source.top();
+    toY = target.top();
+    this._drawSpline(fromX, fromY, toX, toY);
+  },
+
+  _drawSpline: function(fromX, fromY, toX, toY) {
+    this.canvas.width = Math.abs(fromX - toX) + 40;
+    this.canvas.height = Math.abs(fromY - toY) + 40;
+    var offsetX = (fromX < toX ? fromX : toX) - 20;
+    this.canvas.style.left = offsetX;
+    var offsetY = (fromY < toY ? fromY : toY) - 20;
+    this.canvas.style.top = offsetY;
+    var context = this.canvas.getContext("2d");  
+    context.clearRect(0, 0, this.canvas.width-1, this.canvas.height-1);
+    // context.strokeRect(0, 0, this.canvas.width-1, this.canvas.height-1);
+    context.translate(-offsetX, -offsetY);
+    context.beginPath();  
+    context.moveTo(fromX, fromY);  
+    // context.bezierCurveTo(fromX, fromY, toX-((toX-fromX)/4), toY, toX, toY);
+    context.lineTo(toX, toY);
+    context.save();
+    context.translate(toX, toY);
+    context.rotate(Math.atan2((toY-fromY), toX-fromX));
+    context.moveTo(-10, -7);
+    context.lineTo(0, 0);
+    context.lineTo(-10, 7);
+    context.restore();
+    context.strokeStyle = "#00f";
+    context.lineWidth = 2;
+    context.stroke();  
+    this.canvas.show();
   },
 
   runCommand: function(eventId) {
