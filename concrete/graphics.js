@@ -17,7 +17,7 @@ Concrete.Graphics = {
       };
     };
     var lineLength = function(p1, p2) {
-      return Math.sqrt(Math.pow(Math.abs(p1.x - p2.x)) + Math.pow(Math.abs(p1.y - p2.y)));
+      return Math.sqrt(Math.pow(Math.abs(p1.x - p2.x), 2) + Math.pow(Math.abs(p1.y - p2.y), 2));
     };
     var isOnLine = function(point, linePoint1, linePoint2) {
       if (((point.x >= linePoint1.x && point.x <= linePoint2.x) ||
@@ -32,7 +32,7 @@ Concrete.Graphics = {
         return false;
       }
     };
-    var elementBoxClipPoint: function(element, innerPoint, outerPoint) {
+    var elementBoxClipPoint = function(element, innerPoint, outerPoint) {
       var clipHX, clipHY;
       var clipVX, clipVY;
       var clipPointH, clipPointV;
@@ -70,7 +70,7 @@ Concrete.Graphics = {
     };
     // updates the canvas to contain an arrow from p1 to p2
     // the canvas will be just big enough to fit the arrow
-    var drawArrow: function(p1, p2) {
+    var drawArrow = function(p1, p2) {
       var ctx = canvas.getContext("2d");  
       var offsetX = (p1.x < p2.x ? p1.x : p2.x) - 20;
       var offsetY = (p1.y < p2.y ? p1.y : p2.y) - 20;
@@ -85,15 +85,15 @@ Concrete.Graphics = {
       ctx.lineTo(p2.x, p2.y);
       ctx.translate(p2.x, p2.y);
       ctx.rotate(Math.atan2((p2.y-p1.y), p2.x-p1.x));
-      ctx.moveTo(-10, -7);
+      ctx.moveTo(-8, -6);
       ctx.lineTo(0, 0);
-      ctx.lineTo(-10, 7);
+      ctx.lineTo(-8, 6);
       ctx.strokeStyle = "#000";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 0.7;
       ctx.stroke();  
       if (isSelected) {
-        ctx.lineWidth = 1;
-        ctx.drawRect(-3, -3, 3, 3);
+        ctx.clearRect(-3, -3, 6, 6);
+        ctx.strokeRect(-3, -3, 6, 6);
       }
       canvas.show();
     };
@@ -138,7 +138,7 @@ Concrete.Graphics = {
       throw("no source element");
     }
     canvas = document.createElement("canvas");
-    canvas.style.position = "absolute;
+    canvas.style.position = "absolute";
     canvas.style.display = "none";
     canvasContainer.appendChild(canvas);
     canvas._concrete_connector = connector;

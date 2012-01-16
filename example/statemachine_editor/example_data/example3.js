@@ -23,13 +23,13 @@ ExampleData = Object.toJSON(
         {"left": "442px", "top": "66px"}}, "name": "Cooling"}, 
     {"_class": "Transition", "_view": 
       {"position": 
-        {"left": "236px", "top": "4px"}, "variant": 2}, "sourceState": "/AC/On/Heating", "targetState": "/AC/On/Cooling", "trigger": "/AC/ModeButton"}, 
+        {"left": "236px", "top": "4px"}, "variant": 1}, "sourceState": "/AC/On/Heating", "targetState": "/AC/On/Cooling", "trigger": "/AC/ModeButton"}, 
     {"_class": "Transition", "_view": 
       {"position": 
-        {"left": "235px", "top": "82px"}, "variant": 1}, "sourceState": "/AC/On/Cooling", "targetState": "/AC/On/Heating", "trigger": "/AC/ModeButton"}]}, 
+        {"left": "235px", "top": "82px"}, "variant": 2}, "sourceState": "/AC/On/Cooling", "targetState": "/AC/On/Heating", "trigger": "/AC/ModeButton"}]}, 
   {"_class": "Transition", "_view": 
     {"position": 
-      {"left": "214px", "top": "93px"}, "variant": 1}, "sourceState": "/AC/Off", "targetState": "/AC/On", "trigger": "/AC/OnButton"}, 
+      {"left": "214px", "top": "93px"}, "variant": 1}, "sourceState": "/AC/Off", "targetState": "/AC/On/Heating", "trigger": "/AC/OnButton"}, 
   {"_class": "Transition", "_view": 
     {"position": 
       {"left": "212px", "top": "-19px"}, "variant": 2}, "sourceState": "/AC/On", "targetState": "/AC/Off", "trigger": "/AC/OnButton"}]}]

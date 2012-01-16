@@ -149,6 +149,7 @@ Concrete.Editor = Class.create({
 
     if (event.type == "mousedown") {
       this._handleDragStart(event);
+      event.stop();
     }
     if (event.type == "mouseup") {
       this._handleDragStop(event);
@@ -194,6 +195,14 @@ Concrete.Editor = Class.create({
       var ctrlKey = this._ctrlKey(event);
       // left mouse click?:
       if( event.type == "click" && event.isLeftClick() ) {
+        (function() {
+          var connector;
+          if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
+            && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
+              connector.setSelected(true);
+              this._updateConnectors();
+          }
+        })();
         // clicked fold button?:
         if( element.hasClassName("ct_fold_button") ) {
           this.toggleFoldButton(element);
@@ -317,6 +326,11 @@ Concrete.Editor = Class.create({
         this.runCommand("cut_event");
         event.stop();
       }
+      // Ctrl-D?:
+      else if( event.keyCode == 68 && ctrlKey ) {
+        this._updateConnectors();
+        event.stop();
+      }
       else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
                (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
         this.runCommand("edit_event");
@@ -327,6 +341,37 @@ Concrete.Editor = Class.create({
   _ctrlKey: function(event) {
     var onMac = ( navigator.userAgent.indexOf('Mac') > -1 );
     return( onMac ? event.metaKey : event.ctrlKey );
+  },
+
+  _createConnectors: function() {
+    var editor = this;
+    this.connectors = [];
+    this.modelInterface.elements().each(function(e) {
+      e.features.each(function(f) {
+        var refHandle;
+        if (f.mmFeature.isReference()) {
+          refHandle = f.down(".ct_ref_handle");
+          if (refHandle) {
+            e.featureValues(f).each(function(v) {
+              var targets = editor.identifierProvider.getElement(v);
+              if (!(targets instanceof Array)) targets = [targets].compact();
+              targets.each(function(t) {
+                editor.connectors.push(Concrete.Graphics.createConnector(editor.editorRoot, refHandle, t));
+              });
+            });
+          }
+        }
+      });
+    });
+  },
+
+  _updateConnectors: function() {
+    if (!this.connectors) {
+      this._createConnectors();
+    }
+    this.connectors.each(function(c) {
+      c.draw();
+    });
   },
 
   _handleErrorPopups: function(event) {
@@ -472,10 +517,12 @@ Concrete.Editor = Class.create({
       if (dc.type === "move") {
         dc.element.style.left = dc.elementStartLeft + mouseDiffX + "px";
         dc.element.style.top = dc.elementStartTop + mouseDiffY + "px";
+        this._updateConnectors();
       }
       else if (dc.type === "resize") {
         dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
         dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
+        this._updateConnectors();
       }
     }
   },
