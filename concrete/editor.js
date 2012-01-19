@@ -147,24 +147,6 @@ Concrete.Editor = Class.create({
     }
     if( !this._hasFocus ) return;
 
-    if (event.type == "mousedown") {
-      this._handleDragStart(event);
-      event.stop();
-    }
-    if (event.type == "mouseup") {
-      this._handleDragStop(event);
-    }
-    if( event.type == "mousemove" ) {
-      this._handleErrorPopups(event);
-      if( this.options.showInfoPopups ) {
-        this._handleInfoPopups(event);
-      }
-      this._handleRefHighlight(event);
-      this.popup.setStyle({left: event.clientX + 20 + 'px', top: event.clientY + 20 + 'px'});
-      this._handleCursorStyle(event);
-      this._handleDragging(event);
-    }
-
     if( this.inlineEditor.isActive ) {
       // left mouse click?:
       if( event.type == "click" && event.isLeftClick() ) {
@@ -193,16 +175,62 @@ Concrete.Editor = Class.create({
     // inline editor not active:
     else {
       var ctrlKey = this._ctrlKey(event);
+
+      if (event.type == "mousedown" || event.type == "mousemove" || event.type == "click") {
+        // TODO: cleanup disabling of canvas elements
+        if (element.tagName == "CANVAS") {
+          if ((function(editor) {
+            var connector = Concrete.Graphics.getConnectorForCanvas(element);
+            var ne;
+            if (connector && (
+                connector.isOnConnector({x: event.clientX, y: event.clientY}) ||
+                (connector.isSelected() && connector.isOnDragHandle({x: event.clientX, y: event.clientY})))) {
+              // keep event
+            }
+            else {
+              element.style.display = "none";
+              ne = document.elementFromPoint(event.clientX, event.clientY);
+              event.element = function() {
+                return ne; 
+              };
+              event.topDisabledElement = event.topDisabledElement || element;
+              editor.handleEvent(event);
+              element.style.display = "";
+              return true;
+            }
+          })(this)) {
+            return;
+          }
+        }
+      }
+
+      if (event.type == "mousedown") {
+        this._handleDragStart(event);
+        event.stop();
+      }
+      else if (event.type == "mouseup") {
+        this._handleDragStop(event);
+      }
+      else if( event.type == "mousemove" ) {
+        this._handleErrorPopups(event);
+        if( this.options.showInfoPopups ) {
+          this._handleInfoPopups(event);
+        }
+        this._handleRefHighlight(event);
+        this.popup.setStyle({left: event.clientX + 20 + 'px', top: event.clientY + 20 + 'px'});
+        this._handleCursorStyle(event);
+        this._handleDragging(event);
+      }
       // left mouse click?:
-      if( event.type == "click" && event.isLeftClick() ) {
-        (function() {
+      else if( event.type == "click" && event.isLeftClick() ) {
+        (function(editor) {
           var connector;
           if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
             && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
               connector.setSelected(true);
-              this._updateConnectors();
+              editor._updateConnectors();
           }
-        })();
+        })(this);
         // clicked fold button?:
         if( element.hasClassName("ct_fold_button") ) {
           this.toggleFoldButton(element);
@@ -390,6 +418,7 @@ Concrete.Editor = Class.create({
 
   _handleInfoPopups: function(event) {
     var element = event.element();
+    var feature;
     this._resetPopupMessage("feature_name");
     this._resetPopupMessage("reference_value");
     this._resetPopupMessage("reference_module");
@@ -398,7 +427,7 @@ Concrete.Editor = Class.create({
       return;
     }
     if( element.hasClassName("ct_value") ) {
-      var feature = element.mmFeature();
+      feature = element.mmFeature();
       this._setPopupMessage("feature_name", "info", "Feature: " + feature.name);
       if( feature.isReference() && element.value ) {
         this._setPopupMessage("reference_value", "info", "Reference to: " + element.value);
@@ -412,6 +441,16 @@ Concrete.Editor = Class.create({
       if( this.showDocumentationPopups && feature.documentation ) {
         this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
       }
+    }
+    else if (element.hasClassName("ct_ref_handle")) {
+      element = element.up(".ct_reference");
+      feature = element.mmFeature;
+      this._setPopupMessage("feature_name", "info", "Feature: " + feature.name);
+      if( this.showDocumentationPopups && feature.documentation ) {
+        this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
+      }
+      this._setPopupMessage("reference_value", "info", "Reference to: " + 
+        element.findFirstDescendants(["ct_value"], []).collect(function(e) { return e.value }).join(", "));
     } else {
       if( this.showDocumentationPopups && element.hasClassName("ct_class_name") ) {
         var clazzElt = element.up(".ct_element");
@@ -455,8 +494,9 @@ Concrete.Editor = Class.create({
       this.cursorStyledElement = undefined;
     }
     if (element.hasClassName("ct_move_handle")) {
-      element.style.cursor = "move";
-      this.cursorStyledElement = element;
+      // TODO: cleanup disabling of canvas elements
+      (event.topDisabledElement || element).style.cursor = "move";
+      this.cursorStyledElement = (event.topDisabledElement || element);
     }
     else if (this._isAtResizeHandle(event)) {
       element.style.cursor = "se-resize";

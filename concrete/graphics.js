@@ -126,6 +126,9 @@ Concrete.Graphics = {
       setSelected: function(sel) {
         isSelected = sel;
       },
+      isSelected: function() {
+        return isSelected;
+      },
       setTargetElement: function(target) {
         targetElement = target;
       },
