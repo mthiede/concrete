@@ -91,10 +91,12 @@ Concrete.Editor = Class.create({
     this.modelRoot = this.editorRoot.childElements().first();
     this.editorRoot.insert({bottom: "<div style='position: absolute; left: 0; top: 0' class='ct_cursor'></div>"});
     this.marker = this.editorRoot.childElements().last();
-    this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
+    this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0; z-index: 1' class='ct_message_popup'></div>"});
     this.popup = this.editorRoot.childElements().last();
     this.editorRoot.insert({bottom: "<canvas style='position: absolute; display: none;'></canvas>"});
     this.canvas = this.editorRoot.childElements().last();
+    this.editorRoot.insert({bottom: "<div></div>"});
+    this.debug = this.editorRoot.childElements().last();
   },
 
   _createInlineEditor: function() {
@@ -176,7 +178,7 @@ Concrete.Editor = Class.create({
     else {
       var ctrlKey = this._ctrlKey(event);
 
-      if (event.type == "mousedown" || event.type == "mousemove" || event.type == "click") {
+      if (event.type == "mousedown" || event.type == "mousemove" || event.type == "mouseup") {
         // TODO: cleanup disabling of canvas elements
         if (element.tagName == "CANVAS") {
           if ((function(editor) {
@@ -204,12 +206,9 @@ Concrete.Editor = Class.create({
         }
       }
 
-      if (event.type == "mousedown") {
+      if (event.type == "mousedown" && event.isLeftClick()) {
         this._handleDragStart(event);
         event.stop();
-      }
-      else if (event.type == "mouseup") {
-        this._handleDragStop(event);
       }
       else if( event.type == "mousemove" ) {
         this._handleErrorPopups(event);
@@ -221,35 +220,36 @@ Concrete.Editor = Class.create({
         this._handleCursorStyle(event);
         this._handleDragging(event);
       }
-      // left mouse click?:
-      else if( event.type == "click" && event.isLeftClick() ) {
-        (function(editor) {
-          var connector;
-          if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
-            && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
-              connector.setSelected(true);
-              editor._updateConnectors();
+      else if (event.type == "mouseup" && event.isLeftClick()) {
+        if (!this._handleDragStop(event)) {
+          (function(editor) {
+            var connector;
+            if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
+              && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
+                connector.setSelected(true);
+                editor._updateConnectors();
+            }
+          })(this);
+          // clicked fold button?:
+          if( element.hasClassName("ct_fold_button") ) {
+            this.toggleFoldButton(element);
           }
-        })(this);
-        // clicked fold button?:
-        if( element.hasClassName("ct_fold_button") ) {
-          this.toggleFoldButton(element);
-        }
-        if( element.hasClassName("ct_var_handle") ) {
-          this._handleVariantToggle(event);
-        }
-        // follow reference?:
-        else if( ctrlKey ) {
-          this.jumpReference(element);
-        }
-        // ??
-        else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
-          this.runCommand("edit_event");
-        }
-        // ??
-        else {
-          this.selector.selectDirect(element, event.shiftKey);
-          event.stop();
+          if( element.hasClassName("ct_var_handle") ) {
+            this._handleVariantToggle(event);
+          }
+          // follow reference?:
+          else if( ctrlKey ) {
+            this.jumpReference(element);
+          }
+          // ??
+          else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
+            this.runCommand("edit_event");
+          }
+          // ??
+          else {
+            this.selector.selectDirect(element, event.shiftKey);
+            event.stop();
+          }
         }
       }
       else if( event.keyCode == Event.KEY_LEFT && ctrlKey ) {
@@ -545,6 +545,13 @@ Concrete.Editor = Class.create({
 
   _handleDragStop: function(event) {
     this.dragContext = undefined;
+    if (this.didDrag) {
+      this.didDrag = false;
+      return true;
+    }
+    else {
+      return false;
+    }
   },
 
   _handleDragging: function(event) {
@@ -552,6 +559,7 @@ Concrete.Editor = Class.create({
     var mouseDiffX, mouseDiffY;
     var dc = this.dragContext;
     if (dc) {
+      this.didDrag = true;
       mouseDiffX = event.clientX - dc.mouseStartX;
       mouseDiffY = event.clientY - dc.mouseStartY;
       if (dc.type === "move") {
