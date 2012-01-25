@@ -186,7 +186,7 @@ Concrete.Editor = Class.create({
             var ne;
             if (connector && (
                 connector.isOnConnector({x: event.clientX, y: event.clientY}) ||
-                (connector.isSelected() && connector.isOnDragHandle({x: event.clientX, y: event.clientY})))) {
+                connector.isOnDragHandle({x: event.clientX, y: event.clientY}))) {
               // keep event
             }
             else {
@@ -226,8 +226,6 @@ Concrete.Editor = Class.create({
             var connector;
             if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
               && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
-                connector.setSelected(true);
-                editor._updateConnectors();
             }
           })(this);
           // clicked fold button?:
@@ -489,6 +487,7 @@ Concrete.Editor = Class.create({
 
   _handleCursorStyle: function(event) {
     var element = event.element();
+    var connector = Concrete.Graphics.getConnectorForCanvas(element);
     if (this.cursorStyledElement) {
       this.cursorStyledElement.style.cursor = "";
       this.cursorStyledElement = undefined;
@@ -497,6 +496,11 @@ Concrete.Editor = Class.create({
       // TODO: cleanup disabling of canvas elements
       (event.topDisabledElement || element).style.cursor = "move";
       this.cursorStyledElement = (event.topDisabledElement || element);
+    }
+    else if (connector && 
+      connector.isOnDragHandle({x: event.clientX, y: event.clientY})) {
+        element.style.cursor = "move";
+        this.cursorStyledElement = element;
     }
     else if (this._isAtResizeHandle(event)) {
       element.style.cursor = "se-resize";
@@ -520,6 +524,7 @@ Concrete.Editor = Class.create({
   _handleDragStart: function(event) {
     var element = event.element();
     var movee;
+    var connector = Concrete.Graphics.getConnectorForCanvas(element);
     if (element.hasClassName("ct_move_handle")) {
       movee = element.hasClassName("ct_element") ? element : element.up(".ct_element");
       this.dragContext = {
@@ -541,6 +546,13 @@ Concrete.Editor = Class.create({
         elementStartHeight: parseInt(element.getStyle("height"), 10)
       };
     }
+    else if (connector && 
+      connector.isOnDragHandle({x: event.clientX, y: event.clientY})) {
+        this.dragContext = {
+          type: "connector",
+          connector: connector
+      };
+    }
   },
 
   _handleDragStop: function(event) {
@@ -558,6 +570,7 @@ Concrete.Editor = Class.create({
     var element = event.element();
     var mouseDiffX, mouseDiffY;
     var dc = this.dragContext;
+    var ctElement = element.findAncestorOrSelf(["ct_element"]); 
     if (dc) {
       this.didDrag = true;
       mouseDiffX = event.clientX - dc.mouseStartX;
@@ -571,6 +584,15 @@ Concrete.Editor = Class.create({
         dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
         dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
         this._updateConnectors();
+      }
+      else if (dc.type === "connector") {
+        if (ctElement && !dc.connector.sourceElement().ancestors().include(ctElement)) {
+          dc.connector.setTargetElement(ctElement);
+          dc.connector.draw();
+        }
+        else {
+          dc.connector.draw({x: event.clientX, y: event.clientY});
+        }
       }
     }
   },

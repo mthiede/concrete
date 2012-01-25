@@ -134,6 +134,9 @@ Concrete.Graphics = {
       },
       destroy: function() {
         canvas.parentNode.removeChild(canvas);
+      },
+      sourceElement: function() {
+        return sourceElement;
       }
     };
 
