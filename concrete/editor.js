@@ -838,6 +838,9 @@ Concrete.Editor.Commands = [
         init: n.value,
         options: editor.constraintChecker.attributeOptions(n.mmFeature()),
         onSuccess: function(v) {
+          if( n.value != v ) {
+      	    editor._setDirtyState();
+          }
           if (n.hasClassName("ct_empty")) {
             editor.modelInterface.createValue(n, "after", v);
             editor.selector.selectDirect(n.next());
@@ -847,9 +850,6 @@ Concrete.Editor.Commands = [
             editor.modelInterface.changeValue(n, v);
           }
           editor.adjustMarker();
-          if( n.value != v ) {
-        	  editor._setDirtyState();
-          }
         }
       });
     }
