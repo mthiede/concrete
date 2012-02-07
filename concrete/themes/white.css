@@ -17,8 +17,6 @@
 
 /* text input element */
 .ct_inline_editor input {
-	font-family: "courier new";
-	font-size: 12;
 	color: #000;
 	background-color: transparent;
 	border: 0;
