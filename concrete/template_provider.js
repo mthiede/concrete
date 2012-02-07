@@ -145,7 +145,7 @@ Concrete.TemplateProvider = Class.create({
    * the given name and camel-cases it.
    */
   _asClassPart: function(name) {
-    name = name.replace(/[ \\.\\*]/g, '-');
+    name = name.replace(/[ \\.\\*&]/g, '-');	// TODO  replace by regexp that replaces all non-ID characters by '-'
     return name.camelize();
   }
 
