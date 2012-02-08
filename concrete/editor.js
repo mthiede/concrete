@@ -648,29 +648,43 @@ Concrete.Editor = Class.create({
   },
 
   collapseElement: function(n) {
+	var changeDirty = false;
     n.features.each(function(f) {
-      if (f.mmFeature.isContainment()) f.hide();
+      if( f.mmFeature.isContainment() ) f.hide();
+      changeDirty = true;
     });
-    if (n.foldButton) {
-      n.foldButton.removeClassName("ct_fold_open");
-      n.foldButton.addClassName("ct_fold_closed");
+    if( n.foldButton ) {
+      if( n.foldButton.hasClassName("ct_fold_open") ) {
+        n.foldButton.removeClassName("ct_fold_open");
+        n.foldButton.addClassName("ct_fold_closed");
+        changeDirty = true;
+      }
     }
     this.adjustMarker();
-    // TODO  check whether view info changes and set dirty status if so
+    if( changeDirty ) {
+    	this._setDirtyState();
+    }
   },
 
   expandElement: function(n) {
+	var changeDirty = false;
     n.features.each(function(f) {
-      if (f.mmFeature.isContainment() && !Concrete.Editor.CommandHelper.canAutoHide(f)) {
+      if( f.mmFeature.isContainment() && !Concrete.Editor.CommandHelper.canAutoHide(f) ) {
         f.show();
+        changeDirty = true;
       }
     });
-    if (n.foldButton) {
-      n.foldButton.removeClassName("ct_fold_closed");
-      n.foldButton.addClassName("ct_fold_open");
+    if( n.foldButton ) {
+      if( n.foldButton.hasClassName("ct_fold_closed") ) {
+        n.foldButton.removeClassName("ct_fold_closed");
+        n.foldButton.addClassName("ct_fold_open");
+        changeDirty = true;
+      }
     }
     this.adjustMarker();
-    // TODO  check whether view info changes and set dirty status if so
+    if( changeDirty ) {
+    	this._setDirtyState();
+    }
   },
 
   collapseElementRecursive: function(n) {
@@ -678,7 +692,6 @@ Concrete.Editor = Class.create({
       this.collapseElement(e);
     }, this);
     this.collapseElement(n);
-    // TODO  check whether view info changes and set dirty status if so
   },
 
   expandElementRecursive: function(n) {
@@ -686,7 +699,6 @@ Concrete.Editor = Class.create({
       this.expandElement(e);
     }, this);
     this.expandElement(n);
-    // TODO  check whether view info changes and set dirty status if so
   },
 
   // expands the parent elements of an element or attribute/reference value
