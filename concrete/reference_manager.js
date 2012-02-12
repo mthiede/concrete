@@ -204,7 +204,6 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     valueAdded: valueAdded,
     valueRemoved: valueRemoved,
     valueChanged: valueChanged,
-    rootChanged: function() {},
     commitChanges: function() {}
   });
 

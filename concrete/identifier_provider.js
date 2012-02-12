@@ -33,15 +33,19 @@ Concrete.AbstractIdentifierProvider = Class.create({
     throw new Error("Abstract, override in subclass");
   },
 
-  elementChanged: function(element, feature) {
-    throw new Error("Abstract, override in subclass");
-  },
-
   elementRemoved: function(element) {
     throw new Error("Abstract, override in subclass");
   },
 
-  rootChanged: function(root) {
+  valueAdded: function(element, feature, value) {
+    throw new Error("Abstract, override in subclass");
+  },
+
+  valueRemoved: function(element, feature, value) {
+    throw new Error("Abstract, override in subclass");
+  },
+
+  valueChanged: function(element, feature, value, oldText, newText) {
     throw new Error("Abstract, override in subclass");
   },
 
@@ -110,15 +114,20 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
     this._updateElement(element);
   },
 
-  elementChanged: function(element, feature) {
-    this._updateElement(element);
-  },
-
   elementRemoved: function(element) {
     this._removeIdentifiers(element);
   },
 
-  rootChanged: function(root) {
+  valueAdded: function(element, feature, value) {
+    this._updateElement(element);
+  },
+
+  valueRemoved: function(element, feature, value) {
+    this._updateElement(element);
+  },
+
+  valueChanged: function(element, feature, value, oldText, newText) {
+    this._updateElement(element);
   },
 
   commitChanges: function() {
