@@ -182,7 +182,7 @@ Concrete.ModelInterface = Class.create({
       result["_view"] = result["_view"] || {};
       result["_view"]["collapsed"] = element.foldButton.hasClassName("ct_fold_closed");
     }
-    if( element.style.position === "absolute" ) {
+    if( element.hasClassName("ct_draggable") ) {
       result["_view"] = result["_view"] || {};
       result["_view"]["position"] = { left: element.style.left, top: element.style.top};
     }
@@ -380,7 +380,7 @@ Concrete.ModelInterface = Class.create({
     	  this.collapseElement(inst);
       }
     }
-    if (element._view && element._view.position && inst.style.position === "absolute") {
+    if( element._view && element._view.position && inst.hasClassName("ct_draggable") ) {
       inst.style.left = element._view.position.left;
       inst.style.top = element._view.position.top;
     }

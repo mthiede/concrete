@@ -104,3 +104,26 @@
 .ctc_NotExpression .ct_containment { padding: 0; }
 .ctc_NotExpression .ct_containment .ct_element { margin: 0; }
 .ctc_NotExpression .ct_containment > .ct_slot > .ct_inline_editor {	margin: 0; }
+
+
+/* moved from the HTML templates to CSS: */
+
+.cs_diagramBox {
+	position: relative;
+	padding: 10px;
+}
+
+.cs_centeredTextWithPadding {
+	text-align: center;
+	padding: 5px;
+}
+
+.cs_boxed {
+	border-top: 1px solid black;
+	padding: 5px;
+}
+
+.cs_noPadding {
+	padding: 0px;
+}
+

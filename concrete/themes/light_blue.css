@@ -166,3 +166,22 @@
 .ct_ref_target .ct_ref_source {
 	color: #FFF;
 }
+
+/* Resizing & dragging
+ *****************************************************************************/
+
+.ct_resizable {
+  background: url("resize.png") bottom right no-repeat;
+}
+
+.ct_draggable {
+	display: inline-block;
+	position: absolute;
+}
+
+/* Indicates that something should never be visible,
+	e.g. because rendering responsibility is delegated somehow. */
+.ct_hidden {
+	display: none;
+}
+
