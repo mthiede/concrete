@@ -20,6 +20,7 @@ Concrete.AbstractIdentifierProvider = Class.create({
 
   /**
    * Returns the element associated with +identifier+.
+   * Returns an array if several elements exist with this identifer
    * Returns undefined if there is no element with this identifier.
    */
   getElement: function(identifier) {
