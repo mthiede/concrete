@@ -208,7 +208,7 @@ Concrete.ModelInterface = Class.create({
         else {
           converted = children.collect(function(v){
             if (f.mmFeature.type.isInteger()) {
-              return parseInt(v.value);
+              return parseInt(v.value, 10);
             }
             else if (f.mmFeature.type.isFloat()) {
               return parseFloat(v.value);
