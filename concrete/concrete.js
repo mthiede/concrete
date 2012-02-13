@@ -48,6 +48,7 @@ var Concrete = {
         'constraint_checker',
         'clipboard',
         'helper',
+        'reference_manager',
         'graphics'
       ].each( function(include) { 
         Concrete.require(path + include + '.js');

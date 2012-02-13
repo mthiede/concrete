@@ -37,6 +37,9 @@ Concrete.Editor = Class.create({
   //   dirtyListeners:
   //                 an array of listeners whose update() method is called whenever the dirty state
   //                 of the model that's edited changes to 'dirty'/true
+  //   adaptReferences:
+  //                 if set to true, adapt reference values when element identifiers change, default: false
+  //
   initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     options = options || {};
     this.options = options;
@@ -62,6 +65,8 @@ Concrete.Editor = Class.create({
          externalModule: options.externalModule});
     this.constraintChecker.setModelRoot(this.modelRoot);
     this.modelInterface.addModelChangeListener(this.constraintChecker);
+    this.referenceManager = Concrete.createReferenceManager(
+      this.modelInterface, this.identifierProvider, {adaptReferences: options.adaptReferences});
     this.modelRoot.insert({top: this.templateProvider.emptyElement(this.modelRoot)});
     this.selector = options.selector || new Concrete.Selector(); 
     this._setupSelector(this.selector);
