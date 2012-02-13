@@ -1,0 +1,25 @@
+This text holds thoughts on migrating Concrete from Prototype to jQuery.
+
+* Prototype and jQuery are quite different: the former is mostly a framework to provide
+	some niceties on top of core/bare JavaScript while the latter is mostly a framework
+	to help with developing a HTML5(-like) UI.
+
+* Prototype works predominantly by adding methods to object's prototypes - hence the name (dûh!).
+	This pollutes these objects a bit. It also means that it's easy to use Prototype's
+	collection-type functions, with a pleasing syntax to boot.
+
+* Concrete uses Prototype's Class.create({}) heavily. There's no equivalent construct in jQuery,
+	so this would need to be ported "down" to regular JavaScript. This has the advantage that
+	we can specify visibility of members (functions):
+	public (probably none) vs. privileged (functions only) vs. private.
+	This also allows us to do real encapsulation - i.e., without having to rely on the '_'-prefix
+	convention.
+	(Note that an 'initialize' function is effectively transformed into a constructor by Class.create({}.)
+
+* Before actually migrating it's probably a good idea to Refactor the existing code base
+	to be a bit more orthogonal and smaller.
+
+
+Useful link:
+	http://ajaxian.com/archives/prototype-and-jquery-a-code-comparison
+
