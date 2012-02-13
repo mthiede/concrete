@@ -15,9 +15,12 @@ This text holds thoughts on migrating Concrete from Prototype to jQuery.
 	This also allows us to do real encapsulation - i.e., without having to rely on the '_'-prefix
 	convention.
 	(Note that an 'initialize' function is effectively transformed into a constructor by Class.create({}.)
+	The use of these kinds of framework features generally wreaks havoc on IDE capabilities
+	 - e.g., Eclipse + WTP.
 
 * Before actually migrating it's probably a good idea to Refactor the existing code base
-	to be a bit more orthogonal and smaller.
+	to be a bit more orthogonal (e.g., _all_ model access through Concrete.ModelInterface)
+	and smaller.
 
 
 Useful link:
