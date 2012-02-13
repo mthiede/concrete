@@ -27,6 +27,10 @@ Element.addMethods({
     return e.feature(clazz).mmFeature;
   },
 
+  /*
+   * (currently only used by Concrete.UI.SearchReplaceDialog.findNext and
+   *  Concrete.ModelInterface.Helper.nextElement)
+   */
   featureValues: function(e, feature) {
     if (Object.isString(feature)) {
       if (!e.featuresByName) {
@@ -308,7 +312,17 @@ Concrete.ModelInterface = Class.create({
    * @returns All incoming references as an Array of a pair { element: ..., feature: ... }.
    */
   incomingReferences: function(element) {
-    // TODO  implement
+    var references = [];
+    var actions = {
+    	reference: function(reference) {
+			// FIXME  need more intrinsic way of checking equality (not that this should be temporary coding awaiting the ReferenceManager anyway)
+    		if( this.value == element._identifier ) {
+    			references.push( { element: this, feature: reference } );
+    		}
+    	}
+    };
+    this.rootElements().each( function(n) { this.traverse(n, actions); }, this);
+    return references;
   },
 
   /**
