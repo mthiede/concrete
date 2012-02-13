@@ -276,13 +276,13 @@ Concrete.ConstraintChecker = Class.create({
    */
   _featureConstraints: function(element, feature) {
     var byFeature = this.featureConstraints[element.mmClass.name];
-    return( byFeature && byFeature[feature.mmFeature.name] ) || [];
+    return ( byFeature && byFeature[feature.mmFeature.name] ) || [];
   },
 
   _checkFeatureConstraints: function(constraints, element, value, problems) {
     constraints.each(function(c) {
       if( !c.check(element, value) ) {
-        problems.push(c.message(element));
+        problems.push(c.message(element, value));
       }
     });
   },
@@ -325,11 +325,11 @@ Concrete.ConstraintChecker.FeatureValueConstraint = Class.create({
   feature: function() {
     return this.options.feature;
   },
-  check: function(element, value) {
-    return this.options.checker(element, value);
+  check: function(element, target) {
+    return this.options.checker(element, target);
   },
-  message: function(element) {
+  message: function(element, target) {
     var msg = this.options.message;
-    return Object.isFunction(msg) ? msg(element) : msg;
+    return Object.isFunction(msg) ? msg(element, target) : msg;
   }
 });
