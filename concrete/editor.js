@@ -551,6 +551,10 @@ Concrete.Editor = Class.create({
   },
 
   _drawSpline: function(fromX, fromY, toX, toY) {
+	/*
+	 * TODO
+	 * fix the (highlighting/right) canvas on top of the editor and draw from the _from to the _to...
+	 */
     this.canvas.width = Math.abs(fromX - toX) + 40;
     this.canvas.height = Math.abs(fromY - toY) + 40;
     var offsetX = (fromX < toX ? fromX : toX) - 20;
@@ -771,8 +775,7 @@ Concrete.Editor = Class.create({
   },
 
   getModel: function() {
-    return Concrete.Helper.prettyPrintJSON(
-      Object.toJSON(this.modelRoot.childElements().collect(function(n) { return this.modelInterface.extractModel(n); }, this)));
+    return Concrete.Helper.prettyPrintJSON( Object.toJSON(this.modelInterface.model()) );
   },
 
   setModel: function(model) {
