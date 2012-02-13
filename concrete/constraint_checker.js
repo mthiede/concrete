@@ -287,7 +287,7 @@ Concrete.ConstraintChecker.FeatureValueConstraint = Class.create({
     this.options = options;
   },
   klass: function() {
-    return this.options.klass;
+    return this.options["class"];
   },
   feature: function() {
     return this.options.feature;
