@@ -840,6 +840,10 @@ Concrete.Editor.CommandHelper = {
 
 };
 
+
+/**
+ * An enumeration of all the available commands/actions in the editor.
+ */
 Concrete.Editor.Commands = [
 
   {

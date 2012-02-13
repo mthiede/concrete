@@ -4,14 +4,20 @@
 //
 // Concrete is freely distributable under the terms of an MIT-style license.
 
+/**
+ * The Constraint Checker is responsible for checking constraints, both built-in
+ * as well as custom ones.
+ */
+
 Concrete.ConstraintChecker = Class.create({
   
-  // Options:
-  //   externalIdentifierProvider: external identifier provider, default: none
-  //   externalModule: name of the current module within external index, default: none 
-  //   allowDuplicates: classes of which instances with same identifier may exist, default: none
-  //   automaticChecking: if set to false, do not run constraint checks when model changes, default: true
-  //
+  /*
+   * Options:
+   *   externalIdentifierProvider: external identifier provider, default: none
+   *   externalModule: name of the current module within external index, default: none 
+   *   allowDuplicates: classes of which instances with same identifier may exist, default: none
+   *   automaticChecking: if set to false, do not run constraint checks when model changes, default: true
+   */
   initialize: function(rootClasses, identifierProvider, options) {
     this.options = options || {};
     this.options.allowDuplicates = this.options.allowDuplicates || [];
@@ -22,20 +28,26 @@ Concrete.ConstraintChecker = Class.create({
     this._automaticChecking = (this.options.automaticChecking == undefined) ? true : this.options.automaticChecking;
   },
 
-  // model root must be set for the checker to work
+  /**
+   * Sets the model root - must be set for the checker to work.
+   */ 
   setModelRoot: function(modelRoot) {
     this.modelRoot = modelRoot;
   },
 
+  /**
+   * Adds the given constraint.
+   */
   addConstraint: function(constraint) {
-    if (constraint instanceof Concrete.ConstraintChecker.FeatureValueConstraint) {
+    if( constraint instanceof Concrete.ConstraintChecker.FeatureValueConstraint ) {
       this.featureConstraints[constraint.klass()] = this.featureConstraints[constraint.klass()] || {};
       this.featureConstraints[constraint.klass()][constraint.feature()] = this.featureConstraints[constraint.klass()][constraint.feature()] || [];
       this.featureConstraints[constraint.klass()][constraint.feature()].push(constraint);
     }
   },
 
-  // ModelChangeListener Interface
+
+  // ModelChangeListener interface implementation:
 
   elementAdded: function(element) {
   },
@@ -50,12 +62,13 @@ Concrete.ConstraintChecker = Class.create({
   },
 
   commitChanges: function() {
-    if (this._automaticChecking) {
+    if( this._automaticChecking ) {
       this.updateAllProblems();
     }
   },
 
-  // ModelChangeListener End
+  // (ModelChangeListener interface implementation end)
+
 
   isValidInstance: function(type, element) {
     this._allowedTypes = this._allowedTypes || {};
@@ -63,39 +76,48 @@ Concrete.ConstraintChecker = Class.create({
     return this._allowedTypes[type.name].include(element.mmClass);
   },
 
+  /**
+   * Checks the given value of the attribute meta model feature passed.
+   */
   isValidValue: function(mmFeature, value) {
     var opts = this.attributeOptions(mmFeature);
-    return (!(opts instanceof RegExp) || opts.test(value)) &&
-      ((opts instanceof RegExp) || opts == undefined || opts.include(value));
+    return ( !(opts instanceof RegExp) || opts.test(value) )
+        && (  (opts instanceof RegExp) || opts == undefined || opts.include(value) );
   },
 
+  /**
+   * @param mmFeature
+   *            An attribute.
+   * @returns A description of the possible values of the attribute passed.
+   */
   attributeOptions: function(mmFeature) {
-    if (mmFeature.type.isEnum()) {
-      // enum
-      return mmFeature.type.literals;
-    }
-    else if (mmFeature.type.isBoolean()) {
+    var type = mmFeature.type;
+    if( type.isEnum() ) {
+      return type.literals;
+    } else if( type.isBoolean() ) {
       return ["true", "false"];
-    }
-    else if (mmFeature.type.isInteger()) {
+    } else if( type.isInteger() ) {
       return /^(-?[1-9]\d*|0)$/;
-    }
-    else if (mmFeature.type.isFloat()) {
+    } else if( type.isFloat() ) {
       return /^(-?[1-9]\d*|0)(\.\d+)?$/;
-    }
-    else {
+    } else {
       return undefined;
-    }      
+    }
   },
 
+  /**
+   * @param slot
+   *            The slot corresponding to a containment feature.
+   * @returns A list of the name of all classes which are a sub type of the
+   *          containment's type (including the type itself) and non-abstract.
+   */
   elementOptions: function(slot) {
     var namesNonAbstracts = function(collection) {
       return collection.reject(function(t) { return t.abstract; }).collect(function(c) { return c.name; });
     };
-    if (slot.hasClassName("ct_root")) {
+    if( slot.hasClassName("ct_root") ) {
       return namesNonAbstracts(this.rootClasses);
-    }
-    else {
+    } else {
       var type = slot.mmFeature().type;
       return namesNonAbstracts(type.allSubTypes().concat(type));
     }
@@ -129,10 +151,11 @@ Concrete.ConstraintChecker = Class.create({
           break;
         }
       }
-    }.bind(this), 40);	// check 25x per second
+    }.bind(this), 40);  // check 25x per second
   },
 
-  // private
+
+  // --- private functions ---
 
   _updateElementProblems: function(element) {
     if (!element || !element.isElement()) return [];
@@ -247,34 +270,44 @@ Concrete.ConstraintChecker = Class.create({
     return problems.uniq();
   },
 
+  /**
+   * @returns The feature constraints for the indicated feature of the given
+   *          model element, or an empty array.
+   */
   _featureConstraints: function(element, feature) {
     var byFeature = this.featureConstraints[element.mmClass.name];
-    return (byFeature && byFeature[feature.mmFeature.name]) || [];
+    return( byFeature && byFeature[feature.mmFeature.name] ) || [];
   },
 
   _checkFeatureConstraints: function(constraints, element, value, problems) {
     constraints.each(function(c) {
-      if (!c.check(element, value)) {
+      if( !c.check(element, value) ) {
         problems.push(c.message(element));
       }
     });
   },
 
+  /**
+   * Adds an error message 'text' to the given node by adding an invisible
+   * popup to the node (=DOM element) which is made visible by
+   * Concrete.Editor._handleErrorPopups.
+   */
   _addError: function(node, text) {
-    if (!node._errorDescriptions) {
+    if( !node._errorDescriptions ) {
       node._errorDescriptions = [];
       node.addClassName("ct_error");
     }
-    var desc = Concrete.Helper.createDOMNode("div", {'class': "ct_error_description", style: "display: none"}, text);
+    var desc = Concrete.Helper.createDOMNode("div", { 'class': "ct_error_description ct_hidden" }, text);
     node.appendChild(desc);
     node._errorDescriptions.push(desc);
   },
 
+  /**
+   * Removes all error messages from the given node (=DOM element).
+   */
   _removeErrors: function(node) {
-    if (node._errorDescriptions) {
-      node._errorDescriptions.each(function(d) {
-        d.remove();
-      });
+    if( node._errorDescriptions ) {
+      node._errorDescriptions.each(function(d) { d.remove(); });
       node.removeClassName("ct_error");
       node._errorDescriptions = undefined;
     }

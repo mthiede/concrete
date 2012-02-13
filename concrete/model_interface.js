@@ -3,17 +3,22 @@
 // Copyright (c) 2010 Martin Thiede
 //
 // Concrete is freely distributable under the terms of an MIT-style license.
-//
-// The ModelInterface manages the model represented by DOM elements
 
+/**
+ * The ModelInterface manages the model represented by DOM elements
+ * and provides an API on top of it.
+ */ 
+
+
+/*
+ * Add methods to the prototype of the DOM Element.
+ */
 Element.addMethods({
 
-  // speed optimization in case the class is known this will be faster
   feature: function(e, clazz) {
-    if (clazz) {
+    if( clazz ) {
       return e.findAncestor(clazz);
-    }
-    else {
+    } else {
       return e.findAncestor(["ct_attribute", "ct_reference", "ct_containment"]);
     }
   },
@@ -64,6 +69,7 @@ Element.addMethods({
     return e.mmClass != undefined;
   }
 });
+
 
 Concrete.ModelInterface = Class.create({
   
@@ -240,7 +246,7 @@ Concrete.ModelInterface = Class.create({
             if( type.isInteger() ) {
               return parseInt(v.value, 10);
             } else if( type.isFloat() ) {
-              return parseFloat(v.value);
+              return parseFloat(v.value);	// TODO  preserve trailing/precision zeroes
             } else if( type.isBoolean() ) {
               return v.value == "true";
             } else {  // type.isString():
