@@ -26,7 +26,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   // in the latter case the old or new identifier will be undefined respectively
   var identifierChanged = function(element, oldIdent, newIdent) {
     var oldOther = (oldIdent !== undefined && identifierProvider.getElement(oldIdent));
-    var newOther = (newIdent !== undefined && identifierProvider.getElement(newIndent));
+    var newOther = (newIdent !== undefined && identifierProvider.getElement(newIdent));
     if (newOther && newOther.length !== undefined && newOther.length > 1) {
       // more than one element with new identifier: can't have references to any of them
       newOther.each(function(e) {
@@ -35,10 +35,10 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     }
     else {
       if (optionAdaptRefs) {
-        element._incomingRefs.each(function(v) {
+        incomingRefs(element).each(function(v) {
           // this will trigger the value changed notification
           modelInterface.changeValue(v, newIdent);
-        }
+        });
       }
       else {
         // identifier has changed, remove all old incoming references
@@ -77,9 +77,9 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
       elementRefs(e).each(function(r) {
         refValues(r).each(function(v) {
           handleValueRemoved(v);
-        }
-      }
-    }
+        });
+      });
+    });
   };
 
   var valueAdded = function(element, feature, value) {
@@ -107,7 +107,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     var elements = identifierProvider.getElement(value.value);
     if (elements !== undefined && elements.length === undefined) {
       // exactly one target
-      setRefTarget(value, elements[0]);
+      setRefTarget(value, elements);
     }
     else {
       // could not resolve
@@ -129,7 +129,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   };
 
   var removeAllIncomingRefs = function(element) {
-    element._incomingRefs.clone().each(function(v) {
+    incomingRefs(element).clone().each(function(v) {
       unsetRefTarget(v);
     });
   };
@@ -143,9 +143,13 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
       if (value._target) {
         unsetRefTarget(value);
       }
+      target._incomingRefs = target._incomingRefs || [];
       target._incomingRefs.push(value);
       value._target = target;
       removeUnresolvedRef(value);
+      referenceChangeListeners.each(function(l) {
+        l.referenceAdded(value, target);
+      }):
     }
   };
 
@@ -154,14 +158,23 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   // may also be called if no reference target was set before
   var unsetRefTarget = function(value) {
     var idx;
+    var oldTarget;
     if (value._target) {
-      idx = value._target._incomingRefs.indexOf(value);
+      idx = incomingRefs(value._target).indexOf(value);
       if (idx >= 0) {
         delete value._target._incomingRefs[idx];
       }
+      oldTarget = value._target;
       value._target = undefined;
       addUnresolvedRef(value);
+      referenceChangeListeners.each(function(l) {
+        l.referenceRemoved(value, oldTarget);
+      }):
     }
+  };
+
+  var incomingRefs = function(element) {
+    return element._incomingRefs || [];
   };
 
   var addUnresolvedRef = function(value) {
@@ -180,7 +193,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   };
 
   var elementRefs = function(element) {
-    element.features.select(function(f) { return f.mmFeature.isReference(); });
+    return element.features.select(function(f) { return f.mmFeature.isReference(); });
   };
 
   var visitWithChildren = function(element, visitor) {
@@ -195,8 +208,9 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   };
   
   var unresolvedRefs = [];
+  var referenceChangeListeners = [];
 
-  var optionAdaptRefs = (options["adaptReferences"] === true);
+  var optionAdaptRefs = (options.adaptReferences === true);
 
   modelInterface.addModelChangeListener({
     elementAdded: elementAdded,
@@ -207,14 +221,17 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     commitChanges: function() {}
   });
 
-  identifierProvider.addIdentifierChangeLister({
+  identifierProvider.addIdentifierChangeListener({
     identifierChanged: identifierChanged
   });
 
   return {
+    addReferenceChangeListener: function(listener) {
+      referenceChangeListeners.push(listener);
+    },
     // returns the reference value DOM elements (class ct_value) which reference +element+
     getIncomingRefValues: function(element) {
-      return element._incomingRefs;
+      return incomingRefs(element);
     },
     // returns the target element for the given reference value DOM element (class ct_value)
     getRefValueTarget: function(value) {
