@@ -69,7 +69,7 @@ Concrete.TemplateProvider = Class.create({
   },
 
   _createGenericTemplate: function(clazz) {
-    this.templateRoot.insert({bottom: "<div class='ct_element ctc_"+this._asClassPart(clazz.name)+"'><div class='hl_header'></div></div>"});
+    this.templateRoot.insert({bottom: "<div class='ct_element ctc_"+this._asClassPart(clazz.name)+"'><div></div></div>"});
     var tmpl = this.templateRoot.childElements().last();
     tmpl.mmClass = clazz;
     var headDiv = tmpl.down();
@@ -81,7 +81,7 @@ Concrete.TemplateProvider = Class.create({
     if (this.options.featureSortFunc) features = features.sortBy(this.options.featureSortFunc);
     features.each(function(f) {
       var ft;
-      var hideStrat = this.options.alwaysHideFeatures.include(this._asClassPart(f.name)) ? "ct_always_hide" : "ct_auto_hide";
+      var hideStrat = this.options.alwaysHideFeatures.include(this._asClassPart(f.name)) ? "ct_always_hide" : ( f.lowerLimit == 0 ? "ct_auto_hide" : "" );
       if (f.kind == "attribute") {
         if (this.options.identifierAttribute && this._asClassPart(f.name) == this.options.identifierAttribute) {
           headDiv.insert({bottom: "<span class='ct_attribute ctn_"+this._asClassPart(f.name)+" ct_identifier_attribute'><span class='ct_feature_name'>"+f.name+":</span> <span class='ct_slot'></span></span> "});
