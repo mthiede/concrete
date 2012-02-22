@@ -20,7 +20,8 @@ Concrete.Graphics = {
       return Math.sqrt(Math.pow(Math.abs(p1.x - p2.x), 2) + Math.pow(Math.abs(p1.y - p2.y), 2));
     };
     var isOnLine = function(point, linePoint1, linePoint2) {
-      if (((point.x >= linePoint1.x && point.x <= linePoint2.x) ||
+      if (linePoint1 && linePoint2 &&
+          ((point.x >= linePoint1.x && point.x <= linePoint2.x) ||
            (point.x <= linePoint1.x && point.x >= linePoint2.x)) &&
           ((point.y >= linePoint1.y && point.y <= linePoint2.y) ||
            (point.y <= linePoint1.y && point.y >= linePoint2.y)) &&
@@ -71,31 +72,33 @@ Concrete.Graphics = {
     // updates the canvas to contain an arrow from p1 to p2
     // the canvas will be just big enough to fit the arrow
     var drawArrow = function(p1, p2) {
-      var ctx = canvas.getContext("2d");  
-      var offsetX = (p1.x < p2.x ? p1.x : p2.x) - 20;
-      var offsetY = (p1.y < p2.y ? p1.y : p2.y) - 20;
-      canvas.width = Math.abs(p1.x - p2.x) + 40;
-      canvas.height = Math.abs(p1.y - p2.y) + 40;
-      canvas.style.left = offsetX;
-      canvas.style.top = offsetY;
-      ctx.clearRect(0, 0, canvas.width-1, canvas.height-1);
-      ctx.translate(-offsetX, -offsetY);
-      ctx.beginPath();  
-      ctx.moveTo(p1.x, p1.y);  
-      ctx.lineTo(p2.x, p2.y);
-      ctx.translate(p2.x, p2.y);
-      ctx.rotate(Math.atan2((p2.y-p1.y), p2.x-p1.x));
-      ctx.moveTo(-8, -6);
-      ctx.lineTo(0, 0);
-      ctx.lineTo(-8, 6);
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 0.7;
-      ctx.stroke();  
-      if (isSelected) {
-        ctx.clearRect(-3, -3, 6, 6);
-        ctx.strokeRect(-3, -3, 6, 6);
+      if (p1 && p2) {
+        var ctx = canvas.getContext("2d");  
+        var offsetX = (p1.x < p2.x ? p1.x : p2.x) - 20;
+        var offsetY = (p1.y < p2.y ? p1.y : p2.y) - 20;
+        canvas.width = Math.abs(p1.x - p2.x) + 40;
+        canvas.height = Math.abs(p1.y - p2.y) + 40;
+        canvas.style.left = offsetX;
+        canvas.style.top = offsetY;
+        ctx.clearRect(0, 0, canvas.width-1, canvas.height-1);
+        ctx.translate(-offsetX, -offsetY);
+        ctx.beginPath();  
+        ctx.moveTo(p1.x, p1.y);  
+        ctx.lineTo(p2.x, p2.y);
+        ctx.translate(p2.x, p2.y);
+        ctx.rotate(Math.atan2((p2.y-p1.y), p2.x-p1.x));
+        ctx.moveTo(-8, -6);
+        ctx.lineTo(0, 0);
+        ctx.lineTo(-8, 6);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();  
+        if (isSelected) {
+          ctx.clearRect(-3, -3, 6, 6);
+          ctx.strokeRect(-3, -3, 6, 6);
+        }
+        canvas.show();
       }
-      canvas.show();
     };
     var startPoint = function() {
       return elementBoxClipPoint(sourceElement, centerPoint(sourceElement), centerPoint(targetElement));
@@ -108,20 +111,29 @@ Concrete.Graphics = {
     var isSelected = false;
 
     var connector = {
-      draw: function(targetPoint) {
-        if (targetPoint) {
-          drawArrow(startPoint(), targetPoint);
+      draw: function(target) {
+        if (target && target.x) {
+          drawArrow(elementBoxClipPoint(sourceElement, centerPoint(sourceElement), target), target);
+        }
+        else if (target) {
+          drawArrow(elementBoxClipPoint(sourceElement, centerPoint(sourceElement), centerPoint(target)), 
+            elementBoxClipPoint(target, centerPoint(target), centerPoint(sourceElement)));
         }
         else if (targetElement) {
           drawArrow(startPoint(), endPoint());
         }
       },
       isOnConnector: function(point) {
-        return isOnLine(point, startPoint(), endPoint());
+        return targetElement && isOnLine(point, startPoint(), endPoint());
       },
       isOnDragHandle: function(point) {
-        var p = endPoint();
-        return Math.abs(p.x - point.x) <= 5 && Math.abs(p.y - point.y) <= 5;
+        if (targetElement) {
+          var p = endPoint();
+          return p && Math.abs(p.x - point.x) <= 5 && Math.abs(p.y - point.y) <= 5;
+        }
+        else {
+          return false;
+        }
       },
       setSelected: function(sel) {
         isSelected = sel;
@@ -137,6 +149,9 @@ Concrete.Graphics = {
       },
       sourceElement: function() {
         return sourceElement;
+      },
+      targetElement: function() {
+        return targetElement;
       }
     };
 

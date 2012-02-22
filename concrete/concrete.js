@@ -49,6 +49,7 @@ var Concrete = {
         'clipboard',
         'helper',
         'reference_manager',
+        'connector_manager',
         'graphics'
       ].each( function(include) { 
         Concrete.require(path + include + '.js');

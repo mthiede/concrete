@@ -67,6 +67,7 @@ Concrete.Editor = Class.create({
     this.modelInterface.addModelChangeListener(this.constraintChecker);
     this.referenceManager = Concrete.createReferenceManager(
       this.modelInterface, this.identifierProvider, {adaptReferences: options.adaptReferences});
+    this.connectorManager = Concrete.createConnectorManager(this.editorRoot, this.referenceManager, this.modelInterface, this.identifierProvider);
     this.modelRoot.insert({top: this.templateProvider.emptyElement(this.modelRoot)});
     this.selector = options.selector || new Concrete.Selector(); 
     this._setupSelector(this.selector);
@@ -100,7 +101,7 @@ Concrete.Editor = Class.create({
     this.popup = this.editorRoot.childElements().last();
     this.editorRoot.insert({bottom: "<canvas style='position: absolute; display: none;'></canvas>"});
     this.canvas = this.editorRoot.childElements().last();
-    this.editorRoot.insert({bottom: "<div></div>"});
+    this.editorRoot.insert({bottom: "<div id=\"debug_div\"></div>"});
     this.debug = this.editorRoot.childElements().last();
   },
 
@@ -357,11 +358,6 @@ Concrete.Editor = Class.create({
         this.runCommand("cut_event");
         event.stop();
       }
-      // Ctrl-D?:
-      else if( event.keyCode == 68 && ctrlKey ) {
-        this._updateConnectors();
-        event.stop();
-      }
       else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
                (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
         this.runCommand("edit_event");
@@ -372,37 +368,6 @@ Concrete.Editor = Class.create({
   _ctrlKey: function(event) {
     var onMac = ( navigator.userAgent.indexOf('Mac') > -1 );
     return( onMac ? event.metaKey : event.ctrlKey );
-  },
-
-  _createConnectors: function() {
-    var editor = this;
-    this.connectors = [];
-    this.modelInterface.elements().each(function(e) {
-      e.features.each(function(f) {
-        var refHandle;
-        if (f.mmFeature.isReference()) {
-          refHandle = f.down(".ct_ref_handle");
-          if (refHandle) {
-            e.featureValues(f).each(function(v) {
-              var targets = editor.identifierProvider.getElement(v);
-              if (!(targets instanceof Array)) targets = [targets].compact();
-              targets.each(function(t) {
-                editor.connectors.push(Concrete.Graphics.createConnector(editor.editorRoot, refHandle, t));
-              });
-            });
-          }
-        }
-      });
-    });
-  },
-
-  _updateConnectors: function() {
-    if (!this.connectors) {
-      this._createConnectors();
-    }
-    this.connectors.each(function(c) {
-      c.draw();
-    });
   },
 
   _handleErrorPopups: function(event) {
@@ -551,6 +516,12 @@ Concrete.Editor = Class.create({
         elementStartHeight: parseInt(element.getStyle("height"), 10)
       };
     }
+    else if (element.hasClassName("ct_ref_handle")) {
+      this.dragContext = {
+        type: "connector",
+        connector: Concrete.Graphics.createConnector(this.editorRoot, element)
+      };
+    }
     else if (connector && 
       connector.isOnDragHandle({x: event.clientX, y: event.clientY})) {
         this.dragContext = {
@@ -561,7 +532,45 @@ Concrete.Editor = Class.create({
   },
 
   _handleDragStop: function(event) {
-    this.dragContext = undefined;
+    var element = event.element();
+    var ctElement = element.findAncestorOrSelf(["ct_element"]); 
+    var dc = this.dragContext;
+    var ref;
+    var firstChild;
+    var sourceValue;
+    if (dc) {
+      if (dc.type === "connector") {
+        if (ctElement && !dc.connector.sourceElement().ancestors().include(ctElement)) {
+          if (dc.connector._connector_source_value) {
+            this.modelInterface.changeValue(
+              dc.connector._connector_source_value, 
+              this.identifierProvider.getIdentifier(ctElement));
+          }
+          else {
+            ref = dc.connector.sourceElement().findAncestorOrSelf(["ct_reference"]);
+            firstChild = ref.slot.childElements().first();
+            if (firstChild && firstChild.hasClassName("ct_empty")) {
+              firstChild.remove();
+            }
+            this.modelInterface.createValue(ref.slot, "bottom", this.identifierProvider.getIdentifier(ctElement));
+            dc.connector.destroy();
+          }
+        }
+        else {
+          sourceValue = dc.connector._connector_source_value;
+          if (sourceValue) {
+            if (sourceValue.siblings().size() === 0) {
+              sourceValue.insert({after: this.templateProvider.emptyValue(sourceValue.feature())});
+            }
+            this.modelInterface.removeValue(sourceValue);
+          }
+          else {
+            dc.connector.destroy();
+          }
+        }
+      }
+      this.dragContext = undefined;
+    }
     if (this.didDrag) {
       this.didDrag = false;
       return true;
@@ -583,17 +592,16 @@ Concrete.Editor = Class.create({
       if (dc.type === "move") {
         dc.element.style.left = dc.elementStartLeft + mouseDiffX + "px";
         dc.element.style.top = dc.elementStartTop + mouseDiffY + "px";
-        this._updateConnectors();
+        this.connectorManager.repaint();
       }
       else if (dc.type === "resize") {
         dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
         dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
-        this._updateConnectors();
+        this.connectorManager.repaint();
       }
       else if (dc.type === "connector") {
         if (ctElement && !dc.connector.sourceElement().ancestors().include(ctElement)) {
-          dc.connector.setTargetElement(ctElement);
-          dc.connector.draw();
+          dc.connector.draw(ctElement);
         }
         else {
           dc.connector.draw({x: event.clientX, y: event.clientY});
