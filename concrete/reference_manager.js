@@ -34,7 +34,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
       });
     }
     else {
-      if (optionAdaptRefs) {
+      if (optionAdaptRefs && newIdent !== undefined) {
         incomingRefs(element).each(function(v) {
           // this will trigger the value changed notification
           modelInterface.changeValue(v, newIdent);
@@ -149,7 +149,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
       removeUnresolvedRef(value);
       referenceChangeListeners.each(function(l) {
         l.referenceAdded(value, target);
-      }):
+      });
     }
   };
 
@@ -162,14 +162,14 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     if (value._target) {
       idx = incomingRefs(value._target).indexOf(value);
       if (idx >= 0) {
-        delete value._target._incomingRefs[idx];
+        value._target._incomingRefs.splice(idx, 1);
       }
       oldTarget = value._target;
       value._target = undefined;
       addUnresolvedRef(value);
       referenceChangeListeners.each(function(l) {
         l.referenceRemoved(value, oldTarget);
-      }):
+      });
     }
   };
 
@@ -184,7 +184,7 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   var removeUnresolvedRef = function(value) {
     var idx = unresolvedRefs.indexOf(value);
     if (idx >= 0) {
-      delete unresolvedRefs[idx];
+      unresolvedRefs.splice(idx, 1);
     }
   };
 
