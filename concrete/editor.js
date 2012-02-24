@@ -37,6 +37,9 @@ Concrete.Editor = Class.create({
   //   dirtyListeners:
   //                 an array of listeners whose update() method is called whenever the dirty state
   //                 of the model that's edited changes to 'dirty'/true
+  //   adaptReferences:
+  //                 if set to true, adapt reference values when element identifiers change, default: false
+  //
   initialize: function(editorRoot, templateProvider, metamodelProvider, identifierProvider, options) {
     options = options || {};
     this.options = options;
@@ -62,6 +65,9 @@ Concrete.Editor = Class.create({
          externalModule: options.externalModule});
     this.constraintChecker.setModelRoot(this.modelRoot);
     this.modelInterface.addModelChangeListener(this.constraintChecker);
+    this.referenceManager = Concrete.createReferenceManager(
+      this.modelInterface, this.identifierProvider, {adaptReferences: options.adaptReferences});
+    this.connectorManager = Concrete.createConnectorManager(this.editorRoot, this.referenceManager, this.modelInterface, this.identifierProvider);
     this.modelRoot.insert({top: this.templateProvider.emptyElement(this.modelRoot)});
     this.selector = options.selector || new Concrete.Selector(); 
     this._setupSelector(this.selector);
@@ -74,16 +80,7 @@ Concrete.Editor = Class.create({
     this._hasFocus = false;
     this.showDocumentationPopups = true;
     this.dirtyState = false;
-  },
-
-  /**
-   * Sets the dirty state to the given value or to 'dirty'/true if no value is
-   * given.
-   */
-  _setDirtyState: function(state) {
-    this.dirtyState = ( typeof(state) == 'undefined' ) ? true : !!state;
-    var dirtyState = this.dirtyState;
-    this.options.dirtyListeners.forEach(function(l) { l.update(dirtyState); });
+    this._observeEvents();
   },
 
   _setupRoot: function() {
@@ -91,10 +88,12 @@ Concrete.Editor = Class.create({
     this.modelRoot = this.editorRoot.childElements().first();
     this.editorRoot.insert({bottom: "<div style='position: absolute; left: 0; top: 0' class='ct_cursor'></div>"});
     this.marker = this.editorRoot.childElements().last();
-    this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0;' class='ct_message_popup'></div>"});
+    this.editorRoot.insert({bottom: "<div style='position: fixed; display: none; left: 0; top: 0; z-index: 1' class='ct_message_popup'></div>"});
     this.popup = this.editorRoot.childElements().last();
     this.editorRoot.insert({bottom: "<canvas style='position: absolute; display: none;'></canvas>"});
     this.canvas = this.editorRoot.childElements().last();
+    this.editorRoot.insert({bottom: "<div id=\"debug_div\"></div>"});
+    this.debug = this.editorRoot.childElements().last();
   },
 
   _createInlineEditor: function() {
@@ -107,6 +106,35 @@ Concrete.Editor = Class.create({
         marker.show();
       }
     });
+  },
+
+  _observeEvents: function() {
+    var editor = this;
+    Event.observe(window, 'click', function(event) {
+      editor.handleClick(event);
+    });
+    Event.observe(window, 'keydown', function(event) {
+      editor.handleKeyDown(event);
+    });
+    Event.observe(window, 'mousemove', function(event) {
+      editor.handleMouseEvent(event);
+    });
+    Event.observe(window, 'mouseup', function(event) {
+      editor.handleMouseEvent(event);
+    });
+    Event.observe(window, 'mousedown', function(event) {
+      editor.handleMouseEvent(event);
+    });
+  },
+
+  /**
+   * Sets the dirty state to the given value or to 'dirty'/true if no value is
+   * given.
+   */
+  _setDirtyState: function(state) {
+    this.dirtyState = ( typeof(state) == 'undefined' ) ? true : !!state;
+    var dirtyState = this.dirtyState;
+    this.options.dirtyListeners.forEach(function(l) { l.update(dirtyState); });
   },
 
   _setupSelector: function(selector) {
@@ -133,27 +161,236 @@ Concrete.Editor = Class.create({
     this._hasFocus = true;
   },
 
-  handleEvent: function(event) {
-    var element = event.element();
-    if( event.type == "click" && event.isLeftClick() ) {
-      // check whether the event occurred on an element that is contained by the editor:
-      if( element.ancestors().concat(element).include(this.editorRoot) ) {
-        this._hasFocus = true;
-        this.editorRoot.addClassName("ct_focus");
-      } else {
-        this._hasFocus = false;
-        this.editorRoot.removeClassName("ct_focus");
+  handleKeyDown: function(event) {
+    if( !this._hasFocus ) {
+      return;
+    }
+
+    if( this.inlineEditor.isActive ) {
+      // tab?:
+      if( event.keyCode == 9 ) {
+        this.inlineEditor.finish();
+        this.selector.selectTab( event.shiftKey ? "prev" : "next" );
+        event.stop();
+      }
+      // return?:
+      else if( event.keyCode == 13 ) {
+        this.inlineEditor.finish();
+        event.stop();
+      }
+      // escape?:
+      else if( event.keyCode == 27 ) {
+        this.inlineEditor.cancel();
+        event.stop();
+      }
+
+      return;  // let event take place
+    }
+
+    var ctrlKey = this._ctrlKey(event);
+
+    if( event.keyCode == Event.KEY_LEFT && ctrlKey ) {
+      // Ctrl-Shift-Left?:
+      if( event.shiftKey ) {
+        this.runCommand("collapse_recursive_event");
+      }
+      // Ctrl-Left?:
+      else {
+        this.runCommand("collapse_event");
+      }
+      event.stop();
+    }
+    // Ctrl-(Shift-)Right?:
+    else if( event.keyCode == Event.KEY_RIGHT && ctrlKey ) {
+      // Ctrl-Shift-Right?:
+      if( event.shiftKey ) {
+        this.runCommand("expand_recursive_event");
+      }
+      // Ctrl-Right?:
+      else {
+        this.runCommand("expand_event");
+      }
+      event.stop();
+    }
+    // Alt-Left?:
+    else if( event.keyCode == Event.KEY_LEFT && event.altKey ) {
+      if( this.options.followReferenceSupport ) {
+        this.runCommand("jump_backward_event");
+        event.stop();
       }
     }
+    // Alt-Right?:
+    else if( event.keyCode == Event.KEY_RIGHT && event.altKey)  {
+      if( this.options.followReferenceSupport ) {
+        this.runCommand("jump_forward_event");
+        event.stop();
+      }
+    }
+    // Up?:
+    else if( event.keyCode == Event.KEY_UP ) {
+      this.selector.selectCursor("up", event.shiftKey);
+      event.stop();
+    }
+    // Down?:
+    else if( event.keyCode == Event.KEY_DOWN ) {
+      this.selector.selectCursor("down", event.shiftKey);
+      event.stop();
+    }
+    // Left?:
+    else if( event.keyCode == Event.KEY_LEFT ) {
+      this.selector.selectCursor("left", event.shiftKey);
+      event.stop();
+    }
+    // Right?:
+    else if( event.keyCode == Event.KEY_RIGHT ) {
+      this.selector.selectCursor("right", event.shiftKey);
+      event.stop();
+    }
+    // Tab?:
+    else if( event.keyCode == 9 ) {
+      this.selector.selectTab( event.shiftKey ? "prev" : "next" );
+      event.stop();
+    }
+    // Ctrl-Space?:
+    else if( event.keyCode == 32 && ctrlKey ) {
+      this.runCommand("edit_event");
+      event.stop();
+    }
+    // F2?:
+    else if( event.keyCode == 113 ) {
+      this.runCommand("edit_event");
+      event.stop();
+    }
+    // Delete?:
+    else if( event.keyCode == 46 ) {
+      this.runCommand("delete_event");
+      event.stop();
+    }
+    // Shift-Return?:
+    else if( event.shiftKey && event.keyCode == 13 ) {
+      this.runCommand("show_hidden_event");
+      event.stop();
+    }
+    // Return?:
+    else if( event.keyCode == 13 ) {
+      this.runCommand("insert_event");
+      event.stop();
+    }
+    // Ctrl-A?:
+    else if( event.keyCode == 65 && ctrlKey ) {
+      this.selector.selectDirect(this.modelInterface.rootElements().first(), false);
+      this.selector.selectDirect(this.modelInterface.rootElements().last(), true);
+      event.stop();
+    }
+    // Ctrl-C?:
+    else if( event.keyCode == 67 && ctrlKey ) {
+      this.runCommand("copy_event");
+      event.stop();
+    }
+    // Ctrl-V?:
+    else if( event.keyCode == 86 && ctrlKey ) {
+      this.runCommand("paste_event");
+      event.stop();
+    }
+    // Ctrl-X?:
+    else if( event.keyCode == 88 && ctrlKey ) {
+      this.runCommand("cut_event");
+      event.stop();
+    }
+    else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
+             (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
+      this.runCommand("edit_event");
+    }
+  },
+
+  handleClick: function(event) {
+    if( !event.isLeftClick() ) {
+      return;
+    }
+
+    var element = event.element();
+
+    // check whether the event occurred on an element that is contained by the editor:
+    if( element.ancestors().concat(element).include(this.editorRoot) ) {
+      this._hasFocus = true;
+      this.editorRoot.addClassName("ct_focus");
+    } else {
+      this._hasFocus = false;
+      this.editorRoot.removeClassName("ct_focus");
+    }
+
     if( !this._hasFocus ) return;
 
-    if (event.type == "mousedown") {
+    if( this.inlineEditor.isActive ) {
+      if( !element.up().hasClassName("ct_inline_editor") ) {
+        this.inlineEditor.cancel();
+        this.selector.selectDirect(element);
+      }
+    } else {
+      // clicked fold button?:
+      if( element.hasClassName("ct_fold_button") ) {
+        this.toggleFoldButton(element);
+      }
+      // clicked var handle?:
+      if( element.hasClassName("ct_var_handle") ) {
+        this._handleVariantToggle(event);
+      }
+      // follow reference?:
+      else if( this._ctrlKey(event) ) {
+        this.jumpReference(element);
+      }
+      // start editing?:
+      else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
+        this.runCommand("edit_event");
+       }
+      // change selection?:
+      else {
+        this.selector.selectDirect(element, event.shiftKey);
+        event.stop();
+      }
+    }
+  },
+
+  handleMouseEvent: function(event) {
+    if( !this._hasFocus || this.inlineEditor.isActive ) {
+      return;
+    }
+
+    var element = event.element();
+
+    if( event.type == "mousedown" || event.type == "mousemove" || event.type == "mouseup" ) {
+      // TODO  cleanup disabling of canvas elements
+      if( element.tagName == "CANVAS" ) {
+        if( (function(editor) {
+          var connector = Concrete.Graphics.getConnectorForCanvas(element);
+          var ne;
+          if( connector && (
+              connector.isOnConnector({x: event.clientX, y: event.clientY}) ||
+              connector.isOnDragHandle({x: event.clientX, y: event.clientY}))) {
+            // keep event
+          }
+          else {
+            element.style.display = "none";
+            ne = document.elementFromPoint(event.clientX, event.clientY);
+            event.element = function() {
+              return ne; 
+            };
+            event.topDisabledElement = event.topDisabledElement || element;
+            editor.handleMouseEvent(event);
+            element.style.display = "";
+            return true;
+          }
+        })(this)) {
+          return;
+        }
+      }
+    }
+
+    if( event.type == "mousedown" && event.isLeftClick() ) {
       this._handleDragStart(event);
+      event.stop();
     }
-    if (event.type == "mouseup") {
-      this._handleDragStop(event);
-    }
-    if( event.type == "mousemove" ) {
+    else if( event.type == "mousemove" ) {
       this._handleErrorPopups(event);
       if( this.options.showInfoPopups ) {
         this._handleInfoPopups(event);
@@ -163,172 +400,21 @@ Concrete.Editor = Class.create({
       this._handleCursorStyle(event);
       this._handleDragging(event);
     }
-
-    if( this.inlineEditor.isActive ) {
-      // left mouse click?:
-      if( event.type == "click" && event.isLeftClick() ) {
-        if( !element.up().hasClassName("ct_inline_editor") ) {
-          this.inlineEditor.cancel();
-          this.selector.selectDirect(element);
-        }
-      }
-      // Tab?:
-      else if( event.keyCode == 9 ) {
-        this.inlineEditor.finish();
-        this.selector.selectTab( event.shiftKey ? "prev" : "next" );
-        event.stop();
-      }
-      // Return?:
-      else if( event.keyCode == 13 ) {
-        this.inlineEditor.finish();
-        event.stop();
-      }
-      // Escape?:
-      else if( event.keyCode == 27 ) {
-        this.inlineEditor.cancel();
-        event.stop();
-      }
-    }
-    // inline editor not active:
-    else {
-      var ctrlKey = this._ctrlKey(event);
-      // left mouse click?:
-      if( event.type == "click" && event.isLeftClick() ) {
-        // clicked fold button?:
-        if( element.hasClassName("ct_fold_button") ) {
-          this.toggleFoldButton(element);
-        }
-        if( element.hasClassName("ct_var_handle") ) {
-          this._handleVariantToggle(event);
-        }
-        // follow reference?:
-        else if( ctrlKey ) {
-          this.jumpReference(element);
-        }
-        // ??
-        else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
-          this.runCommand("edit_event");
-        }
-        // ??
-        else {
-          this.selector.selectDirect(element, event.shiftKey);
-          event.stop();
-        }
-      }
-      else if( event.keyCode == Event.KEY_LEFT && ctrlKey ) {
-        // Ctrl-Shift-Left?:
-        if( event.shiftKey ) {
-          this.runCommand("collapse_recursive_event");
-        }
-        // Ctrl-Left?:
-        else {
-          this.runCommand("collapse_event");
-        }
-        event.stop();
-      }
-      // Ctrl-Shift-Right?:
-      else if( event.keyCode == Event.KEY_RIGHT && ctrlKey ) {
-        // Ctrl-Right?:
-        if( event.shiftKey ) {
-          this.runCommand("expand_recursive_event");
-        }
-        // Ctrl-Right?:
-        else {
-          this.runCommand("expand_event");
-        }
-        event.stop();
-      }
-      else if( event.keyCode == Event.KEY_LEFT && event.altKey ) {
-        if( this.options.followReferenceSupport ) {
-          this.runCommand("jump_backward_event");
-          event.stop();
-        }
-      }
-      else if( event.keyCode == Event.KEY_RIGHT && event.altKey)  {
-        if (this.options.followReferenceSupport) {
-          this.runCommand("jump_forward_event");
-          event.stop();
-        }
-      }
-      else if( event.keyCode == Event.KEY_UP ) {
-        this.selector.selectCursor("up", event.shiftKey);
-        event.stop();
-      }
-      else if( event.keyCode == Event.KEY_DOWN ) {
-        this.selector.selectCursor("down", event.shiftKey);
-        event.stop();
-      }
-      else if( event.keyCode == Event.KEY_LEFT ) {
-        this.selector.selectCursor("left", event.shiftKey);
-        event.stop();
-      }
-      else if( event.keyCode == Event.KEY_RIGHT ) {
-        this.selector.selectCursor("right", event.shiftKey);
-        event.stop();
-      }
-      // Tab?:
-      else if( event.keyCode == 9 ) {
-        this.selector.selectTab( event.shiftKey ? "prev" : "next" );
-        event.stop();
-      }
-      // Ctrl-Space?:
-      else if( event.keyCode == 32 && ctrlKey ) {
-        this.runCommand("edit_event");
-        event.stop();
-      }
-      // F2?:
-      else if( event.keyCode == 113 ) {
-        this.runCommand("edit_event");
-        event.stop();
-      }
-      // Delete?:
-      else if( event.keyCode == 46 ) {
-        this.runCommand("delete_event");
-        event.stop();
-      }
-      // Shift-Return?:
-      else if( event.shiftKey && event.keyCode == 13 ) {
-        this.runCommand("show_hidden_event");
-        event.stop();
-      }
-      // Return?:
-      else if( event.keyCode == 13 ) {
-        this.runCommand("insert_event");
-        event.stop();
-      }
-      // Ctrl-A?:
-      else if( event.keyCode == 65 && ctrlKey ) {
-        this.selector.selectDirect(this.modelRoot.childElements().first(), false);
-        this.selector.selectDirect(this.modelRoot.childElements().last(), true);
-        event.stop();
-      }
-      // Ctrl-C?:
-      else if( event.keyCode == 67 && ctrlKey ) {
-        this.runCommand("copy_event");
-        event.stop();
-      }
-      // Ctrl-V?:
-      else if( event.keyCode == 86 && ctrlKey ) {
-        this.runCommand("paste_event");
-        event.stop();
-      }
-      // Ctrl-X?:
-      else if( event.keyCode == 88 && ctrlKey ) {
-        this.runCommand("cut_event");
-        event.stop();
-      }
-      // Ctrl-B?:
-      else if( ctrlKey && event.keyCode == 66 ) {
-        WorkbenchController.showNavigator();
-        event.stop();
-      }
-      else if( (event.keyCode >= 65 && event.keyCode <= 90) ||   // a - z
-               (event.keyCode >= 48 && event.keyCode <= 57) ) {  // 0 - 9
-        this.runCommand("edit_event");
+    else if( event.type == "mouseup" && event.isLeftClick() ) {
+      if( !this._handleDragStop(event) ) {
+        (function(editor) {
+          var connector;
+          if (element.tagName === "CANVAS" && (connector = Concrete.Graphics.getConnectorForCanvas(element))
+            && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
+          }
+        })(this);
       }
     }
   },
 
+  /**
+   * @returns Whether the Ctrl-key (or Cmd on Mac) was pressed.
+   */
   _ctrlKey: function(event) {
     var onMac = ( navigator.userAgent.indexOf('Mac') > -1 );
     return( onMac ? event.metaKey : event.ctrlKey );
@@ -372,6 +458,15 @@ Concrete.Editor = Class.create({
       if( this.showDocumentationPopups && feature.documentation ) {
         this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
       }
+    } else if( element.hasClassName("ct_ref_handle") ) {
+      element = element.up(".ct_reference");
+      feature = element.mmFeature;
+      this._setPopupMessage("feature_name", "info", "Feature: " + feature.name);
+      if( this.showDocumentationPopups && feature.documentation ) {
+        this._setPopupMessage("documentation", "info", "Documentation: " + feature.documentation);
+      }
+      this._setPopupMessage("reference_value", "info", "Reference to: " + 
+        element.findFirstDescendants(["ct_value"], []).collect(function(e) { return e.value; }).join(", "));
     } else {
       if( this.showDocumentationPopups && element.hasClassName("ct_class_name") ) {
         var clazzElt = element.up(".ct_element");
@@ -410,13 +505,20 @@ Concrete.Editor = Class.create({
 
   _handleCursorStyle: function(event) {
     var element = event.element();
+    var connector = Concrete.Graphics.getConnectorForCanvas(element);
     if (this.cursorStyledElement) {
       this.cursorStyledElement.style.cursor = "";
       this.cursorStyledElement = undefined;
     }
     if (element.hasClassName("ct_move_handle")) {
-      element.style.cursor = "move";
-      this.cursorStyledElement = element;
+      // TODO  cleanup disabling of canvas elements
+      (event.topDisabledElement || element).style.cursor = "move";
+      this.cursorStyledElement = (event.topDisabledElement || element);
+    }
+    else if (connector && 
+      connector.isOnDragHandle( { x: event.clientX, y: event.clientY } )) {
+        element.style.cursor = "move";
+        this.cursorStyledElement = element;
     }
     else if (this._isAtResizeHandle(event)) {
       element.style.cursor = "se-resize";
@@ -440,6 +542,7 @@ Concrete.Editor = Class.create({
   _handleDragStart: function(event) {
     var element = event.element();
     var movee;
+    var connector = Concrete.Graphics.getConnectorForCanvas(element);
     if (element.hasClassName("ct_move_handle")) {
       movee = element.hasClassName("ct_element") ? element : element.up(".ct_element");
       this.dragContext = {
@@ -461,26 +564,96 @@ Concrete.Editor = Class.create({
         elementStartHeight: parseInt(element.getStyle("height"), 10)
       };
     }
+    else if (element.hasClassName("ct_ref_handle")) {
+      this.dragContext = {
+        type: "connector",
+        connector: Concrete.Graphics.createConnector(this.editorRoot, element)
+      };
+    }
+    else if (connector && 
+      connector.isOnDragHandle({x: event.clientX, y: event.clientY})) {
+        this.dragContext = {
+          type: "connector",
+          connector: connector
+      };
+    }
   },
 
   _handleDragStop: function(event) {
-    this.dragContext = undefined;
+    var element = event.element();
+    var ctElement = element.findAncestorOrSelf(["ct_element"]); 
+    var dc = this.dragContext;
+    var ref;
+    var firstChild;
+    var sourceValue;
+    if (dc) {
+      if (dc.type === "connector") {
+        if (ctElement && !dc.connector.sourceElement().ancestors().include(ctElement)) {
+          if (dc.connector._connector_source_value) {
+            this.modelInterface.changeValue(
+              dc.connector._connector_source_value, 
+              this.identifierProvider.getIdentifier(ctElement));
+          }
+          else {
+            ref = dc.connector.sourceElement().findAncestorOrSelf(["ct_reference"]);
+            firstChild = ref.slot.childElements().first();
+            if (firstChild && firstChild.hasClassName("ct_empty")) {
+              firstChild.remove();
+            }
+            this.modelInterface.createValue(ref.slot, "bottom", this.identifierProvider.getIdentifier(ctElement));
+            dc.connector.destroy();
+          }
+        }
+        else {
+          sourceValue = dc.connector._connector_source_value;
+          if (sourceValue) {
+            if (sourceValue.siblings().size() === 0) {
+              sourceValue.insert({after: this.templateProvider.emptyValue(sourceValue.feature())});
+            }
+            this.modelInterface.removeValue(sourceValue);
+          }
+          else {
+            dc.connector.destroy();
+          }
+        }
+      }
+      this.dragContext = undefined;
+    }
+    if (this.didDrag) {
+      this.didDrag = false;
+      return true;
+    }
+    else {
+      return false;
+    }
   },
 
   _handleDragging: function(event) {
     var element = event.element();
     var mouseDiffX, mouseDiffY;
     var dc = this.dragContext;
+    var ctElement = element.findAncestorOrSelf(["ct_element"]); 
     if (dc) {
+      this.didDrag = true;
       mouseDiffX = event.clientX - dc.mouseStartX;
       mouseDiffY = event.clientY - dc.mouseStartY;
       if (dc.type === "move") {
         dc.element.style.left = dc.elementStartLeft + mouseDiffX + "px";
         dc.element.style.top = dc.elementStartTop + mouseDiffY + "px";
+        this.connectorManager.repaint();
       }
       else if (dc.type === "resize") {
         dc.element.style.width = dc.elementStartWidth + mouseDiffX + "px";
         dc.element.style.height = dc.elementStartHeight + mouseDiffY + "px";
+        this.connectorManager.repaint();
+      }
+      else if (dc.type === "connector") {
+        if (ctElement && !dc.connector.sourceElement().ancestors().include(ctElement)) {
+          dc.connector.draw(ctElement);
+        }
+        else {
+          dc.connector.draw({x: event.clientX, y: event.clientY});
+        }
       }
     }
   },
@@ -551,10 +724,10 @@ Concrete.Editor = Class.create({
   },
 
   _drawSpline: function(fromX, fromY, toX, toY) {
-	/*
-	 * TODO
-	 * fix the (highlighting/right) canvas on top of the editor and draw from the _from to the _to...
-	 */
+    /*
+     * TODO
+     * fix the (highlighting/right) canvas on top of the editor and draw from the _from to the _to...
+     */
     this.canvas.width = Math.abs(fromX - toX) + 40;
     this.canvas.height = Math.abs(fromY - toY) + 40;
     var offsetX = (fromX < toX ? fromX : toX) - 20;
@@ -596,7 +769,7 @@ Concrete.Editor = Class.create({
     return this.selector.multiSelected.concat(this.selector.selected).uniq();
   },
 
-  // assumption all nodes have the same parent
+  // assumption: all nodes have the same parent
   removeElements: function(nodes) {
     if (nodes.first().siblings().select(function(s){ return s.hasClassName("ct_element"); }).size() == nodes.size()-1) {
       nodes.last().insert({after: this.templateProvider.emptyElement(nodes.last().parentNode, nodes.last().feature())});
@@ -652,7 +825,7 @@ Concrete.Editor = Class.create({
   },
 
   collapseElement: function(n) {
-	var changeDirty = false;
+  var changeDirty = false;
     n.features.each(function(f) {
       if( f.mmFeature.isContainment() ) f.hide();
       changeDirty = true;
@@ -666,12 +839,12 @@ Concrete.Editor = Class.create({
     }
     this.adjustMarker();
     if( changeDirty ) {
-    	this._setDirtyState();
+      this._setDirtyState();
     }
   },
 
   expandElement: function(n) {
-	var changeDirty = false;
+  var changeDirty = false;
     n.features.each(function(f) {
       if( f.mmFeature.isContainment() && !Concrete.Editor.CommandHelper.canAutoHide(f) ) {
         f.show();
@@ -687,7 +860,7 @@ Concrete.Editor = Class.create({
     }
     this.adjustMarker();
     if( changeDirty ) {
-    	this._setDirtyState();
+      this._setDirtyState();
     }
   },
 
@@ -858,7 +1031,7 @@ Concrete.Editor.Commands = [
         options: editor.constraintChecker.attributeOptions(n.mmFeature()),
         onSuccess: function(v) {
           if( n.value != v ) {
-      	    editor._setDirtyState();
+            editor._setDirtyState();
           }
           if (n.hasClassName("ct_empty")) {
             editor.modelInterface.createValue(n, "after", v);

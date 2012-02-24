@@ -8,6 +8,7 @@ Concrete.AbstractIdentifierProvider = Class.create({
 
   initialize: function() {
     this._elementByIdentifier = {};
+    this._identifierChangeListeners = [];
   },
 
   /**
@@ -20,10 +21,23 @@ Concrete.AbstractIdentifierProvider = Class.create({
 
   /**
    * Returns the element associated with +identifier+.
+   * Returns an array if several elements exist with this identifer
    * Returns undefined if there is no element with this identifier.
    */
   getElement: function(identifier) {
     return this._elementByIdentifier[identifier];
+  },
+
+  /**
+   * Add a listener object which must provide the method
+   *
+   *   identifierChanged(element, oldIdent, newIdent)
+   *
+   * if a new identifier is created, oldIdent will be undefined.
+   * if an identifier is removed, newIdent will be undefined
+   */
+  addIdentifierChangeListener: function(listener) {
+    this._identifierChangeListeners.push(listener);
   },
 
   // ModelChangeListener Interface
@@ -32,15 +46,19 @@ Concrete.AbstractIdentifierProvider = Class.create({
     throw new Error("Abstract, override in subclass");
   },
 
-  elementChanged: function(element, feature) {
-    throw new Error("Abstract, override in subclass");
-  },
-
   elementRemoved: function(element) {
     throw new Error("Abstract, override in subclass");
   },
 
-  rootChanged: function(root) {
+  valueAdded: function(element, feature, value) {
+    throw new Error("Abstract, override in subclass");
+  },
+
+  valueRemoved: function(element, feature, value) {
+    throw new Error("Abstract, override in subclass");
+  },
+
+  valueChanged: function(element, feature, value, oldText, newText) {
     throw new Error("Abstract, override in subclass");
   },
 
@@ -53,19 +71,20 @@ Concrete.AbstractIdentifierProvider = Class.create({
   // Private
 
   _changeIdentifier: function(element, identifier) {
-    var identifierChanged = (identifier != element._identifier);
+    var oldIdentifier = element._identifier;
+    var identifierChanged = (identifier != oldIdentifier);
     if (identifierChanged) {
       // old identifier
-      if (element._identifier) {
-        var ebi = this._elementByIdentifier[element._identifier];
+      if (oldIdentifier) {
+        var ebi = this._elementByIdentifier[oldIdentifier];
         if (ebi instanceof Array) {
           var idx = ebi.indexOf(element);
           if (idx >= 0) delete ebi[idx];
           ebi = ebi.compact();
-          this._elementByIdentifier[element._identifier] = (ebi.size() > 1) ? ebi : ebi.first();
+          this._elementByIdentifier[oldIdentifier] = (ebi.size() > 1) ? ebi : ebi.first();
         }
         else {
-          delete this._elementByIdentifier[element._identifier];
+          delete this._elementByIdentifier[oldIdentifier];
         }
       }
       // new identifier
@@ -85,6 +104,9 @@ Concrete.AbstractIdentifierProvider = Class.create({
         }
         element._identifier = identifier;
       }
+      this._identifierChangeListeners.each(function(l) {
+        l.identifierChanged(element, oldIdentifier, identifier);
+      });
     }
   }
 });
@@ -109,15 +131,20 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
     this._updateElement(element);
   },
 
-  elementChanged: function(element, feature) {
-    this._updateElement(element);
-  },
-
   elementRemoved: function(element) {
     this._removeIdentifiers(element);
   },
 
-  rootChanged: function(root) {
+  valueAdded: function(element, feature, value) {
+    this._updateElement(element);
+  },
+
+  valueRemoved: function(element, feature, value) {
+    this._updateElement(element);
+  },
+
+  valueChanged: function(element, feature, value, oldText, newText) {
+    this._updateElement(element);
   },
 
   commitChanges: function() {

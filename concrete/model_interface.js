@@ -93,10 +93,12 @@ Concrete.ModelInterface = Class.create({
   },
 
   addModelChangeListener: function(listener) {
-    if( !listener.elementChanged || !(listener.elementChanged instanceof Function) ||
+    if (!listener.valueChanged || !(listener.valueChanged instanceof Function) ||
+        !listener.valueAdded || !(listener.valueAdded instanceof Function) ||
+        !listener.valueRemoved || !(listener.valueRemoved instanceof Function) ||
         !listener.elementAdded || !(listener.elementAdded instanceof Function) ||
-        !listener.elementRemoved || !(listener.elementRemoved instanceof Function) ) {
-      throw new Error ("incomplete listener interface");
+        !listener.elementRemoved || !(listener.elementRemoved instanceof Function)) {
+        throw new Error ("incomplete listener interface");
     }
     this._modelChangeListeners.push(listener);
   },
@@ -140,12 +142,10 @@ Concrete.ModelInterface = Class.create({
     if( where == "after" ) model = model.reverse();
     model.each(function(e) {
       var inst = this._instantiateTemplateRecursive(e, target, where, options);
-      this._notifyModelChangeListeners("added", inst);
+      this._notifyModelChangeListeners("elementAdded", inst);
     }, this);
     var parent = target.up(".ct_element");
-    var feature = parent && target.up(".ct_containment");
     parent = parent || this.modelRoot;
-    this._notifyModelChangeListeners("changed", parent, feature);
     this._notifyModelChangeListeners("commit");
     if (parent != this.modelRoot) {
       if (parent.foldButton) parent.foldButton.removeClassName("ct_fold_empty");
@@ -161,11 +161,9 @@ Concrete.ModelInterface = Class.create({
     elements.each(function(element) {
       if (!element.hasClassName("ct_element")) throw new Error ("not an element");
       var parent = element.up(".ct_element");
-      var feature = parent && element.up(".ct_containment");
       parent = parent || this.modelRoot;
       element.remove();
-      this._notifyModelChangeListeners("removed", element);
-      this._notifyModelChangeListeners("changed", parent, feature);
+      this._notifyModelChangeListeners("elementRemoved", element);
       if (parent != this.modelRoot) {
         if (parent.foldButton && !this._hasChildElements(parent)) parent.foldButton.addClassName("ct_fold_empty");
       }
@@ -183,17 +181,19 @@ Concrete.ModelInterface = Class.create({
     valueNode.value = text;
     var arg = {}; arg[where] = valueNode;
     target.insert(arg);
-    this._notifyModelChangeListeners("changed", target.up(".ct_element"), feature);
+    this._notifyModelChangeListeners("valueAdded", target.up(".ct_element"), feature, valueNode);
     this._notifyModelChangeListeners("commit");
   },
   
   changeValue: function(value, text) {
+    var oldText;
     if (!value.hasClassName("ct_value")) throw new Error("not a value");
     var feature = value.findAncestor(["ct_attribute", "ct_reference"]);
     text = text.toString();
+    oldText = value.value;
     value.textContent = this._displayValue(text, feature);
     value.value = text;
-    this._notifyModelChangeListeners("changed", value.up(".ct_element"), feature);
+    this._notifyModelChangeListeners("valueChanged", value.up(".ct_element"), feature, value, oldText, text);
     this._notifyModelChangeListeners("commit");
   },
 
@@ -202,7 +202,7 @@ Concrete.ModelInterface = Class.create({
     var element = value.up(".ct_element");
     var feature = value.findAncestor(["ct_attribute", "ct_reference"]);
     value.remove();
-    this._notifyModelChangeListeners("changed", element, feature);
+    this._notifyModelChangeListeners("valueRemoved", element, feature, value);
     this._notifyModelChangeListeners("commit");
   },
 
@@ -359,16 +359,17 @@ Concrete.ModelInterface = Class.create({
       });
   },
 
-  _notifyModelChangeListeners: function(type, element, feature) {
-    if (type == "changed")
-      if (element == this.modelRoot)
-        this._modelChangeListeners.each(function(l) {l.rootChanged(this.modelRoot);}, this);
-      else
-        this._modelChangeListeners.each(function(l) {l.elementChanged(element, feature);});
-    else if (type == "added")
+  _notifyModelChangeListeners: function(type, element, feature, value, oldText, newText) {
+    if (type == "elementAdded")
       this._modelChangeListeners.each(function(l) {l.elementAdded(element);});
-    else if (type == "removed")
+    else if (type == "elementRemoved")
       this._modelChangeListeners.each(function(l) {l.elementRemoved(element);});
+    else if (type == "valueAdded")
+      this._modelChangeListeners.each(function(l) {l.valueAdded(element, feature, value);});
+    else if (type == "valueRemoved")
+      this._modelChangeListeners.each(function(l) {l.valueRemoved(element, feature, value);});
+    else if (type == "valueChanged")
+      this._modelChangeListeners.each(function(l) {l.valueChanged(element, feature, value, oldText, newText);});
     else if (type == "commit")
       this._modelChangeListeners.each(function(l) {l.commitChanges();});
     else
@@ -556,7 +557,7 @@ Concrete.ModelInterface.Helper = {
         if (parentFeature) {
           // go up to parent
           var parentElement = (stack && stack.pop()) || parentFeature.up(".ct_element");
-          fIndex = parentElement.features.indexOf(parentFeature) + 1;  // (don't var fIndex as it already exists...)
+          fIndex = parentElement.features.indexOf(parentFeature) + 1;	// (don't var fIndex as it already exists...)
           element = parentElement;
         }
         else {

@@ -26,8 +26,8 @@
 	        <div class="ct_element ctc_Transition ct_move_handle ct_var2_1 ct_draggable">
         		<span class="ct_handle"></span>
 		        <span class="ct_var_handle"></span>
-    	    	<span class="ct_reference ctn_sourceState"><span class="ct_ref_handle"></span><span class="ct_slot ct_hidden"></span></span>
-        		<span class="ct_reference ctn_targetState"><span class="ct_ref_handle"></span><span class="ct_slot ct_hidden"></span></span>
+    	    	<span class="ct_reference ctn_sourceState"><span class="ct_ref_handle"></span>S:<span class="ct_slot ct_inline"></span></span>
+        		<span class="ct_reference ctn_targetState"><span class="ct_ref_handle"></span>T:<span class="ct_slot ct_inline"></span></span>
 		        <span class="ct_reference ctn_trigger"><span class="ct_feature_name">trigger: </span><span class="ct_slot"></span></span>
 				<div class="ct_containment ctn_condition ct_auto_hide"><span class="ct_feature_name">condition</span>: <div class="ct_slot"></div></div>
     	    </div>
@@ -90,7 +90,8 @@
 				var ip = new Concrete.QualifiedNameBasedIdentifierProvider({nameAttribute: "name", separator: "/", leadingSeparator: true});
 				var cb = new Concrete.Clipboard($("clipboard1"));
 				var ed = new Concrete.Editor($("editor1"), tp, mp, ip, {clipboard: cb, 
-					rootClasses: mp.metaclasses.select(function(c) { return ["Statemachine"].include(c.name)})});
+					rootClasses: mp.metaclasses.select(function(c) { return ["Statemachine"].include(c.name)}),
+          adaptReferences: true});
 
         // only show the last part of reference identifiers
         ed.modelInterface.setDisplayValueProvider(function(text, feature) {
@@ -101,22 +102,6 @@
             return text;
           }
         });
-				
-				Event.observe(window, 'click', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'keydown', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mousemove', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mouseup', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mousedown', function(event) {
-					ed.handleEvent(event);
-				});
 			// ]]>
 		</script>
 	</body>

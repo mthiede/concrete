@@ -50,6 +50,9 @@ Element.addMethods({
    */
   findAncestor: function(e, classes) {
     var parent = e.parentNode;
+    if (!parent || parent.nodeType != 1) {
+      return;
+    }
     if (classes instanceof Array) {
       while (!parent.matchesClasses(classes)) {
         parent = parent.parentNode;

@@ -47,7 +47,10 @@ var Concrete = {
         'external_identifier_provider',
         'constraint_checker',
         'clipboard',
-        'helper'
+        'helper',
+        'reference_manager',
+        'connector_manager',
+        'graphics'
       ].each( function(include) { 
         Concrete.require(path + include + '.js');
       });

@@ -47,18 +47,19 @@ Concrete.ConstraintChecker = Class.create({
   },
 
 
-  // ModelChangeListener interface implementation:
-
   elementAdded: function(element) {
-  },
-
-  elementChanged: function(element, feature) {
   },
 
   elementRemoved: function(element) {
   },
 
-  rootChanged: function(root) {
+  valueAdded: function(element, feature, value) {
+  },
+
+  valueRemoved: function(element, feature, value) {
+  },
+
+  valueChanged: function(element, feature, value, oldText, newText) {
   },
 
   commitChanges: function() {

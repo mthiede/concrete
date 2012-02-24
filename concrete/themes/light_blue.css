@@ -179,9 +179,19 @@
 	position: absolute;
 }
 
+/* (counteract the cascading of position:) */
+.ct_draggable > * {
+	position: relative;
+}
+
 /* Indicates that something should never be visible,
 	e.g. because rendering responsibility is delegated somehow. */
 .ct_hidden {
 	display: none;
+}
+
+/* (required for drawable references) */
+.ct_inline {
+	display: inline;
 }
 

@@ -47,26 +47,26 @@
   position: absolute;
   width: 3px;
   height: 3px;
-  left: 55px;
+  left: 0px;
   top: 9px;
   border: 1px solid black;
 }
 
 .ctc_Transition.ct_var2_2 .ctn_sourceState .ct_ref_handle {
-  left: 0px;
+  left: 55px;
 }
 
 .ctc_Transition .ctn_targetState .ct_ref_handle {
   position: absolute;
   width: 3px;
   height: 3px;
-  left: 0px;
+  left: 55px;
   top: 9px;
   border: 1px solid black;
 }
 
 .ctc_Transition.ct_var2_2 .ctn_targetState .ct_ref_handle {
-  left: 55px;
+  left: 0px;
 }
 
 .ctc_Transition .ct_error .ct_ref_handle {
@@ -89,7 +89,7 @@
   background: url(flip.png) no-repeat;
 }
 
-.ctc_Transition:hover .ct_var_handle {
+.ctc_Transition.ct_selected .ct_var_handle {
   display: block;
 }
 
