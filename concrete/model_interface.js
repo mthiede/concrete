@@ -3,17 +3,22 @@
 // Copyright (c) 2010 Martin Thiede
 //
 // Concrete is freely distributable under the terms of an MIT-style license.
-//
-// The ModelInterface manages the model represented by DOM elements
 
+/**
+ * The ModelInterface manages the model represented by DOM elements
+ * and provides an API on top of it.
+ */ 
+
+
+/*
+ * Add methods to the prototype of the DOM Element.
+ */
 Element.addMethods({
 
-  // speed optimization in case the class is known this will be faster
   feature: function(e, clazz) {
-    if (clazz) {
+    if( clazz ) {
       return e.findAncestor(clazz);
-    }
-    else {
+    } else {
       return e.findAncestor(["ct_attribute", "ct_reference", "ct_containment"]);
     }
   },
@@ -22,6 +27,10 @@ Element.addMethods({
     return e.feature(clazz).mmFeature;
   },
 
+  /*
+   * (currently only used by Concrete.UI.SearchReplaceDialog.findNext and
+   *  Concrete.ModelInterface.Helper.nextElement)
+   */
   featureValues: function(e, feature) {
     if (Object.isString(feature)) {
       if (!e.featuresByName) {
@@ -65,6 +74,7 @@ Element.addMethods({
   }
 });
 
+
 Concrete.ModelInterface = Class.create({
   
   // +modelRoot+ is the DOM element containing the model elements
@@ -77,45 +87,64 @@ Concrete.ModelInterface = Class.create({
     this.modelRoot = modelRoot;
     this.templateProvider = templateProvider;
     this.metamodelProvider = metamodelProvider;
-      options = options || {};
-      this._displayValueProvider = options.displayValueProvider;
+    options = options || {};
+    this._displayValueProvider = options.displayValueProvider;
     this._modelChangeListeners = [];
   },
-  
+
   addModelChangeListener: function(listener) {
     if (!listener.valueChanged || !(listener.valueChanged instanceof Function) ||
         !listener.valueAdded || !(listener.valueAdded instanceof Function) ||
         !listener.valueRemoved || !(listener.valueRemoved instanceof Function) ||
         !listener.elementAdded || !(listener.elementAdded instanceof Function) ||
-        !listener.elementRemoved || !(listener.elementRemoved instanceof Function))
+        !listener.elementRemoved || !(listener.elementRemoved instanceof Function)) {
         throw new Error ("incomplete listener interface");
+    }
     this._modelChangeListeners.push(listener);
   },
 
   setDisplayValueProvider: function(dvp) {
     this._displayValueProvider = dvp;
   },
-  
+
+  /**
+   * @returns The root elements of the model (as DOM objects).
+   */
+  rootElements: function() {
+    return this.modelRoot.childElements();
+  },
+
+  /**
+   * @returns The whole model in abstract syntax.
+   */
+  model: function() {
+    return this.rootElements().collect(function(n) { return this.extractModel(n); }, this);
+  },
+
+  /**
+   * @returns <em>All</em> the elements in the model (as DOM objects).
+   */
   elements: function() {
-    return this.modelRoot.childElements().collect(function(e) {
+    return this.rootElements().collect(function(e) {
       return this._collectElementsRecursive(e);
     }, this).flatten();
   },
 
-  // creates the element or elements described be +model+ before or after the element +target+
-  // or at the bottom of slot +target+
+  /**
+   * Creates the element or elements described by 'model' in the position
+   * indicated by 'where', relative to the 'target' element.
+   */
   createElement: function(target, where, model, options) {
-    if (!(["before", "after", "bottom"].include(where))) throw new Error ("unknown position");
-    if (where == "bottom" && target != this.modelRoot && !target.hasClassName("ct_slot")) throw new Error ("not a slot");
-    if (where != "bottom" && !target.hasClassName("ct_element")) throw new Error ("not an element");
-    if (!(model instanceof Array)) model = [ model ];
-    if (where == "after") model = model.reverse();
+    if( !(["before", "after", "bottom"].include(where)) ) throw new Error ("unknown position");
+    if( where == "bottom" && target != this.modelRoot && !target.hasClassName("ct_slot") ) throw new Error ("not a slot");
+    if( where != "bottom" && !target.hasClassName("ct_element") ) throw new Error ("not an element");
+    if( !(model instanceof Array) ) model = [model];
+    if( where == "after" ) model = model.reverse();
     model.each(function(e) {
       var inst = this._instantiateTemplateRecursive(e, target, where, options);
       this._notifyModelChangeListeners("elementAdded", inst);
     }, this);
     var parent = target.up(".ct_element");
-    var feature = parent && target.up(".ct_containment");
     parent = parent || this.modelRoot;
     this._notifyModelChangeListeners("commit");
     if (parent != this.modelRoot) {
@@ -132,7 +161,6 @@ Concrete.ModelInterface = Class.create({
     elements.each(function(element) {
       if (!element.hasClassName("ct_element")) throw new Error ("not an element");
       var parent = element.up(".ct_element");
-      var feature = parent && element.up(".ct_containment");
       parent = parent || this.modelRoot;
       element.remove();
       this._notifyModelChangeListeners("elementRemoved", element);
@@ -177,14 +205,18 @@ Concrete.ModelInterface = Class.create({
     this._notifyModelChangeListeners("valueRemoved", element, feature, value);
     this._notifyModelChangeListeners("commit");
   },
-  
+
+  /**
+   * Extracts the (sub) model in its abstract syntax from the given model (DOM) element,
+   * recursively.
+   */
   extractModel: function(element) {
-    var result = {_class: element.mmClass.name};
+    var result = { _class: element.mmClass.name };
     if( element.foldButton ) {
       result["_view"] = result["_view"] || {};
       result["_view"]["collapsed"] = element.foldButton.hasClassName("ct_fold_closed");
     }
-    if( element.style.position === "absolute" ) {
+    if( element.hasClassName("ct_draggable") ) {
       result["_view"] = result["_view"] || {};
       result["_view"]["position"] = { left: element.style.left, top: element.style.top};
     }
@@ -193,78 +225,134 @@ Concrete.ModelInterface = Class.create({
       result["_view"]["variant"] = element.variantInfo().current;
     }
     element.features.each(function(f) {
-      var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
-      if (f.slot.hasClassName("ct_resizable")) {
+      // all non-empty feature values:
+      var children = f.slot.childElements().reject( function(v) { return v.hasClassName("ct_empty"); } );
+
+      // assign a container size to the extracted model element if the feature's slot is resizable:
+      if( f.slot.hasClassName("ct_resizable") ) {
         result["_view"] = result["_view"] || {};
         result["_view"]["container-size"] = result["_view"]["container-size"] || {};
         result["_view"]["container-size"][f.mmFeature.name] = { width: f.slot.style.width, height: f.slot.style.height };
       }
-      if (children.size() > 0) {
+      // TODO  now the feature's slot influences the _view info on its containing element: desirable?
+
+      if( children.size() > 0 ) {
         var converted = [];
-        if (f.mmFeature.isContainment()) {
-          converted = children.collect(function(v){return this.extractModel(v); }, this);
+        var feature = f.mmFeature;
+        if( feature.isContainment() ) {
+          converted = children.collect(function(v) { return this.extractModel(v); }, this);    // this == Concrete.ModelInterface
         }
-        else if (f.mmFeature.isReference()) {
-          converted = children.collect(function(v){return v.value; }, this);
-        }
-        else {
-          converted = children.collect(function(v){
-            if (f.mmFeature.type.isInteger()) {
-              return parseInt(v.value);
-            }
-            else if (f.mmFeature.type.isFloat()) {
-              return parseFloat(v.value);
-            }
-            else if (f.mmFeature.type.isBoolean()) {
+        else if( feature.isReference() ) {
+          converted = children.collect(function(v) { return v.value; }, this);    // this == Concrete.ModelInterface
+        } else {  // feature.isAttribute():
+          var type = feature.type;
+          converted = children.collect(function(v) {
+            if( type.isInteger() ) {
+              return parseInt(v.value, 10);
+            } else if( type.isFloat() ) {
+              return parseFloat(v.value);	// TODO  preserve trailing/precision zeroes
+            } else if( type.isBoolean() ) {
               return v.value == "true";
-            }
-            else {
+            } else {  // type.isString():
               return v.value; 
             }
           });
         }
-        if (children.size() == 1) {
-          result[f.mmFeature.name] = converted.first();
-        }
-        else {
-          result[f.mmFeature.name] = converted;
+        if( children.size() == 1 ) {
+          result[feature.name] = converted.first();
+        } else {
+          result[feature.name] = converted;
         }
       }
-    }, this);
+    }, this);  // this == Concrete.ModelInterface
     return result;
   },
 
-  // if no +element+ is provided redrawing will start on model root
+  /**
+   * Traverses the (sub) model hanging off the given model element, executing
+   * various functions for element themselves, as well as its references and
+   * attributes.
+   * 
+   * @param element
+   * @param actions,
+   *            may have the following properties which should be functions
+   *            taking a value object of the indicated type and its meta type:
+   *              element, reference, attribute
+   *            (containment is handled through the recursion)
+   */
+  traverse: function(element, actions) {
+//  (function _traverse(element, actions) {
+//    
+//  })(element, actions);
+    // TODO  remove reliance on passing of this to .each by using pattern above
+    element.features.each(function(f) {
+      // all non-empty feature values:
+      var children = f.slot.childElements().reject( function(v) { return v.hasClassName("ct_empty"); } );
+      if( children.size() == 0 ) return;
+
+      var feature = f.mmFeature;
+      if( feature.isContainment() ) {
+        children.each(function(v) { this.traverse(v, actions); }, this);  // this == Concrete.ModelInterface
+      } else if( feature.isReference() ) {
+        if( actions.reference ) {
+          children.each(function(v) { actions.reference.call(v, feature); });
+        }
+      } else if( feature.isAttribute() ) {
+        if( actions.attribute ) {
+          children.each(function(v) { actions.attribute.call(v, feature); });
+        }
+      }
+    }, this);    // this == Concrete.ModelInterface
+    if( actions.element ) {
+      actions.element.call(element, element.mmClass);
+    }
+  },
+
+  /**
+   * @returns All incoming references as an Array of a pair { element: ..., feature: ... }.
+   */
+  incomingReferences: function(element) {
+    var references = [];
+    var actions = {
+    	reference: function(reference) {
+			// FIXME  need more intrinsic way of checking equality (not that this should be temporary coding awaiting the ReferenceManager anyway)
+    		if( this.value == element._identifier ) {
+    			references.push( { element: this, feature: reference } );
+    		}
+    	}
+    };
+    this.rootElements().each( function(n) { this.traverse(n, actions); }, this);
+    return references;
+  },
+
+  /**
+   * Redraws the displayed values in the sub model hanging off the given element.
+   * If no element is provided, redrawing will be done on the whole model.
+   */
   redrawDisplayValues: function(element) {
-    if (!this._displayValueProvider) return; 
-    if (element == undefined) {
-      this.modelRoot.childElements().each(function(c) {
+    if( !this._displayValueProvider ) return; 
+    if( element == undefined ) {
+      this.rootElements().each(function(c) {
         this.redrawDisplayValues(c);
       }, this);
-    }
-    else {
+    } else {
       element.features.each(function(f) {
-        var children = f.slot.childElements().reject(function(v){return v.hasClassName("ct_empty"); });
-        if (children.size() > 0) {
-          if (f.mmFeature.isContainment()) {
-            children.each(function(c) {
-              this.redrawDisplayValues(c);
-            }, this);
-          }
-          else {
-            children.each(function(c) {
-              c.textContent = this._displayValue(c.value, f);
-            }, this);
-          }
+        var children = f.slot.childElements().reject( function(v) { return v.hasClassName("ct_empty"); } );
+        if( children.size() == 0 ) return;
+        if( f.mmFeature.isContainment() ) {
+          children.each(function(c) { this.redrawDisplayValues(c); }, this);
+        } else {
+          children.each(function(c) { c.textContent = this._displayValue(c.value, f); }, this);
         }
       }, this);
     }
   },
-  
-  // Private
+
+
+  // -- private functions --
 
   _hasChildElements: function(element) {
-    return element.features.any(function(f) { 
+    return element.features.any(function(f) {
         return f.mmFeature.isContainment() && f.slot.childElements().any(function(c) { 
           return !c.hasClassName("ct_empty");
         });
@@ -287,11 +375,15 @@ Concrete.ModelInterface = Class.create({
     else
       throw new Error("unknown type");
   },
-  
+
+  /**
+   * Collects all elements in the sub model hanging off the given element
+   * (including itself) in a flat list.
+   */
   _collectElementsRecursive: function(element) {
     var result = [element];
     element.features.each(function(f) {
-      if (f.mmFeature.isContainment()) {
+      if( f.mmFeature.isContainment() ) {
         result = result.concat(f.slot.childElements().collect(function(c) {
           return this._collectElementsRecursive(c);
         }, this).flatten());
@@ -299,10 +391,13 @@ Concrete.ModelInterface = Class.create({
     }, this);
     return result;
   },
-  
-  // inserts a instance of the template representing element into slot
-  // also inserts template instances for all contained elements
-  // this function is optimized to minimize model load time
+
+  /**
+   * Inserts a instance of the template representing element into slot.
+   * Also inserts template instances for all contained elements.
+   * <p>
+   * This function is optimized to minimize model load time.
+   */
   _instantiateTemplateRecursive: function(element, target, where, options) {
     options = options || {};
     var clazz = this.metamodelProvider.metaclassesByName[element._class];
@@ -333,7 +428,7 @@ Concrete.ModelInterface = Class.create({
     inst.features = [];
     var children = inst.allChildren();
     var hasChildElements = false;
-    for (var i=0; i<tmpl.featurePositions.length; i++) {
+    for( var i = 0; i < tmpl.featurePositions.length; i++ ) {
       var mmf = tmpl.mmFeatures[i];
       var f = children[tmpl.featurePositions[i]];
       inst.features.push(f);
@@ -341,7 +436,7 @@ Concrete.ModelInterface = Class.create({
       if (!(values instanceof Array)) values = [ values ].compact();
       f.mmFeature = mmf;
       var slot = children[tmpl.slotPositions[i]];
-      f.slot = slot;
+      f.slot = slot;  // creates a new property 'slot' on the feature's DOM object
       if (values.size() > 0) {
         if (mmf.isContainment()) {
           if (options.collapse) f.hide();
@@ -380,10 +475,10 @@ Concrete.ModelInterface = Class.create({
       if (!hasChildElements) inst.foldButton.addClassName("ct_fold_empty");
       // collapse if that info is saved with the model:
       if( element._view && element._view.collapsed ) {
-    	  this.collapseElement(inst);
+        this.collapseElement(inst);
       }
     }
-    if (element._view && element._view.position && inst.style.position === "absolute") {
+    if( element._view && element._view.position && inst.hasClassName("ct_draggable") ) {
       inst.style.left = element._view.position.left;
       inst.style.top = element._view.position.top;
     }
@@ -412,7 +507,7 @@ Concrete.ModelInterface = Class.create({
       return text;
     }
   },
-    
+
   // add information used to make template instantiation more efficient 
   _addTemplateInfo: function(tmpl) {
     var allChilds = tmpl.allChildren();

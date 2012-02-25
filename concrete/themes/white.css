@@ -17,8 +17,6 @@
 
 /* text input element */
 .ct_inline_editor input {
-	font-family: "courier new";
-	font-size: 12;
 	color: #000;
 	background-color: transparent;
 	border: 0;
@@ -165,5 +163,33 @@
 /* source when within target */
 .ct_ref_target .ct_ref_source {
 	color: #FFF;
+}
+
+/* Resizing & dragging
+ *****************************************************************************/
+
+.ct_resizable {
+  background: url("resize.png") bottom right no-repeat;
+}
+
+.ct_draggable {
+	display: inline-block;
+	position: absolute;
+}
+
+/* (counteract the cascading of position:) */
+.ct_draggable > * {
+	position: relative;
+}
+
+/* Indicates that something should never be visible,
+	e.g. because rendering responsibility is delegated somehow. */
+.ct_hidden {
+	display: none;
+}
+
+/* (required for drawable references) */
+.ct_inline {
+	display: inline;
 }
 

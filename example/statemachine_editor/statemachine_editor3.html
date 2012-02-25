@@ -11,37 +11,37 @@
 	<body>
 		<div id="templates1" style="display: none" >
 			<div class="ct_element ctc_Statemachine">
-        <div><span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+		        <div><span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
 				<div class="ct_containment ctn_triggers"><span class="ct_feature_name">triggers:</span> <div class="ct_slot"></div></div>
 				<div class="ct_containment ctn_variables"><span class="ct_feature_name">variables:</span> <div class="ct_slot"></div></div>
-				<div class="ct_containment ctn_chartElements"><div class="ct_slot ct_resizable" style="position: relative; padding: 10px"></div></div>
-			</div>	
-			<div class="ct_element ctc_SimpleState" style="display: inline-block; position: absolute;">
-				<div class="ct_move_handle" style="text-align: center; padding: 5px"><span class="ct_fold_button"></span> <span class="ct_handle">SimpleState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
-			</div>	
-			<div class="ct_element ctc_CompositeState" style="display: inline-block; position: absolute;">
-				<div class="ct_move_handle" style="text-align: center; padding: 5px"><span class="ct_fold_button"></span> <span class="ct_handle">CompositeState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
-				<div class="ct_containment ctn_chartElements" style="border-top: 1px solid black; padding: 5px"><div class="ct_slot ct_resizable" style="position: relative; padding: 10px"></div></div>
-			</div>	
-      <div class="ct_element ctc_Transition ct_move_handle ct_var2_1" style="display: inline-block; position: absolute">
-        <span class="ct_handle"></span>
-        <span class="ct_var_handle"></span>
-        <span class="ct_reference ctn_sourceState"><span class="ct_ref_handle"></span>S:<span class="ct_slot" style="display: inline"></span></span>
-        <span class="ct_reference ctn_targetState"><span class="ct_ref_handle"></span>T:<span class="ct_slot" style="display: inline"></span></span>
-        <span class="ct_reference ctn_trigger"><span class="ct_feature_name">trigger: </span><span class="ct_slot"></span></span>
+				<div class="ct_containment ctn_chartElements"><div class="ct_slot ct_resizable cs_diagramBox"></div></div>
+			</div>
+			<div class="ct_element ctc_SimpleState ct_draggable">
+				<div class="ct_move_handle cs_centeredTextWithPadding"><span class="ct_fold_button"></span> <span class="ct_handle">SimpleState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+			</div>
+			<div class="ct_element ctc_CompositeState ct_draggable">
+				<div class="ct_move_handle cs_centeredTextWithPadding"><span class="ct_fold_button"></span> <span class="ct_handle">CompositeState</span> <span class="ct_attribute ct_identifier_attribute ctn_name"><span class="ct_slot"></span></span></div>
+				<div class="ct_containment ctn_chartElements cs_boxed"><div class="ct_slot ct_resizable cs_diagramBox"></div></div>
+			</div>
+	        <div class="ct_element ctc_Transition ct_move_handle ct_var2_1 ct_draggable">
+        		<span class="ct_handle"></span>
+		        <span class="ct_var_handle"></span>
+    	    	<span class="ct_reference ctn_sourceState"><span class="ct_ref_handle"></span>S:<span class="ct_slot ct_inline"></span></span>
+        		<span class="ct_reference ctn_targetState"><span class="ct_ref_handle"></span>T:<span class="ct_slot ct_inline"></span></span>
+		        <span class="ct_reference ctn_trigger"><span class="ct_feature_name">trigger: </span><span class="ct_slot"></span></span>
 				<div class="ct_containment ctn_condition ct_auto_hide"><span class="ct_feature_name">condition</span>: <div class="ct_slot"></div></div>
-      </div>
-			<span class="ct_element ctc_AndExpression" style="">
-				(<span class="ct_containment ctn_expr1" style="padding: 0px"><span class="ct_slot" style="padding: 0px"></span></span><span class="ct_handle">&&</span><span class="ct_containment ctn_expr2" style="padding: 0px"><span class="ct_slot"></span></span>)
+    	    </div>
+			<span class="ct_element ctc_AndExpression">
+				(<span class="ct_containment ctn_expr1 cs_noPadding"><span class="ct_slot cs_noPadding"></span></span><span class="ct_handle">&&</span><span class="ct_containment ctn_expr2 cs_noPadding"><span class="ct_slot"></span></span>)
 			</span>	
-			<span class="ct_element ctc_OrExpression" style="">
-				(<span class="ct_containment ctn_expr1" style="padding: 0px"><span class="ct_slot"></span></span><span class="ct_handle">||</span><span class="ct_containment ctn_expr2" style="padding: 0px"><span class="ct_slot"></span></span>)
+			<span class="ct_element ctc_OrExpression">
+				(<span class="ct_containment ctn_expr1 cs_noPadding"><span class="ct_slot"></span></span><span class="ct_handle">||</span><span class="ct_containment ctn_expr2 cs_noPadding"><span class="ct_slot"></span></span>)
 			</span>	
-			<span class="ct_element ctc_NotExpression" style="">
-				<span class="ct_handle">!</span><span class="ct_containment ctn_expr" style="padding: 0px"><span class="ct_slot"></span></span>
+			<span class="ct_element ctc_NotExpression">
+				<span class="ct_handle">!</span><span class="ct_containment ctn_expr cs_noPadding"><span class="ct_slot"></span></span>
 			</span>	
-			<span class="ct_element ctc_VarRef" style="">
-				<span class="ct_handle">var</span>(<span class="ct_reference ctn_variable" style="padding: 0px"><span class="ct_slot"></span></span>)
+			<span class="ct_element ctc_VarRef">
+				<span class="ct_handle">var</span>(<span class="ct_reference ctn_variable cs_noPadding"><span class="ct_slot"></span></span>)
 			</span>	
 		</div>
 		<div id="metamodel1" style="display: none" >
@@ -102,22 +102,6 @@
             return text;
           }
         });
-				
-				Event.observe(window, 'click', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'keydown', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mousemove', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mouseup', function(event) {
-					ed.handleEvent(event);
-				});
-				Event.observe(window, 'mousedown', function(event) {
-					ed.handleEvent(event);
-				});
 			// ]]>
 		</script>
 	</body>

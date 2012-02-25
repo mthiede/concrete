@@ -135,10 +135,9 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
   };
 
   // set the reference target of value
-  // removes the value from the set of unresolved refrences if preset
+  // removes the value from the set of unresolved references if preset
   // may also be called to change the reference target
   var setRefTarget = function(value, target) {
-    var idx;
     if (value._target !== target) {
       if (value._target) {
         unsetRefTarget(value);
@@ -207,10 +206,10 @@ Concrete.createReferenceManager = function(modelInterface, identifierProvider, o
     });
   };
   
-  var unresolvedRefs = [];
+  var unresolvedRefs = [];  // (is read, IDE just doesn't pick it up)
   var referenceChangeListeners = [];
 
-  var optionAdaptRefs = (options.adaptReferences === true);
+  var optionAdaptRefs = (options.adaptReferences === true);  // (is read, IDE just doesn't pick it up)
 
   modelInterface.addModelChangeListener({
     elementAdded: elementAdded,

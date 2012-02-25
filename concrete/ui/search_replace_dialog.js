@@ -102,7 +102,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     this._setStatus("Searching...");
     this._defer(function() {
       if (this._selectNextMatch(className, featureName, searchPattern)) {
-        this._setStatus("Found next occurance");
+        this._setStatus("Found next occurrence");
       }
       else {
         this._setStatus("Pattern not found");
@@ -115,7 +115,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
       this._setStatus("Replacing...");
       this._defer(function() {
         if (this._replaceMatch(this.lastNodeFound, searchPattern, replaceText)) {
-          this._setStatus("Replaced 1 occurance");
+          this._setStatus("Replaced 1 occurrence");
         }
         else {
           this._setStatus("Nothing replaced");
@@ -131,7 +131,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     this._setStatus("Replacing...");
     this._defer(function() {
       var numReplaced = this._replaceAll(className, featureName, searchPattern, replaceText);
-      this._setStatus("Replaced "+numReplaced+" occurances");
+      this._setStatus("Replaced "+numReplaced+" occurrences");
     });
   },
 

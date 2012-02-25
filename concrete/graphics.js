@@ -36,36 +36,24 @@ Concrete.Graphics = {
     var elementBoxClipPoint = function(element, innerPoint, outerPoint) {
       var clipHX, clipHY;
       var clipVX, clipVY;
-      var clipPointH, clipPointV;
-      if (outerPoint.x < innerPoint.x) {
-        clipHX = element.left();
-      }
-      else {
-        clipHX = element.right();
-      }
-      if (Math.abs(clipHX - innerPoint.x) < Math.abs(innerPoint.x - outerPoint.x)) {
+      var clipPointH = null, clipPointV = null;
+      clipHX = ( outerPoint.x < innerPoint.x ) ? element.left() : element.right();
+      if( Math.abs(clipHX - innerPoint.x) < Math.abs(innerPoint.x - outerPoint.x) ) {
         clipHY = outerPoint.y + ((innerPoint.y - outerPoint.y) * Math.abs(clipHX - outerPoint.x) / Math.abs(innerPoint.x - outerPoint.x));
-        clipPointH = {x: clipHX, y: clipHY};
+        clipPointH = { x: clipHX, y: clipHY };
       }
-      if (outerPoint.y < innerPoint.y) {
-        clipVY = element.top();
-      }
-      else {
-        clipVY = element.bottom();
-      }
-      if (Math.abs(clipVY - innerPoint.y) < Math.abs(innerPoint.y - outerPoint.y)) {
+      clipVY = ( outerPoint.y < innerPoint.y ) ? element.top() : element.bottom();
+      if( Math.abs(clipVY - innerPoint.y) < Math.abs(innerPoint.y - outerPoint.y) ) {
         clipVX = outerPoint.x + ((innerPoint.x - outerPoint.x) * Math.abs(clipVY - outerPoint.y) / Math.abs(innerPoint.y - outerPoint.y));
-        clipPointV = {x: clipVX, y: clipVY};
+        clipPointV = { x: clipVX, y: clipVY };
       }
-      if (clipPointH && clipPointV) {
-        if (lineLength(outerPoint, clipPointH) > lineLength(outerPoint, clipPointV)) {
+      if( clipPointH && clipPointV ) {
+        if( lineLength(outerPoint, clipPointH) > lineLength(outerPoint, clipPointV) ) {
           return clipPointH;
-        }
-        else {
+        } else {
           return clipPointV;
         }
-      }
-      else {
+      } else {
         return clipPointH || clipPointV; 
       }
     };
@@ -104,10 +92,10 @@ Concrete.Graphics = {
       return elementBoxClipPoint(sourceElement, centerPoint(sourceElement), centerPoint(targetElement));
     };
     var endPoint = function() {
-      return elementBoxClipPoint(targetElement, centerPoint(targetElement), centerPoint(sourceElement))
+      return elementBoxClipPoint(targetElement, centerPoint(targetElement), centerPoint(sourceElement));
     };
 
-    var canvas;
+    var canvas = null;
     var isSelected = false;
 
     var connector = {
@@ -145,7 +133,7 @@ Concrete.Graphics = {
         targetElement = target;
       },
       destroy: function() {
-        canvas.parentNode.removeChild(canvas);
+        canvas.parentNode.removeChild(canvas);	// (always initialized to non-null by code below)
       },
       sourceElement: function() {
         return sourceElement;
