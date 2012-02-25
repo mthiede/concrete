@@ -318,19 +318,10 @@ Concrete.Editor = Class.create({
       this._hasFocus = false;
       this.editorRoot.removeClassName("ct_focus");
     }
-
-    if( !this._hasFocus ) return;
-
-    if( this.inlineEditor.isActive ) {
-      if( !element.up().hasClassName("ct_inline_editor") ) {
-        this.inlineEditor.cancel();
-        this.selector.selectDirect(element);
-      }
-    }
   },
 
   handleMouseEvent: function(event) {
-    if( !this._hasFocus || this.inlineEditor.isActive ) {
+    if( !this._hasFocus ) {
       return;
     }
 
@@ -361,6 +352,16 @@ Concrete.Editor = Class.create({
         })(this)) {
           return;
         }
+      }
+    }
+
+    if( this.inlineEditor.isActive) {
+      if( event.type == "mouseup" && !element.up().hasClassName("ct_inline_editor") ) {
+        this.inlineEditor.cancel();
+        this.selector.selectDirect(element);
+      }
+      if( event.type == "mouseup" || event.type == "mousedown" ) {
+        return;
       }
     }
 
