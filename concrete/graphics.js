@@ -66,8 +66,8 @@ Concrete.Graphics = {
         var offsetY = (p1.y < p2.y ? p1.y : p2.y) - 20;
         canvas.width = Math.abs(p1.x - p2.x) + 40;
         canvas.height = Math.abs(p1.y - p2.y) + 40;
-        canvas.style.left = offsetX;
-        canvas.style.top = offsetY;
+        canvas.style.left = offsetX - offsetParentOffset.left;
+        canvas.style.top = offsetY - offsetParentOffset.top;
         ctx.clearRect(0, 0, canvas.width-1, canvas.height-1);
         ctx.translate(-offsetX, -offsetY);
         ctx.beginPath();  
@@ -97,6 +97,7 @@ Concrete.Graphics = {
 
     var canvas = null;
     var isSelected = false;
+    var offsetParentOffset;
 
     var connector = {
       draw: function(target) {
@@ -151,6 +152,7 @@ Concrete.Graphics = {
     canvas.style.display = "none";
     canvasContainer.appendChild(canvas);
     canvas._concrete_connector = connector;
+    offsetParentOffset = canvas.getOffsetParent().cumulativeOffset();
 
     return connector;
   }
