@@ -326,28 +326,6 @@ Concrete.Editor = Class.create({
         this.inlineEditor.cancel();
         this.selector.selectDirect(element);
       }
-    } else {
-      // clicked fold button?:
-      if( element.hasClassName("ct_fold_button") ) {
-        this.toggleFoldButton(element);
-      }
-      // clicked var handle?:
-      if( element.hasClassName("ct_var_handle") ) {
-        this._handleVariantToggle(event);
-      }
-      // follow reference?:
-      else if( this._ctrlKey(event) ) {
-        this.jumpReference(element);
-      }
-      // start editing?:
-      else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
-        this.runCommand("edit_event");
-       }
-      // change selection?:
-      else {
-        this.selector.selectDirect(element, event.shiftKey);
-        event.stop();
-      }
     }
   },
 
@@ -408,6 +386,27 @@ Concrete.Editor = Class.create({
             && connector.isOnConnector({x: event.clientX, y: event.clientY})) {
           }
         })(this);
+        // clicked fold button?:
+        if( element.hasClassName("ct_fold_button") ) {
+          this.toggleFoldButton(element);
+        }
+        // clicked var handle?:
+        if( element.hasClassName("ct_var_handle") ) {
+          this._handleVariantToggle(event);
+        }
+        // follow reference?:
+        else if( this._ctrlKey(event) ) {
+          this.jumpReference(element);
+        }
+        // start editing?:
+        else if( this.selector.selected == this.selector.surroundingSelectable(element) ) {
+          this.runCommand("edit_event");
+         }
+        // change selection?:
+        else {
+          this.selector.selectDirect(element, event.shiftKey);
+          event.stop();
+        }
       }
     }
   },
