@@ -133,7 +133,6 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
 
   _updateQNames: function(element, qnamePrefix) {
     var nameAttribute = element.features.find(function(f) { return f.mmFeature.name == this.options.nameAttribute; }, this);
-    debugger;
     var nameValue = nameAttribute && nameAttribute._slot.childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).first();
     var name = nameValue && nameValue.value;
     var qname = null;
