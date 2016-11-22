@@ -133,7 +133,7 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
 
   _updateQNames: function(element, qnamePrefix) {
     var nameAttribute = element.features.find(function(f) { return f.mmFeature.name == this.options.nameAttribute; }, this);
-    var nameValue = nameAttribute && nameAttribute.slot.childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).first();
+    var nameValue = nameAttribute && nameAttribute._slot.childElements().select(function(e) { return !e.hasClassName("ct_empty"); }).first();
     var name = nameValue && nameValue.value;
     var qname = null;
     if (name) {
@@ -151,7 +151,7 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
     }
     element.features.each(function(f) {
       if (f.mmFeature.isContainment()) {
-        f.slot.childElements().each(function(e) {
+        f._slot.childElements().each(function(e) {
           this._updateQNames(e, qname);
         }, this);
       }
@@ -162,7 +162,7 @@ Concrete.QualifiedNameBasedIdentifierProvider = Class.create(Concrete.AbstractId
     this._changeIdentifier(element, undefined);
     element.features.each(function(f) {
       if (f.mmFeature.isContainment()) {
-        f.slot.childElements().each(function(e) {
+        f._slot.childElements().each(function(e) {
           this._removeIdentifiers(e);
         }, this);
       }

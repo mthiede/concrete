@@ -178,7 +178,7 @@ Concrete.ConstraintChecker = Class.create({
   _checkFeature: function(element, feature) {
     var problems = [];
     var mmf = feature.mmFeature;
-    var children = feature.slot.childElements().select(function(c) { return !c.hasClassName("ct_empty"); });
+    var children = feature._slot.childElements().select(function(c) { return !c.hasClassName("ct_empty"); });
     var featureConstraints = this._featureConstraints(element, feature);
     if (mmf.upperLimit > -1 && children.size() > mmf.upperLimit) {
       if (mmf.upperLimit == 1) {

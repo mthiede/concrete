@@ -149,7 +149,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     if (!startLoc) return false;
     var nextLoc = this.findNext(startLoc[0], startLoc[1], startLoc[2], className, featureName, searchPattern);
     if (nextLoc) {
-      var node = nextLoc[0].features[nextLoc[1]].slot.childElements()[nextLoc[2]];
+      var node = nextLoc[0].features[nextLoc[1]]._slot.childElements()[nextLoc[2]];
       this.editor.expandParentElements(node);
       if (node.ancestors().any(function(a) {return !a.visible();})) {
         this.editor.showHiddenFeatures(node.up(".ct_element"));
@@ -176,7 +176,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     }
     var numReplaced = 0;
     matches.each(function(match) {
-      var node = match[0].features[match[1]].slot.childElements()[match[2]];
+      var node = match[0].features[match[1]]._slot.childElements()[match[2]];
       if (this._replaceMatch(node, searchPattern, replaceText)) {
         numReplaced++;
       }
@@ -252,7 +252,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
           // go up to parent
           var parentElement = containmentStack.pop() || parentFeature.up(".ct_element");
           fIndex = parentElement.features.indexOf(parentFeature);
-          vIndex = parentFeature.slot.childElements().indexOf(element);
+          vIndex = parentFeature._slot.childElements().indexOf(element);
           element = parentElement;
         }
         else if (element.next()) {
@@ -298,7 +298,7 @@ Concrete.UI.SearchReplaceDialog = Class.create(Concrete.UI.AbstractDialog, {
     else {
       var feature = node.findAncestor(["ct_containment", "ct_reference", "ct_attribute"]);
       var element = feature.up(".ct_element");
-      return [element, element.features.indexOf(feature), feature.slot.childElements().indexOf(node)];
+      return [element, element.features.indexOf(feature), feature._slot.childElements().indexOf(node)];
     }
   },
 
